@@ -56,7 +56,10 @@ services:
       CACHE_ENABLED: "true"
       CACHE_STORE: memory
       CORS_ENABLED: "true"
-      CORS_ORIGIN: "https://isetag-univ.net,https://www.isetag-univ.net"
+      # TEMP: localhost:4200/4201 added for Djo's local Angular dev against prod
+      # content while cms.isetag-univ.net DNS isn't set up yet — remove once
+      # Nginx/TLS is the real ingress and direct :8055 access is retired.
+      CORS_ORIGIN: "https://isetag-univ.net,https://www.isetag-univ.net,http://localhost:4200,http://localhost:4201"
       EMAIL_TRANSPORT: smtp
       EMAIL_SMTP_HOST: ${SMTP_HOST}
       EMAIL_SMTP_PORT: ${SMTP_PORT}
@@ -70,6 +73,10 @@ services:
       - ../../cms/uploads:/directus/uploads
       - ../../cms/extensions:/directus/extensions
       - ../../cms/snapshots:/directus/snapshots
+    # TEMP: direct port exposure for Djo's local frontend dev, firewalled to his
+    # IP only (see ufw rule on the VPS) — remove once Nginx/TLS is the real ingress.
+    ports:
+      - "8055:8055"
     networks:
       - internal
       - isetag_edge
