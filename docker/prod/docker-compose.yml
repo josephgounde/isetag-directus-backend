@@ -1,0 +1,120 @@
+# Stack de production. Tourne aux côtés de docker/staging sur le même VPS unique
+# (voir proposition technique signée : un seul "Hébergement Web Premium (Cloud/VPS)").
+#
+# Nginx vit ici (et non dans staging) car un seul processus peut tenir les ports 80/443
+# de l'hôte. Il rejoint le réseau externe "isetag_edge" pour proxyfier aussi bien les
+# conteneurs prod que staging par leur container_name.
+#
+# Préparation (une seule fois sur le VPS) :
+#   docker network create isetag_edge
+#   mkdir -p /etc/letsencrypt cms/uploads cms/snapshots
+#
+# Déploiement : voir scripts/deploy.sh (pull des images -> up -d -> apply snapshot).
+
+name: isetag-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: isetag-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  directus:
+    image: directus/directus:11.17.4
+    container_name: isetag-directus-prod
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
+      STORAGE_LOCATIONS: local
+      STORAGE_LOCAL_ROOT: /directus/uploads
+      CACHE_ENABLED: "true"
+      CACHE_STORE: memory
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "https://isetag-univ.net,https://www.isetag-univ.net"
+      EMAIL_TRANSPORT: smtp
+      EMAIL_SMTP_HOST: ${SMTP_HOST}
+      EMAIL_SMTP_PORT: ${SMTP_PORT}
+      EMAIL_SMTP_USER: ${SMTP_USER}
+      EMAIL_SMTP_PASSWORD: ${SMTP_PASSWORD}
+      EMAIL_FROM: ${SMTP_FROM}
+      ADMISSIONS_EMAIL: ${ADMISSIONS_EMAIL}
+      CONTACT_EMAIL: ${CONTACT_EMAIL}
+      FLOWS_ENV_ALLOW_LIST: PUBLIC_URL,ADMISSIONS_EMAIL,CONTACT_EMAIL
+    volumes:
+      - ../../cms/uploads:/directus/uploads
+      - ../../cms/extensions:/directus/extensions
+      - ../../cms/snapshots:/directus/snapshots
+    networks:
+      - internal
+      - isetag_edge
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    container_name: isetag-frontend-prod
+    restart: always
+    environment:
+      DIRECTUS_API_URL: ${DIRECTUS_PUBLIC_URL}
+    networks:
+      - isetag_edge
+
+  nginx:
+    image: nginx:alpine
+    container_name: isetag-nginx
+    restart: always
+    depends_on:
+      - directus
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../nginx/conf.d:/etc/nginx/conf.d:ro
+      - ../../nginx/snippets:/etc/nginx/snippets:ro
+      - certbot_webroot:/var/www/certbot:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - isetag_edge
+
+  certbot:
+    image: certbot/certbot
+    container_name: isetag-certbot
+    profiles: ["certbot"]
+    volumes:
+      - certbot_webroot:/var/www/certbot
+      - /etc/letsencrypt:/etc/letsencrypt
+
+networks:
+  internal:
+  isetag_edge:
+    external: true
+
+volumes:
+  postgres_data_prod:
+  certbot_webroot:

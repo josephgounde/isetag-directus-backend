@@ -1,0 +1,89 @@
+# Stack de staging. Tourne aux côtés de docker/prod sur le même VPS unique.
+# Pas de service Nginx ici : le Nginx de la stack prod (docker/prod/docker-compose.yml)
+# proxyfie aussi ces conteneurs via le réseau externe partagé "isetag_edge".
+#
+# Préparation (une seule fois sur le VPS, si pas déjà fait pour la prod) :
+#   docker network create isetag_edge
+#
+# Le .env de staging doit être distinct du .env de prod (secrets et
+# DIRECTUS_PUBLIC_URL=https://cms-staging.isetag-univ.net différents).
+
+name: isetag-staging
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: isetag-postgres-staging
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data_staging:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  directus:
+    image: directus/directus:11.17.4
+    container_name: isetag-directus-staging
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
+      STORAGE_LOCATIONS: local
+      STORAGE_LOCAL_ROOT: /directus/uploads
+      CACHE_ENABLED: "true"
+      CACHE_STORE: memory
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "https://staging.isetag-univ.net"
+      EMAIL_TRANSPORT: smtp
+      EMAIL_SMTP_HOST: ${SMTP_HOST}
+      EMAIL_SMTP_PORT: ${SMTP_PORT}
+      EMAIL_SMTP_USER: ${SMTP_USER}
+      EMAIL_SMTP_PASSWORD: ${SMTP_PASSWORD}
+      EMAIL_FROM: ${SMTP_FROM}
+      ADMISSIONS_EMAIL: ${ADMISSIONS_EMAIL}
+      CONTACT_EMAIL: ${CONTACT_EMAIL}
+      FLOWS_ENV_ALLOW_LIST: PUBLIC_URL,ADMISSIONS_EMAIL,CONTACT_EMAIL
+    volumes:
+      - ../../cms/uploads-staging:/directus/uploads
+      - ../../cms/extensions:/directus/extensions:ro
+      - ../../cms/snapshots:/directus/snapshots:ro
+    networks:
+      - internal
+      - isetag_edge
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    container_name: isetag-frontend-staging
+    restart: always
+    environment:
+      DIRECTUS_API_URL: ${DIRECTUS_PUBLIC_URL}
+    networks:
+      - isetag_edge
+
+networks:
+  internal:
+  isetag_edge:
+    external: true
+
+volumes:
+  postgres_data_staging:
