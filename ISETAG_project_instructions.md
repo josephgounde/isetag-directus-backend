@@ -646,9 +646,14 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       universitaire, bilinguisme) ; les 2 restantes (partenariats académiques,
       cadre rigoureux) ont reçu une image de réemploi choisie par
       approximation, **à valider/remplacer** si de meilleures photos arrivent.
-      Contenu vérifié par deep-fetch anonyme sur dev ; **pas encore migré vers
-      prod** (contrairement à Admissions, cette migration n'a pas été
-      redemandée pour Accueil — à faire sur confirmation explicite).
+      Contenu vérifié par deep-fetch anonyme sur dev, puis **migré vers prod**
+      le jour même (schéma appliqué via `directus schema apply` + redémarrage
+      du conteneur requis pour que l'API vive recharge son cache de schéma —
+      sans ça, les nouvelles collections restent invisibles même après un
+      apply réussi ; contenu recréé directement sur prod plutôt que copié avec
+      IDs préservés, plus simple ici puisqu'aucune collection accueil_* ne
+      pré-existait). Revérifié par deep-fetch anonyme sur prod : les 8
+      sections et les 6 images se chargent correctement.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
