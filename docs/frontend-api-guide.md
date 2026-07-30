@@ -112,14 +112,22 @@ collections propres à la page demandée dans `sections.item:<collection>.*` :
 GET {BASE_URL}/items/pages?filter[key][_eq]=admissions&fields=*,sections.collection,sections.sort,sections.item:admissions_hero.*,sections.item:admissions_richtext.*,sections.item:admissions_feature.*,sections.item:admissions_steps.items.*,sections.item:admissions_cta_banner.*
 ```
 
+Exemple pour Accueil (noter le `.partners.partners_id.*` et
+`.testimonials.testimonials_id.*` pour traverser les jonctions M2M jusqu'aux
+données réelles) :
+
+```
+GET {BASE_URL}/items/pages?filter[key][_eq]=accueil&fields=*,sections.collection,sections.sort,sections.item:accueil_hero.*,sections.item:accueil_poles_highlight.*,sections.item:accueil_reasons.heading_fr,sections.item:accueil_reasons.heading_en,sections.item:accueil_reasons.items.*,sections.item:accueil_cta_banner.*,sections.item:accueil_partners_highlight.heading_fr,sections.item:accueil_partners_highlight.intro_text_fr,sections.item:accueil_partners_highlight.partners.partners_id.*,sections.item:accueil_testimonials_highlight.heading_fr,sections.item:accueil_testimonials_highlight.testimonials.testimonials_id.*,sections.item:accueil_vie_campus_teaser.*
+```
+
 La réponse contient `sections` = liste ordonnée (`sort`) d'objets
 `{collection, item}` — `collection` indique la collection de bloc (donc
 implicitement la page et le type) et `item` contient les champs du bloc
 correspondant. Le frontend fait un `switch` sur `collection` pour choisir le
 composant Angular à rendre pour chaque section.
 
-Types de blocs actuellement en usage — **Admissions** (seule page avec du
-contenu réel à ce jour) :
+Types de blocs actuellement en usage — **Admissions** et **Accueil** ont du
+contenu réel à ce jour :
 
 - **`admissions_hero`** — title_fr/en, subtitle_fr/en, image, cta_label_fr/en, cta_url
 - **`admissions_feature`** — image + heading_fr/en + body_fr/en (WYSIWYG) +
@@ -133,16 +141,31 @@ contenu réel à ce jour) :
   par le HTML du WYSIWYG lui-même : ça fige l'environnement, un champ fichier
   dédié laisse le frontend construire l'URL avec le bon `BASE_URL`)
 - **`admissions_cta_banner`** — heading_fr/en, text_fr/en, button_label_fr/en, button_url
-
-Collections déjà créées pour **Accueil** et **Actualités** mais encore vides
-(pas de contenu saisi) — mêmes types de champs que ci-dessus, adaptés à leur
-cas d'usage :
-
-- **`accueil_news_preview`** — heading_fr/en + `limit` (pas de sélection
-  manuelle : toujours les N actus les plus récentes — le frontend requête
-  `news` séparément, triée par `date_published`, avec ce `limit`)
-- **`accueil_programs_highlight`** — heading_fr/en + `programs` (M2M curaté à
-  la main — "mis en avant" est un choix éditorial, pas un "top N")
+- **`accueil_hero`** — title_fr/en, subtitle_fr/en, image, **deux** CTA
+  (`cta1_label_fr/en`/`cta1_url`, `cta2_label_fr/en`/`cta2_url` — la page
+  Accueil a deux boutons hero, contrairement à Admissions qui n'en a qu'un)
+- **`accueil_poles_highlight`** — heading_fr/en uniquement ; le carrousel de
+  pôles lui-même vient directement de la collection partagée `poles` (tous les
+  pôles sont affichés, triés par `display_order` — pas de sélection curatée
+  donc pas de jonction M2M ici)
+- **`accueil_reasons`** — heading_fr/en + `items` (O2M ordonné par `sort` :
+  title_fr/en, description_fr/en, `image`) — le carrousel "5 raisons de
+  choisir l'ISETAG"
+- **`accueil_cta_banner`** — heading_fr/en, text_fr/en, button_label_fr/en,
+  button_url — même schéma que `admissions_cta_banner` mais collection
+  propre à Accueil ; **deux lignes existent** (teaser Admissions en milieu de
+  page, CTA final en bas de page), le frontend les distingue par `sort` dans
+  `pages_sections`, pas par un champ dédié
+- **`accueil_partners_highlight`** — heading_fr/en + intro_text_fr/en +
+  `partners` (M2M curaté à la main, via jonction
+  `accueil_partners_highlight_partners`)
+- **`accueil_testimonials_highlight`** — heading_fr/en + `testimonials` (M2M
+  curaté à la main, via jonction `accueil_testimonials_highlight_testimonials`)
+  — section Alumni de la page Accueil (ne pas confondre avec
+  `actualites_testimonials_highlight`, section différente de la page Actualités)
+- **`accueil_vie_campus_teaser`** — heading_fr/en, text_fr/en, `image`
+  optionnelle — court teaser en bas de la page Accueil, renvoie vers la page
+  Vie Campus
 - **`actualites_testimonials_highlight`** — heading_fr/en + cta_label_fr/en +
   cta_url optionnels + `testimonials` (M2M curaté à la main, via jonction
   `actualites_testimonials_highlight_testimonials`) — section "Success Stories"
@@ -151,27 +174,41 @@ cas d'usage :
   court) + `category_filter` optionnel (le frontend requête `documents`
   séparément, filtrée par cette catégorie si renseignée)
 
+Deux collections Accueil créées lors de la première passe de restructuration
+existent toujours mais restent **vides et hors de la page** pour l'instant —
+le contenu fourni pour Accueil ne les couvrait pas :
+
+- **`accueil_news_preview`** — heading_fr/en + `limit` (section "dernières
+  actualités" — pas encore de brief éditorial pour cette section)
+- **`accueil_programs_highlight`** — heading_fr/en + `programs` (M2M curaté ;
+  le contenu Accueil actuel met en avant les **pôles**, pas des programmes
+  individuels — voir `accueil_poles_highlight` ci-dessus. Cette collection
+  resterait pertinente si une future section "formations phares" distincte
+  des pôles est ajoutée)
+
 Programmes, Vie Campus et Contact n'ont pas encore leurs propres collections de
 blocs (hero/richtext/cta_banner, etc.) : elles seront créées au moment où le
 contenu de ces pages sera saisi, en suivant la même convention de nommage et le
-même schéma de champs que les collections `admissions_*` ci-dessus (copiées
-comme référence). Si vous consultez ce guide avant que ce travail soit fait,
-la spec OpenAPI live (`GET {BASE_URL}/server/specs/oas`) reste la source de
-vérité pour savoir exactement quelles collections existent à un instant donné.
+même schéma de champs que les collections `admissions_*`/`accueil_*` ci-dessus
+(copiées comme référence). Si vous consultez ce guide avant que ce travail soit
+fait, la spec OpenAPI live (`GET {BASE_URL}/server/specs/oas`) reste la source
+de vérité pour savoir exactement quelles collections existent à un instant donné.
 
 Les 6 pages existent déjà (`accueil`, `programmes`, `admissions`, `vie_campus`,
 `actualites`, `contact`, toutes `status: published`, + `a_propos` conservée
-mais probablement inutile vu que son contenu vit dans le hero Accueil). Seule
-`admissions` a des sections pour l'instant ; les 5 autres renvoient `sections: []`
-en attendant que l'équipe communication/admissions compose leur contenu via
-l'Admin UI Directus.
+mais probablement inutile vu que son contenu vit dans le hero Accueil).
+`accueil` (8 sections) et `admissions` (17 sections) ont du contenu réel ; les
+4 autres renvoient `sections: []` en attendant que l'équipe communication/
+admissions compose leur contenu via l'Admin UI Directus.
 
 ## Référence des collections publiques
 
 Champs exacts consultables via la spec OpenAPI ou `GET {BASE_URL}/fields/<collection>`.
 Résumé :
 
-- **poles** — `slug`, `name_fr`, `name_en`, `icon`, `color`, `display_order`
+- **poles** — `slug`, `name_fr`, `name_en`, `icon`, `color`, `display_order`,
+  `description_fr`, `description_en` (WYSIWYG, ajoutés pour la section pôles
+  de la page Accueil)
 - **programs** — `slug`, `name_fr`, `name_en`, `pole` (relation → poles), `level`,
   `is_hnd`, `schedule` (`jour`/`soir`/`jour_soir`), `seo_title_fr`,
   `seo_description_fr`, `cover_image`, `status` (**filtrer `_eq: published`**)

@@ -66,6 +66,16 @@ READ_COLLECTIONS = [
     ("accueil_news_preview", {}, ["*"]),
     ("accueil_programs_highlight", {}, ["*"]),
     ("accueil_programs_highlight_programs", {}, ["*"]),
+    ("accueil_hero", {}, ["*"]),
+    ("accueil_poles_highlight", {}, ["*"]),
+    ("accueil_reasons", {}, ["*"]),
+    ("accueil_reasons_items", {}, ["*"]),
+    ("accueil_cta_banner", {}, ["*"]),
+    ("accueil_partners_highlight", {}, ["*"]),
+    ("accueil_partners_highlight_partners", {}, ["*"]),
+    ("accueil_testimonials_highlight", {}, ["*"]),
+    ("accueil_testimonials_highlight_testimonials", {}, ["*"]),
+    ("accueil_vie_campus_teaser", {}, ["*"]),
     ("actualites_testimonials_highlight", {}, ["*"]),
     ("actualites_testimonials_highlight_testimonials", {}, ["*"]),
     ("actualites_documents_list", {}, ["*"]),
@@ -81,6 +91,9 @@ PUBLIC_FILE_FIELDS = [
     ("admissions_hero", "image"),
     ("admissions_feature", "image"),
     ("admissions_richtext", "image"),
+    ("accueil_hero", "image"),
+    ("accueil_reasons_items", "image"),
+    ("accueil_vie_campus_teaser", "image"),
 ]
 
 

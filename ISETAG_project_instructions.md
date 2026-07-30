@@ -581,6 +581,74 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       `cms.isetag-univ.net` → `31.207.34.25` une fois l'accès à la zone DNS
       restauré, puis construire `frontend/Dockerfile` avant de pouvoir amener
       les services `nginx`/`frontend`/`certbot` du compose prod.
+- [x] **Contenu dev migré vers prod** (2026-07-30) : les 17 sections
+      Admissions (avec leurs 8 fichiers image) + `poles` (5), `programs` (27),
+      `tuition_plans` (10) copiés de dev vers prod via un script one-off
+      (IDs entiers préservés pour garder les FK cohérentes, séquences Postgres
+      resynchronisées après coup). Le seul `testimonials` de dev ("Test
+      Etudiant") a été volontairement **exclu** — donnée de test, pas du
+      contenu réel. Fichiers re-rattachés au dossier "Public" après migration
+      (sinon 403 sur `/assets/<uuid>` malgré la ligne DB présente — le modèle
+      de lecture publique des fichiers est un allowlist par dossier, voir
+      `scripts/provision_public_read.py`).
+- [x] **Accès temporaire prod pour le développeur frontend (Djo)**, avant que
+      `cms.isetag-univ.net` n'existe en DNS : port `8055` direct s'est révélé
+      **injoignable de l'extérieur** malgré un `ufw allow` correct — LWS
+      applique un pare-feu réseau en amont de la VM qui bloque silencieusement
+      les ports non standards (confirmé : aucune trace, ni autorisée ni
+      bloquée, dans les logs noyau `ufw` pour ce port, contrairement au port 80
+      qui répond bien avec un "connection refused" propre). Contournement :
+      un conteneur `nginx:alpine` autonome (`isetag-nginx-temp`, hors compose
+      pour éviter la dépendance au service `frontend` inexistant) proxifie le
+      port 80 vers `isetag-directus-prod:8055` en interne ; `ufw` restreint le
+      port 80 à l'IP publique du développeur uniquement. `CORS_ORIGIN` élargi
+      pour inclure `http://localhost:4200`/`4201`. **Marqué TEMP** dans
+      `docker/prod/docker-compose.yml` — à retirer une fois Nginx/TLS réel en
+      place (voir point DNS ci-dessus).
+- [x] **Dépôt GitHub créé** (2026-07-30) : le projet n'était versionné nulle
+      part avant (pas de `.git` local, aucun dépôt distant) — tout le
+      déploiement VPS avait été fait à la main par SSH jusqu'ici. Dépôt public
+      [`josephgounde/isetag-directus-backend`](https://github.com/josephgounde/isetag-directus-backend),
+      `.env` et secrets correctement exclus (vérifié par `git grep` avant push
+      vu la visibilité publique). **Reste à faire** : ajouter les secrets
+      `VPS_HOST`/`VPS_USER`/`VPS_PORT`/`VPS_SSH_KEY` dans les paramètres du
+      dépôt pour que `deploy.yml` fonctionne réellement (actuellement no-op
+      tant que `frontend/Dockerfile` n'existe pas).
+- [x] **Page Admissions comparée au prototype Figma** (2026-07-30) : le
+      prototype montre une structure bien plus simple (hero → 2 étapes avec
+      formulaire intégré → tarifs/bourses → newsletter) que les 17 sections
+      actuelles (10 `admissions_richtext`, 4 `admissions_feature`). Plan de
+      consolidation théorique établi (quel contenu va où) mais **pas encore
+      appliqué** — l'équipe design retravaille le prototype pour l'aligner sur
+      le cahier éditorial, la consolidation attendra cette version à jour.
+      Deux blocs contiennent par ailleurs des notes éditoriales internes
+      ("à valider avant publication") qui ne devraient jamais être publiques :
+      `admissions_richtext` #8 (note sur une photo manquante) et #10 (note
+      entière, à supprimer) — à corriger indépendamment de la consolidation.
+- [x] **Page Accueil construite** (2026-07-30) depuis
+      `contenuç_accueil/Texte Page Accueil Site ISETAG.docx` (texte) +
+      `contenuç_accueil/CHOISIR L'ISETAG/*.jpeg` (images uniquement — le texte
+      de ce dossier a été explicitement écarté, c'est le contenu d'une page
+      différente). Comparée au prototype Figma d'abord : alignement structurel
+      bon, les 9 sections du docx correspondent 1:1 aux sections du prototype
+      (contrairement à Admissions, aucune restructuration nécessaire).
+      7 nouvelles collections créées (`accueil_hero`, `accueil_poles_highlight`,
+      `accueil_reasons`+`_items`, `accueil_cta_banner` [2 lignes],
+      `accueil_partners_highlight`+jonction, `accueil_testimonials_highlight`
+      +jonction, `accueil_vie_campus_teaser`) plus `description_fr/en` ajoutés
+      à `poles` (les 5 pôles avaient déjà nom/slug mais pas de texte de
+      présentation). `partners` rempli avec les 8 vrais partenaires du docx
+      (Port Autonome de Douala, Université de Douala, ENSP Douala, UMT Tunis,
+      IAHF, EEMI, IHECF Paris, Regional Maritime University Ghana) — **logos
+      pas encore fournis**, champ `logo` laissé vide. 1 vrai témoignage alumni
+      ajouté à `testimonials`. Sur les 6 images fournies, seules 3 avaient une
+      correspondance évidente avec les 5 "raisons" du docx (ateliers, cité
+      universitaire, bilinguisme) ; les 2 restantes (partenariats académiques,
+      cadre rigoureux) ont reçu une image de réemploi choisie par
+      approximation, **à valider/remplacer** si de meilleures photos arrivent.
+      Contenu vérifié par deep-fetch anonyme sur dev ; **pas encore migré vers
+      prod** (contrairement à Admissions, cette migration n'a pas été
+      redemandée pour Accueil — à faire sur confirmation explicite).
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
