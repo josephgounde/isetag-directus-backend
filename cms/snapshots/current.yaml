@@ -9951,6 +9951,48 @@ fields:
       has_auto_increment: false
       foreign_key_table: null
       foreign_key_column: null
+  - collection: poles
+    field: image
+    type: uuid
+    meta:
+      collection: poles
+      conditions: null
+      display: null
+      display_options: null
+      field: image
+      group: null
+      hidden: false
+      interface: file-image
+      note: Image de la carte pôle dans le carrousel Accueil
+      options:
+        folder: 8c177154-5946-44b7-885a-67a42e68af01
+      readonly: false
+      required: false
+      searchable: true
+      sort: 8
+      special:
+        - file
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: image
+      table: poles
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_files
+      foreign_key_column: id
   - collection: programs
     field: id
     type: integer
@@ -12245,6 +12287,27 @@ relations:
       one_deselect_action: nullify
       one_field: null
       sort_field: null
+  - collection: poles
+    field: image
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: poles
+      many_field: image
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: poles
+      column: image
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: poles_image_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
   - collection: programs
     field: pole
     related_collection: poles

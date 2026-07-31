@@ -654,6 +654,24 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       IDs préservés, plus simple ici puisqu'aucune collection accueil_* ne
       pré-existait). Revérifié par deep-fetch anonyme sur prod : les 8
       sections et les 6 images se chargent correctement.
+- [x] (2026-07-31) Corrections section pôles Accueil, demandées après relecture du
+      prototype Figma : `accueil_poles_highlight.heading_fr` était "Pôles de
+      formation" (texte générique choisi faute de mieux dans le docx éditorial) —
+      remplacé par "Choisis le pôle qui te valorise", le vrai titre du prototype,
+      sur dev et prod. Champ `image` (uuid → directus_files) ajouté à `poles`
+      (schéma appliqué sur prod + conteneur redémarré, cf. gotcha ci-dessus ;
+      `provision_public_read.py` mis à jour et rejoué dev+prod pour le dossier
+      Public par défaut du champ). 4 images sur 5 déposées par l'utilisateur et
+      attachées (industriel-techno, gestion-commerce, communication-digital,
+      sante-paramedical) sur dev et prod, vérifiées publiquement servables
+      (200) — **il manque l'image du pôle maritime-logistique** (`image: null`),
+      à fournir plus tard. Note pour le frontend : chaque carte pôle du
+      carrousel affiche aussi une liste de programmes courte
+      (ex. "Shipping Management | Douane et Transit | ...") — ce n'est PAS un
+      champ de `poles`, il faut requêter `programs?filter[pole][_eq]=<id>`
+      séparément ; les libellés du prototype sont parfois plus courts que
+      `programs.name_fr` (ex. "Portuaire" vs "Logistique Maritime & Portuaire"),
+      à réconcilier avec l'équipe design si besoin.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

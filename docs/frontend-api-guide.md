@@ -144,10 +144,15 @@ contenu réel à ce jour :
 - **`accueil_hero`** — title_fr/en, subtitle_fr/en, image, **deux** CTA
   (`cta1_label_fr/en`/`cta1_url`, `cta2_label_fr/en`/`cta2_url` — la page
   Accueil a deux boutons hero, contrairement à Admissions qui n'en a qu'un)
-- **`accueil_poles_highlight`** — heading_fr/en uniquement ; le carrousel de
-  pôles lui-même vient directement de la collection partagée `poles` (tous les
-  pôles sont affichés, triés par `display_order` — pas de sélection curatée
-  donc pas de jonction M2M ici)
+- **`accueil_poles_highlight`** — heading_fr/en uniquement (heading_fr =
+  "Choisis le pôle qui te valorise", repris du prototype Figma — absent du
+  document éditorial d'origine) ; le carrousel de pôles lui-même vient
+  directement de la collection partagée `poles` (tous les pôles sont
+  affichés, triés par `display_order` — pas de sélection curatée donc pas de
+  jonction M2M ici). Chaque carte pôle affiche en plus la liste de ses
+  `programs` (filtrer `programs?filter[pole][_eq]=<id>` — les libellés courts
+  du prototype ne correspondent pas toujours exactement à `name_fr`, à
+  vérifier avec l'équipe design/contenu)
 - **`accueil_reasons`** — heading_fr/en + `items` (O2M ordonné par `sort` :
   title_fr/en, description_fr/en, `image`) — le carrousel "5 raisons de
   choisir l'ISETAG"
@@ -208,7 +213,9 @@ Résumé :
 
 - **poles** — `slug`, `name_fr`, `name_en`, `icon`, `color`, `display_order`,
   `description_fr`, `description_en` (WYSIWYG, ajoutés pour la section pôles
-  de la page Accueil)
+  de la page Accueil), `image` (carte carrousel — ajouté pour la section
+  pôles de la page Accueil ; **4 pôles sur 5 ont une image** au 2026-07-31,
+  il manque celle de `maritime-logistique`, `image: null` en attendant)
 - **programs** — `slug`, `name_fr`, `name_en`, `pole` (relation → poles), `level`,
   `is_hnd`, `schedule` (`jour`/`soir`/`jour_soir`), `seo_title_fr`,
   `seo_description_fr`, `cover_image`, `status` (**filtrer `_eq: published`**)
