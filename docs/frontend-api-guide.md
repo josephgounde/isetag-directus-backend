@@ -168,9 +168,13 @@ contenu réel à ce jour :
   curaté à la main, via jonction `accueil_testimonials_highlight_testimonials`)
   — section Alumni de la page Accueil (ne pas confondre avec
   `actualites_testimonials_highlight`, section différente de la page Actualités)
-- **`accueil_vie_campus_teaser`** — heading_fr/en, text_fr/en, `image`
-  optionnelle — court teaser en bas de la page Accueil, renvoie vers la page
-  Vie Campus
+- **`accueil_vie_campus_teaser`** — heading_fr/en, text_fr/en, `image`, +
+  `cta_label_fr/en`/`cta_url` (ajoutés 2026-08-01) — court teaser en bas de la
+  page Accueil. Contenu réel actuel : `cta_label_fr` = "Découvrez notre
+  campus", `cta_url` = `/vie-campus/` (route déduite des liens relatifs déjà
+  utilisés ailleurs dans le contenu, ex. `/vie-campus/cite-universitaire/`
+  dans `admissions_richtext` — **à confirmer avec le frontend** si la route
+  réelle diffère)
 - **`actualites_testimonials_highlight`** — heading_fr/en + cta_label_fr/en +
   cta_url optionnels + `testimonials` (M2M curaté à la main, via jonction
   `actualites_testimonials_highlight_testimonials`) — section "Success Stories"

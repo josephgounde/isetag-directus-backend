@@ -696,6 +696,19 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       bourses (texte, images) toujours à fournir par l'équipe design/contenu —
       la maquette elle-même n'affiche que du texte de remplissage identique
       sur les deux cartes.
+- [x] (2026-08-01) Hero Accueil : nouvelle image fournie (façade + blason
+      ISETAG sur socle) remplace l'ancienne, convertie en WebP (1,58 Mo → 111
+      Ko) avant upload ; ancien fichier supprimé de la bibliothèque sur dev et
+      prod pour ne rien laisser d'orphelin.
+      Section "Vie sur nos Campus" (Accueil) : image de fond fournie (façade
+      de nuit, enseigne ISETAG illuminée — confirmée identique à l'image du
+      prototype Figma v2) attachée à `accueil_vie_campus_teaser.image`.
+      Champs `cta_label_fr/en` + `cta_url` ajoutés à cette collection (n'existaient
+      pas) et remplis avec du contenu réel cette fois (pas juste la structure,
+      contrairement à `scholarships`) : label "Découvrez notre campus" trouvé
+      dans le prototype Figma, URL `/vie-campus/` déduite de la convention de
+      routage déjà vue ailleurs dans le contenu — à confirmer avec le
+      frontend si la route réelle diffère.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
