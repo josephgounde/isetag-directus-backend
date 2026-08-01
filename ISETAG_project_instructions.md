@@ -721,6 +721,14 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       cadre d'études structuré à Yassa" en base) — décision explicite de
       l'utilisateur. Structure appliquée dev+prod, permissions publiques
       provisionnées, collection vide (`gallery: []`), aucune photo fournie.
+- [x] (2026-08-01) Retour sur la citation étudiant (Charles Mengue) de la
+      section Vie sur nos Campus : décision finale de l'utilisateur — construire
+      la structure quand même (contrairement à la décision précédente de tout
+      sauter), juste sans contenu. 4 champs ajoutés à `accueil_vie_campus_teaser`
+      (`quote_text_fr/en`, `quote_author`, `quote_program`), dédiés plutôt
+      qu'un lien vers `testimonials` (un seul témoignage affiché ici, pas une
+      liste). Appliqué dev+prod, tous `null`, aucune permission à toucher
+      (champs texte simples sur une collection déjà publique).
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

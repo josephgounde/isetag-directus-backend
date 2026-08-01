@@ -178,11 +178,13 @@ contenu réel à ce jour :
   ajouté 2026-08-01) — galerie de photos supplémentaires vue dans le
   prototype Figma v2 (mosaïque de plusieurs images en plus du fond) ;
   **structure prête, collection vide** (`gallery: []`), aucune photo fournie
-  pour l'instant. Note : le prototype affiche aussi une citation d'un
-  étudiant (nom + filière + phrase courte) incrustée sur cette mosaïque —
-  **volontairement pas modélisée**, en attente de contenu réel de l'équipe
-  design/contenu avant de décider si elle réutilise `testimonials` ou des
-  champs dédiés. `heading_fr` reste "Un cadre d'études structuré à Yassa"
+  pour l'instant. + `quote_text_fr/en`, `quote_author`, `quote_program`
+  (ajoutés 2026-08-01) — citation d'un étudiant incrustée sur la mosaïque
+  dans le prototype (ex. "Charles Mengue", "L3 Banques et Finance") ; champs
+  dédiés plutôt qu'un lien vers `testimonials` car un seul témoignage est
+  affiché ici, pas une liste curatée. **Structure prête, tous `null`** —
+  aucun contenu réel fourni pour l'instant, à remplir dès que l'équipe
+  design/contenu transmet la vraie citation. `heading_fr` reste "Un cadre d'études structuré à Yassa"
   bien que Figma affiche "La Vie sur nos Campus" — écart connu, non corrigé
   sur demande explicite
 - **`actualites_testimonials_highlight`** — heading_fr/en + cta_label_fr/en +

@@ -3997,6 +3997,166 @@ fields:
       validation: null
       validation_message: null
       width: full
+  - collection: accueil_vie_campus_teaser
+    field: quote_text_fr
+    type: text
+    meta:
+      collection: accueil_vie_campus_teaser
+      conditions: null
+      display: null
+      display_options: null
+      field: quote_text_fr
+      group: null
+      hidden: false
+      interface: input-multiline
+      note: Citation étudiant courte (ex. section Vie sur nos Campus)
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 9
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: quote_text_fr
+      table: accueil_vie_campus_teaser
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser
+    field: quote_text_en
+    type: text
+    meta:
+      collection: accueil_vie_campus_teaser
+      conditions: null
+      display: null
+      display_options: null
+      field: quote_text_en
+      group: null
+      hidden: false
+      interface: input-multiline
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 10
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: quote_text_en
+      table: accueil_vie_campus_teaser
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser
+    field: quote_author
+    type: string
+    meta:
+      collection: accueil_vie_campus_teaser
+      conditions: null
+      display: null
+      display_options: null
+      field: quote_author
+      group: null
+      hidden: false
+      interface: input
+      note: Ex. "Charles Mengue"
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 11
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: quote_author
+      table: accueil_vie_campus_teaser
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser
+    field: quote_program
+    type: string
+    meta:
+      collection: accueil_vie_campus_teaser
+      conditions: null
+      display: null
+      display_options: null
+      field: quote_program
+      group: null
+      hidden: false
+      interface: input
+      note: Ex. "L3 Banques et Finance"
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 12
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: quote_program
+      table: accueil_vie_campus_teaser
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
   - collection: accueil_vie_campus_teaser_gallery
     field: id
     type: integer
