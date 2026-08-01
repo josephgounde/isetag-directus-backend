@@ -709,6 +709,18 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       dans le prototype Figma, URL `/vie-campus/` déduite de la convention de
       routage déjà vue ailleurs dans le contenu — à confirmer avec le
       frontend si la route réelle diffère.
+- [x] (2026-08-01) `accueil_vie_campus_teaser_gallery` créée (O2M, même
+      schéma que `accueil_reasons`/`accueil_reasons_items` : champ alias
+      `gallery` côté parent, `image`+`sort` côté enfant) pour la mosaïque de
+      photos vue dans le prototype Figma v2 de cette section — le prototype
+      montre ~5-6 photos en plus du fond déjà en place, plus une citation
+      d'étudiant incrustée (Charles Mengue) volontairement non modélisée
+      (décision explicite : attendre le contenu réel avant de choisir
+      `testimonials` vs champs dédiés). `heading_fr` volontairement laissé
+      inchangé malgré l'écart avec Figma ("La Vie sur nos Campus" vs "Un
+      cadre d'études structuré à Yassa" en base) — décision explicite de
+      l'utilisateur. Structure appliquée dev+prod, permissions publiques
+      provisionnées, collection vide (`gallery: []`), aucune photo fournie.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

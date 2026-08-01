@@ -76,6 +76,7 @@ READ_COLLECTIONS = [
     ("accueil_testimonials_highlight", {}, ["*"]),
     ("accueil_testimonials_highlight_testimonials", {}, ["*"]),
     ("accueil_vie_campus_teaser", {}, ["*"]),
+    ("accueil_vie_campus_teaser_gallery", {}, ["*"]),
     ("actualites_testimonials_highlight", {}, ["*"]),
     ("actualites_testimonials_highlight_testimonials", {}, ["*"]),
     ("actualites_documents_list", {}, ["*"]),
@@ -96,6 +97,7 @@ PUBLIC_FILE_FIELDS = [
     ("accueil_vie_campus_teaser", "image"),
     ("poles", "image"),
     ("scholarships", "image"),
+    ("accueil_vie_campus_teaser_gallery", "image"),
 ]
 
 

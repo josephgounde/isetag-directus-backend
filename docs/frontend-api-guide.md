@@ -117,7 +117,7 @@ Exemple pour Accueil (noter le `.partners.partners_id.*` et
 données réelles) :
 
 ```
-GET {BASE_URL}/items/pages?filter[key][_eq]=accueil&fields=*,sections.collection,sections.sort,sections.item:accueil_hero.*,sections.item:accueil_poles_highlight.*,sections.item:accueil_reasons.heading_fr,sections.item:accueil_reasons.heading_en,sections.item:accueil_reasons.items.*,sections.item:accueil_cta_banner.*,sections.item:accueil_partners_highlight.heading_fr,sections.item:accueil_partners_highlight.intro_text_fr,sections.item:accueil_partners_highlight.partners.partners_id.*,sections.item:accueil_testimonials_highlight.heading_fr,sections.item:accueil_testimonials_highlight.testimonials.testimonials_id.*,sections.item:accueil_vie_campus_teaser.*
+GET {BASE_URL}/items/pages?filter[key][_eq]=accueil&fields=*,sections.collection,sections.sort,sections.item:accueil_hero.*,sections.item:accueil_poles_highlight.*,sections.item:accueil_reasons.heading_fr,sections.item:accueil_reasons.heading_en,sections.item:accueil_reasons.items.*,sections.item:accueil_cta_banner.*,sections.item:accueil_partners_highlight.heading_fr,sections.item:accueil_partners_highlight.intro_text_fr,sections.item:accueil_partners_highlight.partners.partners_id.*,sections.item:accueil_testimonials_highlight.heading_fr,sections.item:accueil_testimonials_highlight.testimonials.testimonials_id.*,sections.item:accueil_vie_campus_teaser.*,sections.item:accueil_vie_campus_teaser.gallery.image,sections.item:accueil_vie_campus_teaser.gallery.sort
 ```
 
 La réponse contient `sections` = liste ordonnée (`sort`) d'objets
@@ -174,7 +174,17 @@ contenu réel à ce jour :
   campus", `cta_url` = `/vie-campus/` (route déduite des liens relatifs déjà
   utilisés ailleurs dans le contenu, ex. `/vie-campus/cite-universitaire/`
   dans `admissions_richtext` — **à confirmer avec le frontend** si la route
-  réelle diffère)
+  réelle diffère). + `gallery` (O2M, alias vers `accueil_vie_campus_teaser_gallery`,
+  ajouté 2026-08-01) — galerie de photos supplémentaires vue dans le
+  prototype Figma v2 (mosaïque de plusieurs images en plus du fond) ;
+  **structure prête, collection vide** (`gallery: []`), aucune photo fournie
+  pour l'instant. Note : le prototype affiche aussi une citation d'un
+  étudiant (nom + filière + phrase courte) incrustée sur cette mosaïque —
+  **volontairement pas modélisée**, en attente de contenu réel de l'équipe
+  design/contenu avant de décider si elle réutilise `testimonials` ou des
+  champs dédiés. `heading_fr` reste "Un cadre d'études structuré à Yassa"
+  bien que Figma affiche "La Vie sur nos Campus" — écart connu, non corrigé
+  sur demande explicite
 - **`actualites_testimonials_highlight`** — heading_fr/en + cta_label_fr/en +
   cta_url optionnels + `testimonials` (M2M curaté à la main, via jonction
   `actualites_testimonials_highlight_testimonials`) — section "Success Stories"

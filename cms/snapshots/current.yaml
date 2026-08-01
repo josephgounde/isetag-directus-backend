@@ -458,6 +458,32 @@ collections:
       versioning: false
     schema:
       name: accueil_vie_campus_teaser
+  - collection: accueil_vie_campus_teaser_gallery
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: accueil_vie_campus_teaser_gallery
+      color: null
+      display_template: null
+      group: Accueil & Global
+      hidden: true
+      icon: photo_library
+      item_duplication_fields: null
+      note: >-
+        Galerie de photos individuelles pour la section Vie sur nos Campus
+        (O2M).
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+      versioning: false
+    schema:
+      name: accueil_vie_campus_teaser_gallery
   - collection: actualites_documents_list
     meta:
       accountability: all
@@ -3938,6 +3964,192 @@ fields:
       max_length: 255
       numeric_precision: null
       numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser
+    field: gallery
+    type: alias
+    meta:
+      collection: accueil_vie_campus_teaser
+      conditions: null
+      display: null
+      display_options: null
+      field: gallery
+      group: null
+      hidden: false
+      interface: list-o2m
+      note: Galerie de photos de la section Vie sur nos Campus
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 8
+      special:
+        - o2m
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+  - collection: accueil_vie_campus_teaser_gallery
+    field: id
+    type: integer
+    meta:
+      collection: accueil_vie_campus_teaser_gallery
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: numeric
+      note: null
+      options: null
+      readonly: true
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: accueil_vie_campus_teaser_gallery
+      data_type: integer
+      default_value: nextval('accueil_vie_campus_teaser_gallery_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser_gallery
+    field: accueil_vie_campus_teaser_id
+    type: integer
+    meta:
+      collection: accueil_vie_campus_teaser_gallery
+      conditions: null
+      display: null
+      display_options: null
+      field: accueil_vie_campus_teaser_id
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: accueil_vie_campus_teaser_id
+      table: accueil_vie_campus_teaser_gallery
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: accueil_vie_campus_teaser
+      foreign_key_column: id
+  - collection: accueil_vie_campus_teaser_gallery
+    field: image
+    type: uuid
+    meta:
+      collection: accueil_vie_campus_teaser_gallery
+      conditions: null
+      display: null
+      display_options: null
+      field: image
+      group: null
+      hidden: false
+      interface: file-image
+      note: null
+      options:
+        folder: 8c177154-5946-44b7-885a-67a42e68af01
+      readonly: false
+      required: false
+      searchable: true
+      sort: 2
+      special:
+        - file
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: image
+      table: accueil_vie_campus_teaser_gallery
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser_gallery
+    field: sort
+    type: integer
+    meta:
+      collection: accueil_vie_campus_teaser_gallery
+      conditions: null
+      display: null
+      display_options: null
+      field: sort
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: sort
+      table: accueil_vie_campus_teaser_gallery
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
       is_nullable: true
       is_unique: false
       is_indexed: false
@@ -12265,6 +12477,27 @@ relations:
       foreign_key_table: directus_files
       foreign_key_column: id
       constraint_name: accueil_vie_campus_teaser_image_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: accueil_vie_campus_teaser_gallery
+    field: accueil_vie_campus_teaser_id
+    related_collection: accueil_vie_campus_teaser
+    meta:
+      junction_field: null
+      many_collection: accueil_vie_campus_teaser_gallery
+      many_field: accueil_vie_campus_teaser_id
+      one_allowed_collections: null
+      one_collection: accueil_vie_campus_teaser
+      one_collection_field: null
+      one_deselect_action: delete
+      one_field: gallery
+      sort_field: sort
+    schema:
+      table: accueil_vie_campus_teaser_gallery
+      column: accueil_vie_campus_teaser_id
+      foreign_key_table: accueil_vie_campus_teaser
+      foreign_key_column: id
+      constraint_name: accueil_vie_campus_teaser_gallery_accueil___70de150b_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
   - collection: actualites_testimonials_highlight_testimonials
