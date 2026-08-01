@@ -95,6 +95,7 @@ PUBLIC_FILE_FIELDS = [
     ("accueil_reasons_items", "image"),
     ("accueil_vie_campus_teaser", "image"),
     ("poles", "image"),
+    ("scholarships", "image"),
 ]
 
 

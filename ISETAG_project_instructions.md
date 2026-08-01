@@ -672,6 +672,30 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       séparément ; les libellés du prototype sont parfois plus courts que
       `programs.name_fr` (ex. "Portuaire" vs "Logistique Maritime & Portuaire"),
       à réconcilier avec l'équipe design si besoin.
+- [x] (2026-08-01) Comparaison structurelle du prototype Figma **v2** d'Admissions
+      (mis à jour par l'équipe design) vs le contenu Directus actuel (17 sections) :
+      nouvelle maquette bien plus courte — hero (titre changé en "Comment
+      S'inscrire ?"), 2 étapes narratives + formulaire de pré-inscription (4
+      onglets, inchangé), section Tarifs en cartes "Cycle BTS/Licence/Master",
+      section Bourses en cartes (Bourse SNK, Bourse Université Montplaisir
+      Tunis). Disparaissent de la v2 (encore en ligne aujourd'hui) : "Modalités
+      d'admission", détail pièces par cycle, "Conditions pratiques" (EPI/
+      logement), FAQ, CTA final "Prêt à commencer ?", et les 2 blocs de notes
+      internes éditoriales (`admissions_richtext` #8 et #10) — pas d'action
+      prise, en attente de confirmation de l'équipe design que ces sections
+      sont bien abandonnées et pas juste absentes de cette itération Figma.
+      Découverte importante : `tuition_plans` (10 lignes réelles, jamais
+      utilisée par la page) correspond presque exactement aux cartes Tarifs —
+      pas de carte Maritime dans la maquette malgré 2 lignes Maritime en base,
+      laissées de côté sans action sur demande explicite de l'utilisateur (pas
+      un problème, à traiter quand le design ajoutera cette carte).
+      `scholarships` (0 ligne) avait un schéma incomplet pour les cartes
+      Bourses — champs `image`, `cta_label_fr/en`, `cta_url` ajoutés (structure
+      seulement, sur demande explicite : "laisse le contenu vide, assure-toi
+      que la structure soit là"), appliqué sur dev et prod. Contenu réel des 2
+      bourses (texte, images) toujours à fournir par l'équipe design/contenu —
+      la maquette elle-même n'affiche que du texte de remplissage identique
+      sur les deux cartes.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

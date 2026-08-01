@@ -219,6 +219,22 @@ Résumé :
 - **programs** — `slug`, `name_fr`, `name_en`, `pole` (relation → poles), `level`,
   `is_hnd`, `schedule` (`jour`/`soir`/`jour_soir`), `seo_title_fr`,
   `seo_description_fr`, `cover_image`, `status` (**filtrer `_eq: published`**)
+- **scholarships** — `name`, `amount`, `description`, `conditions`,
+  `display_order`, `status` (**filtrer `_eq: published`**), + `image`,
+  `cta_label_fr/en`, `cta_url` (ajoutés 2026-08-01 pour matcher les cartes
+  "Bourses" du prototype Figma v2 de la page Admissions — **collection
+  toujours vide**, structure prête mais aucun contenu réel saisi ; ne pas
+  construire de section frontend dessus tant qu'elle n'a pas de lignes)
+- **tuition_plans** — `cycle_name`, `level` (BTS/HND, Licence, Master,
+  Maritime), `total_amount`, `installments` (JSON), `note`, `display_order`,
+  `status` (**filtrer `_eq: published`**) — **10 lignes réelles déjà en
+  base**, non utilisée par la page Admissions actuelle (qui affiche un
+  tableau HTML équivalent codé en dur dans `admissions_richtext`) ; à
+  brancher sur la page le jour où le composant "Cycle BTS/Licence/Master" du
+  prototype v2 sera implémenté. Note : le prototype ne montre pas de carte
+  Maritime — les 2 lignes `level: "Maritime"` restent donc sans page pour
+  l'instant, laissées telles quelles en attendant que l'équipe design ajoute
+  cette carte
 - **news** — `slug`, `title_fr`, `title_en`, `category`, `content_fr`,
   `date_published`, `cover_image`
 - **campus_services** — `name_fr`, `name_en`, `icon`, `category`, `display_section`
