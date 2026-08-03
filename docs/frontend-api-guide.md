@@ -109,7 +109,7 @@ Tout se récupère en **un seul appel** grâce au deep-fetch, en listant les
 collections propres à la page demandée dans `sections.item:<collection>.*` :
 
 ```
-GET {BASE_URL}/items/pages?filter[key][_eq]=admissions&fields=*,sections.collection,sections.sort,sections.item:admissions_hero.*,sections.item:admissions_richtext.*,sections.item:admissions_feature.*,sections.item:admissions_steps.items.*,sections.item:admissions_cta_banner.*,sections.item:admissions_tuition_highlight.*,sections.item:admissions_scholarships_highlight.*
+GET {BASE_URL}/items/pages?filter[key][_eq]=admissions&fields=*,sections.collection,sections.sort,sections.item:admissions_hero.*,sections.item:admissions_richtext.*,sections.item:admissions_feature.*,sections.item:admissions_steps.items.*,sections.item:admissions_cta_banner.*,sections.item:admissions_tuition_highlight.*,sections.item:admissions_scholarships_highlight.*,sections.item:admissions_brochure.*
 ```
 
 `admissions_tuition_highlight` et `admissions_scholarships_highlight` ne
@@ -154,6 +154,13 @@ contenu réel à ce jour :
 - **`admissions_scholarships_highlight`** (ajouté 2026-08-03) — heading_fr/en
   uniquement (= "Bourses, aides et facilités"), même pattern : les cartes
   viennent directement de `scholarships` (triées par `display_order`)
+- **`admissions_brochure`** (ajouté 2026-08-03) — heading_fr/en, text_fr/en,
+  cta_label_fr/en + `file` (relation directe vers `directus_files`, interface
+  `file` générique et non `file-image` puisque c'est un PDF) — bloc
+  "Télécharger notre brochure" du prototype Figma v2. **`file` est vide pour
+  l'instant** : le PDF de la brochure admissions n'a pas encore été fourni —
+  structure prête, à remplir dès réception (ne pas afficher le bouton de
+  téléchargement côté frontend tant que `file` est `null`)
 - **`admissions_cta_banner`** — heading_fr/en, text_fr/en, button_label_fr/en, button_url
 - **`accueil_hero`** — title_fr/en, subtitle_fr/en, image, **deux** CTA
   (`cta1_label_fr/en`/`cta1_url`, `cta2_label_fr/en`/`cta2_url` — la page

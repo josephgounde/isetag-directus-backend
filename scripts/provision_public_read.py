@@ -65,6 +65,7 @@ READ_COLLECTIONS = [
     ("admissions_steps_items", {}, ["*"]),
     ("admissions_tuition_highlight", {}, ["*"]),
     ("admissions_scholarships_highlight", {}, ["*"]),
+    ("admissions_brochure", {}, ["*"]),
     ("accueil_news_preview", {}, ["*"]),
     ("accueil_programs_highlight", {}, ["*"]),
     ("accueil_programs_highlight_programs", {}, ["*"]),
@@ -100,6 +101,7 @@ PUBLIC_FILE_FIELDS = [
     ("poles", "image"),
     ("scholarships", "image"),
     ("accueil_vie_campus_teaser_gallery", "image"),
+    ("admissions_brochure", "file"),
 ]
 
 

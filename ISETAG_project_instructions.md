@@ -853,6 +853,50 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       Les 17 champs fichier du schéma ont été vérifiés un par un après coup —
       tous ont désormais une relation FK réelle vers `directus_files`, sur dev
       et prod.
+- [x] (2026-08-03) Revue section par section de la page Admissions contre le
+      prototype Figma **v2** mis à jour (frame "Admissions - Desktop"), pour
+      confirmer que tout le contenu du prototype a bien sa place dans Directus.
+      Trois écarts trouvés et corrigés, dev + prod :
+      - **`admissions_brochure`** (nouvelle collection) — le bloc "Brochure
+        admissions" / "Télécharger notre brochure" du prototype n'avait aucune
+        collection dans le schéma. Créée (`heading_fr/en`, `text_fr/en`,
+        `cta_label_fr/en`, `file` → relation réelle vers `directus_files`,
+        interface `file` et non `file-image` car c'est un PDF), ajoutée à
+        `pages_sections.item.one_allowed_collections` et à
+        `provision_public_read.py` (lecture publique + dossier "Public" par
+        défaut sur `file`). Contenu texte rempli, **`file` laissé vide** : le
+        PDF de la brochure n'a pas été fourni — structure prête, à remplir dès
+        réception. Insérée en section 6 (juste après les 3 cartes
+        Pré-inscription/Tarifs/Modalités).
+      - **Texte "cérémonie de lauréats"** — présent deux fois dans le
+        prototype sans section dédiée dans Directus depuis le 2026-07-31
+        (jamais traité). Ajouté comme nouvelle ligne `admissions_richtext`
+        (texte repris tel quel, coquilles d'origine du prototype conservées —
+        même principe que la coquille "logments" d'Accueil), insérée juste
+        avant la carte "Prêt à commencer ?".
+      - **Notes éditoriales internes exposées publiquement** (bug trouvé
+        pendant cette revue, pas un écart Figma) : la dernière section de la
+        page (`admissions_richtext` id=10, "points signalés par l'équipe
+        éditoriale, à valider avant publication") n'a jamais dû être publique
+        — `admissions_richtext` a une lecture publique inconditionnelle, donc
+        ces notes internes ("date 29 février 2027 impossible", "intitulé
+        manquant ligne 02", etc. — voir l'entrée du 2026-08-01 ci-dessus où
+        elles sont déjà archivées in extenso) étaient lisibles par n'importe
+        qui via l'API publique et potentiellement affichées sur le site en
+        production. Section retirée de `pages_sections` et ligne supprimée de
+        `admissions_richtext` (contenu déjà conservé dans ce fichier, aucune
+        perte).
+      Page Admissions : 19 → **20 sections**. Vérifié via l'API publique
+      anonyme (page complète, `admissions_brochure`, la nouvelle ligne
+      cérémonie, et confirmation 403 sur l'ancien id=10 supprimé) sur dev et
+      prod. `docs/frontend-api-guide.md` et `docs/openapi-public.json` mis à
+      jour en conséquence.
+      **Confirmé bon à ce jour** (rien à changer) : hero (titre volontairement
+      divergent du prototype, décision utilisateur du 2026-08-03 inchangée),
+      les 3 cartes d'intro, les 4 étapes de pré-inscription, tous les tableaux
+      de tarifs/dates/pièces, la FAQ, et les tarifs maritimes — absents d'une
+      version antérieure du prototype Figma, désormais bien présents dans la
+      v2 et déjà couverts par `tuition_plans`.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
