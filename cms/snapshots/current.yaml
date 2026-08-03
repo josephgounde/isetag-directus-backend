@@ -1391,6 +1391,206 @@ fields:
       has_auto_increment: false
       foreign_key_table: null
       foreign_key_column: null
+  - collection: accueil_cta_banner
+    field: eyebrow_fr
+    type: string
+    meta:
+      collection: accueil_cta_banner
+      conditions: null
+      display: null
+      display_options: null
+      field: eyebrow_fr
+      group: null
+      hidden: false
+      interface: input
+      note: Petit label au-dessus du heading (ex. "Admissions") — optionnel
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: eyebrow_fr
+      table: accueil_cta_banner
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_cta_banner
+    field: eyebrow_en
+    type: string
+    meta:
+      collection: accueil_cta_banner
+      conditions: null
+      display: null
+      display_options: null
+      field: eyebrow_en
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: eyebrow_en
+      table: accueil_cta_banner
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_cta_banner
+    field: cta2_label_fr
+    type: string
+    meta:
+      collection: accueil_cta_banner
+      conditions: null
+      display: null
+      display_options: null
+      field: cta2_label_fr
+      group: null
+      hidden: false
+      interface: input
+      note: Deuxième bouton (Figma v2 a 2 CTA sur ce bandeau) — optionnel
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 20
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: cta2_label_fr
+      table: accueil_cta_banner
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_cta_banner
+    field: cta2_label_en
+    type: string
+    meta:
+      collection: accueil_cta_banner
+      conditions: null
+      display: null
+      display_options: null
+      field: cta2_label_en
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 21
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: cta2_label_en
+      table: accueil_cta_banner
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_cta_banner
+    field: cta2_url
+    type: string
+    meta:
+      collection: accueil_cta_banner
+      conditions: null
+      display: null
+      display_options: null
+      field: cta2_url
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 22
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: cta2_url
+      table: accueil_cta_banner
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
   - collection: accueil_hero
     field: id
     type: integer
@@ -3451,6 +3651,206 @@ fields:
       validation: null
       validation_message: null
       width: full
+  - collection: accueil_testimonials_highlight
+    field: eyebrow_fr
+    type: string
+    meta:
+      collection: accueil_testimonials_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: eyebrow_fr
+      group: null
+      hidden: false
+      interface: input
+      note: Grand titre au-dessus du heading (ex. "Les Alumnis de ISETAG")
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: eyebrow_fr
+      table: accueil_testimonials_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_testimonials_highlight
+    field: eyebrow_en
+    type: string
+    meta:
+      collection: accueil_testimonials_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: eyebrow_en
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: eyebrow_en
+      table: accueil_testimonials_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_testimonials_highlight
+    field: cta_label_fr
+    type: string
+    meta:
+      collection: accueil_testimonials_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: cta_label_fr
+      group: null
+      hidden: false
+      interface: input
+      note: Même pattern que actualites_testimonials_highlight
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 20
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: cta_label_fr
+      table: accueil_testimonials_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_testimonials_highlight
+    field: cta_label_en
+    type: string
+    meta:
+      collection: accueil_testimonials_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: cta_label_en
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 21
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: cta_label_en
+      table: accueil_testimonials_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_testimonials_highlight
+    field: cta_url
+    type: string
+    meta:
+      collection: accueil_testimonials_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: cta_url
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 22
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: cta_url
+      table: accueil_testimonials_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
   - collection: accueil_testimonials_highlight_testimonials
     field: id
     type: integer
@@ -4142,6 +4542,86 @@ fields:
       width: half
     schema:
       name: quote_program
+      table: accueil_vie_campus_teaser
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser
+    field: eyebrow_fr
+    type: string
+    meta:
+      collection: accueil_vie_campus_teaser
+      conditions: null
+      display: null
+      display_options: null
+      field: eyebrow_fr
+      group: null
+      hidden: false
+      interface: input
+      note: Petit titre au-dessus du heading (ex. "La Vie sur nos Campus")
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: eyebrow_fr
+      table: accueil_vie_campus_teaser
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: accueil_vie_campus_teaser
+    field: eyebrow_en
+    type: string
+    meta:
+      collection: accueil_vie_campus_teaser
+      conditions: null
+      display: null
+      display_options: null
+      field: eyebrow_en
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: eyebrow_en
       table: accueil_vie_campus_teaser
       data_type: character varying
       default_value: null

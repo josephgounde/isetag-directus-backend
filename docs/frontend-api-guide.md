@@ -143,7 +143,13 @@ contenu réel à ce jour :
 - **`admissions_cta_banner`** — heading_fr/en, text_fr/en, button_label_fr/en, button_url
 - **`accueil_hero`** — title_fr/en, subtitle_fr/en, image, **deux** CTA
   (`cta1_label_fr/en`/`cta1_url`, `cta2_label_fr/en`/`cta2_url` — la page
-  Accueil a deux boutons hero, contrairement à Admissions qui n'en a qu'un)
+  Accueil a deux boutons hero, contrairement à Admissions qui n'en a qu'un).
+  Copie mise à jour 2026-08-03 pour coller au texte réel du prototype Figma v2
+  (`title_fr` = "Choisir l'ISETAG", `subtitle_fr` = "C'est s'offrir une
+  profession", `cta1` = "Je me pré-inscris" → `/admissions#pre-inscription`,
+  `cta2` = "Découvrir nos Programmes" → `/programmes`) — remplace l'ancienne
+  copie plus longue rédigée avant que l'équipe design finalise le texte
+  on-page ; `image` inchangée (déjà la bonne photo du portail/cour campus)
 - **`accueil_poles_highlight`** — heading_fr/en uniquement (heading_fr =
   "Choisis le pôle qui te valorise", repris du prototype Figma — absent du
   document éditorial d'origine) ; le carrousel de pôles lui-même vient
@@ -152,41 +158,74 @@ contenu réel à ce jour :
   jonction M2M ici). Chaque carte pôle affiche en plus la liste de ses
   `programs` (filtrer `programs?filter[pole][_eq]=<id>` — les libellés courts
   du prototype ne correspondent pas toujours exactement à `name_fr`, à
-  vérifier avec l'équipe design/contenu)
+  vérifier avec l'équipe design/contenu). `poles.description_fr` (déjà
+  existant) concorde mot pour mot avec le texte affiché sur la carte active
+  dans le prototype Figma v2 (vérifié 2026-08-03, pôle Maritime) — aucune
+  correction nécessaire. `poles.image` (5 photos réelles fournies par
+  l'équipe institutionnelle, uploadées 2026-07-31) diffère des photos
+  utilisées dans le prototype Figma v2 (silhouettes stock génériques par
+  métier) — **conservées telles quelles délibérément** : les photos réelles de
+  l'institution sont préférées aux silhouettes stock du prototype, à moins
+  que l'équipe design ne demande explicitement l'alignement visuel
 - **`accueil_reasons`** — heading_fr/en + `items` (O2M ordonné par `sort` :
   title_fr/en, description_fr/en, `image`) — le carrousel "5 raisons de
   choisir l'ISETAG"
-- **`accueil_cta_banner`** — heading_fr/en, text_fr/en, button_label_fr/en,
-  button_url — même schéma que `admissions_cta_banner` mais collection
-  propre à Accueil ; **deux lignes existent** (teaser Admissions en milieu de
-  page, CTA final en bas de page), le frontend les distingue par `sort` dans
-  `pages_sections`, pas par un champ dédié
-- **`accueil_partners_highlight`** — heading_fr/en + intro_text_fr/en +
-  `partners` (M2M curaté à la main, via jonction
-  `accueil_partners_highlight_partners`)
-- **`accueil_testimonials_highlight`** — heading_fr/en + `testimonials` (M2M
-  curaté à la main, via jonction `accueil_testimonials_highlight_testimonials`)
-  — section Alumni de la page Accueil (ne pas confondre avec
-  `actualites_testimonials_highlight`, section différente de la page Actualités)
+- **`accueil_cta_banner`** — heading_fr/en, text_fr/en, button_label_fr/en
+  (= CTA 1), button_url — même schéma de base que `admissions_cta_banner` mais
+  collection propre à Accueil ; **deux lignes existent** (teaser Admissions en
+  milieu de page, CTA final en bas de page), le frontend les distingue par
+  `sort` dans `pages_sections`, pas par un champ dédié. + `eyebrow_fr/en`
+  (ajouté 2026-08-03, optionnel) — petit label au-dessus du heading, rempli
+  uniquement sur la ligne teaser (`"Admissions"`), `null` sur le bandeau final.
+  + `cta2_label_fr/en`/`cta2_url` (ajoutés 2026-08-03) — le prototype Figma v2
+  affiche **2 boutons** sur les deux bandeaux ; `cta2_url` du teaser
+  (`/admissions#modalites`) et de la section Alumni ci-dessous (`cta_url`,
+  `/actualites#success-stories`) sont **déduits**, pas confirmés par le
+  frontend — même statut que `/vie-campus/` plus bas
+- **`accueil_partners_highlight`** — heading_fr/en (= "Nos Entreprises
+  Partenaires", corrigé 2026-08-03 pour coller au prototype Figma v2, était
+  "Entreprises & Institutions Partenaires") + intro_text_fr/en + `partners`
+  (M2M curaté à la main, via jonction `accueil_partners_highlight_partners`).
+  Les 8 partenaires existent déjà (mêmes 8 que le prototype Figma v2) mais
+  **`partners.logo` est `null` sur les 8 lignes** — les vrais logos sont
+  visibles dans le prototype mais n'ont pas pu être extraits de manière fiable
+  (rendu WebGL en lecture seule, pas d'accès export) ; à fournir par l'équipe
+  design/contenu ou via un accès édition au fichier Figma
+- **`accueil_testimonials_highlight`** — heading_fr/en (= sous-titre affiché,
+  "Que deviennent nos anciens étudiants ?") + `testimonials` (M2M curaté à la
+  main, via jonction `accueil_testimonials_highlight_testimonials`) — section
+  Alumni de la page Accueil (ne pas confondre avec
+  `actualites_testimonials_highlight`, section différente de la page
+  Actualités). + `eyebrow_fr/en` (ajouté 2026-08-03) — grand titre affiché
+  au-dessus du heading dans Figma (= "Les Alumnis de ISETAG" ; le nom de champ
+  "eyebrow" est trompeur ici, visuellement c'est le plus gros des deux titres,
+  gardé pour cohérence avec les autres blocs). + `cta_label_fr/en`/`cta_url`
+  (ajoutés 2026-08-03) — bouton "Découvez nos success stories" (coquille
+  d'origine dans Figma, conservée telle quelle) ; même pattern que
+  `actualites_testimonials_highlight` qui avait déjà ces champs
 - **`accueil_vie_campus_teaser`** — heading_fr/en, text_fr/en, `image`, +
   `cta_label_fr/en`/`cta_url` (ajoutés 2026-08-01) — court teaser en bas de la
   page Accueil. Contenu réel actuel : `cta_label_fr` = "Découvrez notre
   campus", `cta_url` = `/vie-campus/` (route déduite des liens relatifs déjà
   utilisés ailleurs dans le contenu, ex. `/vie-campus/cite-universitaire/`
   dans `admissions_richtext` — **à confirmer avec le frontend** si la route
-  réelle diffère). + `gallery` (O2M, alias vers `accueil_vie_campus_teaser_gallery`,
-  ajouté 2026-08-01) — galerie de photos supplémentaires vue dans le
-  prototype Figma v2 (mosaïque de plusieurs images en plus du fond) ;
-  **structure prête, collection vide** (`gallery: []`), aucune photo fournie
-  pour l'instant. + `quote_text_fr/en`, `quote_author`, `quote_program`
-  (ajoutés 2026-08-01) — citation d'un étudiant incrustée sur la mosaïque
-  dans le prototype (ex. "Charles Mengue", "L3 Banques et Finance") ; champs
-  dédiés plutôt qu'un lien vers `testimonials` car un seul témoignage est
-  affiché ici, pas une liste curatée. **Structure prête, tous `null`** —
-  aucun contenu réel fourni pour l'instant, à remplir dès que l'équipe
-  design/contenu transmet la vraie citation. `heading_fr` reste "Un cadre d'études structuré à Yassa"
-  bien que Figma affiche "La Vie sur nos Campus" — écart connu, non corrigé
-  sur demande explicite
+  réelle diffère). + `eyebrow_fr/en` (ajouté 2026-08-03) — petit titre affiché
+  au-dessus du heading dans Figma (= "La Vie sur nos Campus") ; confirme que
+  `heading_fr` ("Un cadre d'études structuré à Yassa") n'était **pas** un écart
+  à corriger comme supposé le 2026-08-01, mais un second niveau de titre
+  distinct — la décision de ne pas y toucher était la bonne. + `gallery` (O2M,
+  alias vers `accueil_vie_campus_teaser_gallery`, ajouté 2026-08-01) — galerie
+  de photos supplémentaires vue dans le prototype Figma v2 (mosaïque de
+  plusieurs images en plus du fond) ; **structure prête, collection vide**
+  (`gallery: []`) — les 3 photos réelles existent dans le prototype Figma mais
+  n'ont pas pu être extraites de manière fiable (mêmes limites techniques que
+  les logos partenaires ci-dessus). + `quote_text_fr/en`, `quote_author`,
+  `quote_program` (ajoutés 2026-08-01, **remplis 2026-08-03** avec le vrai
+  contenu du prototype Figma v2) — citation d'un étudiant incrustée sur la
+  mosaïque : `quote_text_fr` = "On se sent bien dans les logments" (coquille
+  "logments" présente telle quelle dans la maquette source, conservée à
+  l'identique — à signaler à l'équipe contenu), `quote_author` = "Charles
+  Mengue", `quote_program` = "L3 Banques et Finance"
 - **`actualites_testimonials_highlight`** — heading_fr/en + cta_label_fr/en +
   cta_url optionnels + `testimonials` (M2M curaté à la main, via jonction
   `actualites_testimonials_highlight_testimonials`) — section "Success Stories"

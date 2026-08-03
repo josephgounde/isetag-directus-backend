@@ -729,6 +729,59 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       qu'un lien vers `testimonials` (un seul témoignage affiché ici, pas une
       liste). Appliqué dev+prod, tous `null`, aucune permission à toucher
       (champs texte simples sur une collection déjà publique).
+- [x] (2026-08-03) Comparaison structurelle + contenu du prototype Figma
+      **v2** de la page **Accueil** (le prototype a maintenant du contenu réel
+      partout, plus des blocs de test) contre le schéma/contenu Directus
+      existant, frame par frame (frame "Accueil - Desktop", node-id 4116:1344).
+      Résultat :
+      - `poles.description_fr` (5 pôles) et `accueil_reasons.items` (5
+        raisons) concordaient déjà mot pour mot avec Figma — aucune action.
+      - Champs manquants ajoutés (structure seulement, sur dev puis appliqué
+        sur prod) : `accueil_cta_banner.eyebrow_fr/en` +
+        `cta2_label_fr/en`/`cta2_url` (le prototype a 2 boutons par bandeau,
+        pas 1) ; `accueil_testimonials_highlight.eyebrow_fr/en` +
+        `cta_label_fr/en`/`cta_url` (même pattern que
+        `actualites_testimonials_highlight`) ; `accueil_vie_campus_teaser.eyebrow_fr/en`.
+      - Contenu réécrit pour coller au texte finalisé du prototype (remplace
+        une copie plus ancienne, rédigée avant que le texte on-page soit
+        arrêté) : `accueil_hero` (title/subtitle/2 CTA), les 2 lignes
+        `accueil_cta_banner` (teaser Admissions + bandeau final),
+        `accueil_partners_highlight.heading_fr`.
+      - Contenu réel enfin disponible pour des champs laissés vides le
+        2026-08-01 : `accueil_vie_campus_teaser.quote_text_fr/quote_author/quote_program`
+        remplis ("On se sent bien dans les logments" — coquille d'origine
+        conservée telle quelle —, "Charles Mengue", "L3 Banques et Finance") ;
+        `accueil_testimonials_highlight.eyebrow_fr` rempli ("Les Alumnis de
+        ISETAG" — confirme que c'est un second niveau de titre, pas un
+        heading_fr à remplacer). Ceci confirme aussi que la décision du
+        2026-08-01 de ne pas toucher `accueil_vie_campus_teaser.heading_fr`
+        était correcte : "La Vie sur nos Campus" est un eyebrow au-dessus, pas
+        un remplacement.
+      - Décision explicite : **`poles.image`** (5 photos réelles fournies par
+        l'utilisateur, uploadées le 2026-07-31) n'a **pas** été remplacée par
+        les photos du prototype Figma v2, qui utilise des silhouettes stock
+        génériques par métier (casque de chantier, tenue militaire, blouse
+        médicale, etc.) plutôt que les vraies photos institutionnelles — les
+        photos réelles restent préférables, sauf demande contraire explicite
+        de l'équipe design.
+      - **Non résolu** : les 8 logos partenaires (`partners.logo`, tous
+        `null`) et les 3 photos de la mosaïque `accueil_vie_campus_teaser_gallery`
+        (toujours vide) sont visibles dans le prototype Figma mais n'ont pas pu
+        être extraits de façon fiable — le fichier Figma est en lecture seule
+        (pas de droits d'édition/export) et son rendu WebGL ne permet
+        l'extraction d'assets qu'indirectement (interception réseau des
+        requêtes d'image), ce qui a marché pour les photos de pôles mais pas
+        pour ces deux ensembles (probablement chargés différemment ou trop
+        petits pour déclencher une requête réseau séparée). À fournir par
+        l'équipe design/contenu, ou revisiter avec un accès édition au fichier
+        Figma.
+      - Trouvé par accident (image préchargée par Figma, hors périmètre de
+        cette page) : un visuel réel "Bourse Académique d'Innovation" de la
+        **SNK Foundation** (bourse pour bacheliers scientifiques, dépôt via
+        snk-foundation.org, deadline 15 août 2026) — pertinent pour le
+        `scholarships` de la page Admissions ("Bourse SNK", laissée vide le
+        2026-08-01), pas pour Accueil. Signalé ici mais aucune action prise
+        sur Admissions dans cette passe.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
