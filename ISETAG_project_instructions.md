@@ -780,13 +780,50 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       ainsi (175 Ko / 435 Ko en sortie) ; la troisième (339 Ko) et les 8 logos
       (tous < 10 Ko) sont restés dans leur format d'origine. Appliqué dev+prod,
       vérifié via `/assets/<uuid>`.
-      - Trouvé par accident (image préchargée par Figma, hors périmètre de
-        cette page) : un visuel réel "Bourse Académique d'Innovation" de la
+      - Trouvé par accident (image préchargée par Figma pendant l'audit
+        Accueil) : un visuel réel "Bourse Académique d'Innovation" de la
         **SNK Foundation** (bourse pour bacheliers scientifiques, dépôt via
-        snk-foundation.org, deadline 15 août 2026) — pertinent pour le
-        `scholarships` de la page Admissions ("Bourse SNK", laissée vide le
-        2026-08-01), pas pour Accueil. Signalé ici mais aucune action prise
-        sur Admissions dans cette passe.
+        snk-foundation.org, deadline 15 août 2026). **Correction** : ce
+        visuel appartient bien à la page Admissions (frame "Admissions -
+        Desktop", carte "Bourse SNK"), pas à une page hors périmètre comme
+        supposé le 2026-08-03 au moment de la trouvaille — utilisé le jour
+        même dans l'audit Admissions ci-dessous.
+- [x] (2026-08-03) Comparaison structurelle + contenu du prototype Figma
+      **v2** de la page **Admissions** (frame "Admissions - Desktop") contre
+      le schéma/contenu Directus existant. Le contenu réel du prototype a
+      confirmé deux angles morts identifiés le 2026-07-31 (`tuition_plans`
+      jamais branchée, `scholarships` toujours vide) :
+      - **Nouvelles collections de bloc** créées et appliquées dev+prod :
+        `admissions_tuition_highlight` et `admissions_scholarships_highlight`
+        (heading_fr/en uniquement, même pattern que
+        `accueil_poles_highlight` — pas de sélection curatée, le frontend
+        requête `tuition_plans`/`scholarships` directement, triés par
+        `display_order`). Ajoutées à `pages_sections.item.one_allowed_collections`
+        et à `provision_public_read.py`.
+      - **`tuition_plans`** (10 lignes réelles) branchée à la page (nouvelle
+        section, sort=11, juste après l'intro "Tarifs & Bourses"). Écart de
+        montant trouvé et corrigé sur confirmation explicite de
+        l'utilisateur : `id=6` ("Licence — Sciences de gestion appliquée")
+        était à 500 000 FCFA, corrigé à **395 000 FCFA** (valeur confirmée
+        par l'utilisateur, conforme au prototype).
+      - **`scholarships`** (0 ligne) rempli avec 2 lignes réelles (nouvelle
+        section, sort=12) : "Bourse SNK" (description/conditions/CTA tirés du
+        vrai flyer SNK Foundation trouvé la veille, image attachée,
+        `cta_url` = `https://www.snk-foundation.org`) et "Bourse de
+        l'Université Montplaisir Tunis" (texte honnête repris de
+        `admissions_richtext` — conditions "en cours de confirmation", pas
+        d'image dans le prototype, `cta_url` laissé `null`).
+      - `pages_sections` de la page Admissions renumérotée en conséquence :
+        17 → **19 sections** (les sections sort 11-17 d'origine décalées à
+        13-19 pour faire de la place aux 2 nouvelles en position 11-12).
+      - **Décision explicite de l'utilisateur** : `admissions_hero.title_fr`
+        **reste** "Construisez votre parcours à l'ISETAG" — le prototype
+        Figma v2 affiche "Comment s'inscrire ?" mais l'utilisateur a choisi
+        de ne pas aligner ce champ. Écart connu, volontaire, ne pas
+        "corriger" sans nouvelle instruction.
+      - Reste non résolu (inchangé depuis le 2026-07-30) : le texte
+        "cérémonie de lauréats" apparaît deux fois dans le prototype sans
+        section dédiée dans les 19 actuelles — pas d'action prise.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

@@ -63,6 +63,8 @@ READ_COLLECTIONS = [
     ("admissions_cta_banner", {}, ["*"]),
     ("admissions_steps", {}, ["*"]),
     ("admissions_steps_items", {}, ["*"]),
+    ("admissions_tuition_highlight", {}, ["*"]),
+    ("admissions_scholarships_highlight", {}, ["*"]),
     ("accueil_news_preview", {}, ["*"]),
     ("accueil_programs_highlight", {}, ["*"]),
     ("accueil_programs_highlight_programs", {}, ["*"]),

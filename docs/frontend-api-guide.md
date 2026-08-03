@@ -109,8 +109,14 @@ Tout se récupère en **un seul appel** grâce au deep-fetch, en listant les
 collections propres à la page demandée dans `sections.item:<collection>.*` :
 
 ```
-GET {BASE_URL}/items/pages?filter[key][_eq]=admissions&fields=*,sections.collection,sections.sort,sections.item:admissions_hero.*,sections.item:admissions_richtext.*,sections.item:admissions_feature.*,sections.item:admissions_steps.items.*,sections.item:admissions_cta_banner.*
+GET {BASE_URL}/items/pages?filter[key][_eq]=admissions&fields=*,sections.collection,sections.sort,sections.item:admissions_hero.*,sections.item:admissions_richtext.*,sections.item:admissions_feature.*,sections.item:admissions_steps.items.*,sections.item:admissions_cta_banner.*,sections.item:admissions_tuition_highlight.*,sections.item:admissions_scholarships_highlight.*
 ```
+
+`admissions_tuition_highlight` et `admissions_scholarships_highlight` ne
+portent que le `heading_fr/en` — le frontend doit faire un appel séparé pour
+les données réelles : `GET {BASE_URL}/items/tuition_plans?filter[status][_eq]=published&sort=display_order`
+et `GET {BASE_URL}/items/scholarships?filter[status][_eq]=published&sort=display_order`
+(même pattern que `poles` pour la section pôles d'Accueil).
 
 Exemple pour Accueil (noter le `.partners.partners_id.*` et
 `.testimonials.testimonials_id.*` pour traverser les jonctions M2M jusqu'aux
@@ -140,6 +146,14 @@ contenu réel à ce jour :
   optionnelle (illustration du bloc — ne jamais faire porter une URL d'image
   par le HTML du WYSIWYG lui-même : ça fige l'environnement, un champ fichier
   dédié laisse le frontend construire l'URL avec le bon `BASE_URL`)
+- **`admissions_tuition_highlight`** (ajouté 2026-08-03) — heading_fr/en
+  uniquement (= "Tarifs et Frais d'Inscription", repris du prototype Figma
+  v2), même pattern que `accueil_poles_highlight` : le tableau de prix
+  lui-même vient directement de la collection partagée `tuition_plans` (les
+  10 lignes, triées par `display_order`, pas de sélection curatée)
+- **`admissions_scholarships_highlight`** (ajouté 2026-08-03) — heading_fr/en
+  uniquement (= "Bourses, aides et facilités"), même pattern : les cartes
+  viennent directement de `scholarships` (triées par `display_order`)
 - **`admissions_cta_banner`** — heading_fr/en, text_fr/en, button_label_fr/en, button_url
 - **`accueil_hero`** — title_fr/en, subtitle_fr/en, image, **deux** CTA
   (`cta1_label_fr/en`/`cta1_url`, `cta2_label_fr/en`/`cta2_url` — la page
@@ -257,7 +271,8 @@ de vérité pour savoir exactement quelles collections existent à un instant do
 Les 6 pages existent déjà (`accueil`, `programmes`, `admissions`, `vie_campus`,
 `actualites`, `contact`, toutes `status: published`, + `a_propos` conservée
 mais probablement inutile vu que son contenu vit dans le hero Accueil).
-`accueil` (8 sections) et `admissions` (17 sections) ont du contenu réel ; les
+`accueil` (8 sections) et `admissions` (19 sections, depuis l'ajout des
+sections tarifs/bourses le 2026-08-03) ont du contenu réel ; les
 4 autres renvoient `sections: []` en attendant que l'équipe communication/
 admissions compose leur contenu via l'Admin UI Directus.
 
@@ -277,19 +292,28 @@ Résumé :
 - **scholarships** — `name`, `amount`, `description`, `conditions`,
   `display_order`, `status` (**filtrer `_eq: published`**), + `image`,
   `cta_label_fr/en`, `cta_url` (ajoutés 2026-08-01 pour matcher les cartes
-  "Bourses" du prototype Figma v2 de la page Admissions — **collection
-  toujours vide**, structure prête mais aucun contenu réel saisi ; ne pas
-  construire de section frontend dessus tant qu'elle n'a pas de lignes)
+  "Bourses" du prototype Figma v2 de la page Admissions). **2 lignes réelles
+  ajoutées 2026-08-03** après confirmation du contenu réel du prototype :
+  "Bourse SNK" (image = flyer réel "Bourse Académique d'Innovation" de la SNK
+  Foundation, `cta_url` = `https://www.snk-foundation.org`, vraie URL trouvée
+  sur le flyer) et "Bourse de l'Université Montplaisir Tunis" (pas d'image
+  dans le prototype, `cta_url` laissé `null` — pas de cible confirmée).
+  Branchée sur la page Admissions via la nouvelle section
+  `admissions_scholarships_highlight` (voir plus bas).
 - **tuition_plans** — `cycle_name`, `level` (BTS/HND, Licence, Master,
   Maritime), `total_amount`, `installments` (JSON), `note`, `display_order`,
-  `status` (**filtrer `_eq: published`**) — **10 lignes réelles déjà en
-  base**, non utilisée par la page Admissions actuelle (qui affiche un
-  tableau HTML équivalent codé en dur dans `admissions_richtext`) ; à
-  brancher sur la page le jour où le composant "Cycle BTS/Licence/Master" du
-  prototype v2 sera implémenté. Note : le prototype ne montre pas de carte
-  Maritime — les 2 lignes `level: "Maritime"` restent donc sans page pour
-  l'instant, laissées telles quelles en attendant que l'équipe design ajoute
-  cette carte
+  `status` (**filtrer `_eq: published`**) — **10 lignes réelles**, désormais
+  **branchées sur la page Admissions** (2026-08-03) via la nouvelle section
+  `admissions_tuition_highlight` (voir plus bas) ; le tableau HTML codé en dur
+  dans `admissions_richtext` (sort 9) reste en place à côté (texte
+  d'introduction + liste des filières par cycle), le vrai tableau de prix
+  vient de cette collection. Un écart de montant a été corrigé le 2026-08-03 :
+  `id=6` ("Licence — Sciences de gestion appliquée") était à 500 000 FCFA,
+  corrigé à **395 000 FCFA** (valeur confirmée par l'utilisateur, conforme au
+  prototype Figma v2). Note : le prototype ne montre pas de carte Maritime
+  séparée — les 2 lignes `level: "Maritime"` restent affichées avec les
+  autres (triées par `display_order`), aucune section dédiée n'existe pour
+  elles dans Figma
 - **news** — `slug`, `title_fr`, `title_en`, `category`, `content_fr`,
   `date_published`, `cover_image`
 - **campus_services** — `name_fr`, `name_en`, `icon`, `category`, `display_section`

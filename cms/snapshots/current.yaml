@@ -706,6 +706,30 @@ collections:
       versioning: false
     schema:
       name: admissions_richtext
+  - collection: admissions_scholarships_highlight
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: admissions_scholarships_highlight
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: school
+      item_duplication_fields: null
+      note: Section Bourses — wrapper heading pour scholarships (page Admissions)
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+      versioning: false
+    schema:
+      name: admissions_scholarships_highlight
   - collection: admissions_steps
     meta:
       accountability: all
@@ -756,6 +780,30 @@ collections:
       versioning: false
     schema:
       name: admissions_steps_items
+  - collection: admissions_tuition_highlight
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: admissions_tuition_highlight
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: payments
+      item_duplication_fields: null
+      note: Section Tarifs — wrapper heading pour tuition_plans (page Admissions)
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+      versioning: false
+    schema:
+      name: admissions_tuition_highlight
   - collection: campus_services
     meta:
       accountability: all
@@ -8350,6 +8398,126 @@ fields:
       has_auto_increment: false
       foreign_key_table: directus_files
       foreign_key_column: id
+  - collection: admissions_scholarships_highlight
+    field: id
+    type: integer
+    meta:
+      collection: admissions_scholarships_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: admissions_scholarships_highlight
+      data_type: integer
+      default_value: nextval('admissions_scholarships_highlight_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: admissions_scholarships_highlight
+    field: heading_fr
+    type: string
+    meta:
+      collection: admissions_scholarships_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: heading_fr
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: heading_fr
+      table: admissions_scholarships_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: admissions_scholarships_highlight
+    field: heading_en
+    type: string
+    meta:
+      collection: admissions_scholarships_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: heading_en
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: heading_en
+      table: admissions_scholarships_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
   - collection: admissions_steps
     field: id
     type: integer
@@ -8765,6 +8933,126 @@ fields:
       max_length: null
       numeric_precision: 32
       numeric_scale: 0
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: admissions_tuition_highlight
+    field: id
+    type: integer
+    meta:
+      collection: admissions_tuition_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: admissions_tuition_highlight
+      data_type: integer
+      default_value: nextval('admissions_tuition_highlight_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: admissions_tuition_highlight
+    field: heading_fr
+    type: string
+    meta:
+      collection: admissions_tuition_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: heading_fr
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: heading_fr
+      table: admissions_tuition_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: admissions_tuition_highlight
+    field: heading_en
+    type: string
+    meta:
+      collection: admissions_tuition_highlight
+      conditions: null
+      display: null
+      display_options: null
+      field: heading_en
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      searchable: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: heading_en
+      table: admissions_tuition_highlight
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
       is_nullable: true
       is_unique: false
       is_indexed: false
@@ -13437,6 +13725,8 @@ relations:
         - accueil_partners_highlight
         - accueil_testimonials_highlight
         - accueil_vie_campus_teaser
+        - admissions_tuition_highlight
+        - admissions_scholarships_highlight
       one_collection: null
       one_collection_field: collection
       one_deselect_action: nullify
