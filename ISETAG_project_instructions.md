@@ -824,6 +824,35 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       - Reste non résolu (inchangé depuis le 2026-07-30) : le texte
         "cérémonie de lauréats" apparaît deux fois dans le prototype sans
         section dédiée dans les 19 actuelles — pas d'action prise.
+- [x] (2026-08-03) **Bug schéma corrigé** : plusieurs champs fichier
+      (`type: uuid`, `meta.special: ["file"]`, interface `file-image`) étaient
+      configurés comme des champs fichier **sans la relation FK réelle** vers
+      `directus_files` derrière. Résultat concret constaté par l'utilisateur :
+      les champs affichaient bien la vraie valeur (UUID) via l'API, le fichier
+      existait et était servi correctement par `/assets/<uuid>`, **mais
+      l'Admin UI affichait "Choose File from Library" comme si le champ était
+      vide** — le composant file-picker ne peut pas résoudre/afficher la
+      vignette sans la relation. `fields=*,champ.*` en deep-fetch API
+      retournait aussi juste la valeur brute sans jamais faire l'expansion.
+      Audit systématique des 17 champs fichier de tout le schéma
+      (`GET /fields` puis `GET /relations/<collection>/<field>` pour chacun) :
+      **6 champs touchés**, corrigés en créant la relation manquante via
+      `POST /relations` (dev, puis snapshot/apply/restart vers prod) :
+      - `accueil_vie_campus_teaser_gallery.image` — introduit par erreur dans
+        cette session (2026-08-01, script `add_vie_campus_gallery.py`) : la
+        relation O2M parent↔enfant avait été créée, mais pas la relation M2O
+        `image` → `directus_files` elle-même.
+      - `partners.logo`, `documents.file`, `news.cover_image`,
+        `programs.cover_image`, `testimonials.photo` — gap **préexistant**,
+        antérieur à ce projet Directus (pas introduit par le travail de cette
+        session), présent depuis la création initiale de ces collections de
+        base. Explique pourquoi l'utilisateur ne voyait aucune image sur
+        `partners`/`accueil_vie_campus_teaser_gallery` dans l'Admin malgré des
+        uploads réussis (logos partenaires et galerie Vie Campus faits plus
+        tôt le même jour).
+      Les 17 champs fichier du schéma ont été vérifiés un par un après coup —
+      tous ont désormais une relation FK réelle vers `directus_files`, sur dev
+      et prod.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

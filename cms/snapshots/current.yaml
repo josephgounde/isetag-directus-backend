@@ -4805,8 +4805,8 @@ fields:
       is_generated: false
       generation_expression: null
       has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
+      foreign_key_table: directus_files
+      foreign_key_column: id
   - collection: accueil_vie_campus_teaser_gallery
     field: sort
     type: integer
@@ -9757,8 +9757,8 @@ fields:
       is_generated: false
       generation_expression: null
       has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
+      foreign_key_table: directus_files
+      foreign_key_column: id
   - collection: documents
     field: display_order
     type: integer
@@ -10177,8 +10177,8 @@ fields:
       is_generated: false
       generation_expression: null
       has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
+      foreign_key_table: directus_files
+      foreign_key_column: id
   - collection: pages
     field: id
     type: integer
@@ -10689,8 +10689,8 @@ fields:
       is_generated: false
       generation_expression: null
       has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
+      foreign_key_table: directus_files
+      foreign_key_column: id
   - collection: partners
     field: type
     type: string
@@ -11701,8 +11701,8 @@ fields:
       is_generated: false
       generation_expression: null
       has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
+      foreign_key_table: directus_files
+      foreign_key_column: id
   - collection: programs
     field: status
     type: string
@@ -12760,8 +12760,8 @@ fields:
       is_generated: false
       generation_expression: null
       has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
+      foreign_key_table: directus_files
+      foreign_key_column: id
   - collection: testimonials
     field: video_url
     type: string
@@ -13428,6 +13428,27 @@ relations:
       constraint_name: accueil_vie_campus_teaser_gallery_accueil___70de150b_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
+  - collection: accueil_vie_campus_teaser_gallery
+    field: image
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: accueil_vie_campus_teaser_gallery
+      many_field: image
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: accueil_vie_campus_teaser_gallery
+      column: image
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: accueil_vie_campus_teaser_gallery_image_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
   - collection: actualites_testimonials_highlight_testimonials
     field: actualites_testimonials_highlight_id
     related_collection: actualites_testimonials_highlight
@@ -13680,6 +13701,48 @@ relations:
       constraint_name: admissions_steps_items_admissions_steps_id_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
+  - collection: documents
+    field: file
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: documents
+      many_field: file
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: documents
+      column: file
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: documents_file_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: news
+    field: cover_image
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: news
+      many_field: cover_image
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: news
+      column: cover_image
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: news_cover_image_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
   - collection: pages_sections
     field: pages_id
     related_collection: pages
@@ -13732,6 +13795,27 @@ relations:
       one_deselect_action: nullify
       one_field: null
       sort_field: null
+  - collection: partners
+    field: logo
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: partners
+      many_field: logo
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: partners
+      column: logo
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: partners_logo_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
   - collection: poles
     field: image
     related_collection: directus_files
@@ -13774,6 +13858,27 @@ relations:
       constraint_name: programs_pole_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
+  - collection: programs
+    field: cover_image
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: programs
+      many_field: cover_image
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: programs
+      column: cover_image
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: programs_cover_image_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
   - collection: scholarships
     field: image
     related_collection: directus_files
@@ -13814,5 +13919,26 @@ relations:
       foreign_key_table: programs
       foreign_key_column: id
       constraint_name: testimonials_program_foreign
+      on_update: NO ACTION
+      on_delete: NO ACTION
+  - collection: testimonials
+    field: photo
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: testimonials
+      many_field: photo
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: testimonials
+      column: photo
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: testimonials_photo_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
