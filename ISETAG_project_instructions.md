@@ -764,17 +764,22 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         médicale, etc.) plutôt que les vraies photos institutionnelles — les
         photos réelles restent préférables, sauf demande contraire explicite
         de l'équipe design.
-      - **Non résolu** : les 8 logos partenaires (`partners.logo`, tous
-        `null`) et les 3 photos de la mosaïque `accueil_vie_campus_teaser_gallery`
-        (toujours vide) sont visibles dans le prototype Figma mais n'ont pas pu
-        être extraits de façon fiable — le fichier Figma est en lecture seule
-        (pas de droits d'édition/export) et son rendu WebGL ne permet
-        l'extraction d'assets qu'indirectement (interception réseau des
-        requêtes d'image), ce qui a marché pour les photos de pôles mais pas
-        pour ces deux ensembles (probablement chargés différemment ou trop
-        petits pour déclencher une requête réseau séparée). À fournir par
-        l'équipe design/contenu, ou revisiter avec un accès édition au fichier
-        Figma.
+      - Logos partenaires et photos Vie Campus non extractibles de Figma dans
+        cette passe (voir juste au-dessus) — **résolu le jour même** : voir
+        entrée suivante, l'utilisateur a fourni les fichiers réels directement.
+- [x] (2026-08-03) Logos partenaires + galerie Vie Campus fournis par
+      l'utilisateur dans `contenuç_accueil` (8 fichiers `part1.png`…`part8.png`
+      + `vie campus1/2/3`), identifiés visuellement et attachés : `partners.logo`
+      rempli sur les 8 lignes (Port Autonome de Douala, Université de Douala,
+      ENSP Douala, Université Montplaisir Tunis, IAHF, EEMI, IHECF Paris,
+      Regional Maritime University) ; `accueil_vie_campus_teaser_gallery` rempli
+      avec 3 lignes (`sort` 1-3). Nouvelle règle projet appliquée pour la
+      première fois : toute image dépassant 1 Mo est convertie en WebP (et
+      redimensionnée à ~2000px de large si nécessaire) avant upload — deux des
+      trois photos Vie Campus (17,5 Mo et 27,7 Mo en JPEG) ont été converties
+      ainsi (175 Ko / 435 Ko en sortie) ; la troisième (339 Ko) et les 8 logos
+      (tous < 10 Ko) sont restés dans leur format d'origine. Appliqué dev+prod,
+      vérifié via `/assets/<uuid>`.
       - Trouvé par accident (image préchargée par Figma, hors périmètre de
         cette page) : un visuel réel "Bourse Académique d'Innovation" de la
         **SNK Foundation** (bourse pour bacheliers scientifiques, dépôt via

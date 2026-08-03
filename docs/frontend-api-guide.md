@@ -186,11 +186,9 @@ contenu réel à ce jour :
   Partenaires", corrigé 2026-08-03 pour coller au prototype Figma v2, était
   "Entreprises & Institutions Partenaires") + intro_text_fr/en + `partners`
   (M2M curaté à la main, via jonction `accueil_partners_highlight_partners`).
-  Les 8 partenaires existent déjà (mêmes 8 que le prototype Figma v2) mais
-  **`partners.logo` est `null` sur les 8 lignes** — les vrais logos sont
-  visibles dans le prototype mais n'ont pas pu être extraits de manière fiable
-  (rendu WebGL en lecture seule, pas d'accès export) ; à fournir par l'équipe
-  design/contenu ou via un accès édition au fichier Figma
+  Les 8 partenaires existent déjà (mêmes 8 que le prototype Figma v2) et
+  **`partners.logo` est rempli sur les 8 lignes** (logos réels fournis par
+  l'utilisateur le 2026-08-03, fichiers PNG légers donc non convertis en WebP)
 - **`accueil_testimonials_highlight`** — heading_fr/en (= sous-titre affiché,
   "Que deviennent nos anciens étudiants ?") + `testimonials` (M2M curaté à la
   main, via jonction `accueil_testimonials_highlight_testimonials`) — section
@@ -216,10 +214,12 @@ contenu réel à ce jour :
   distinct — la décision de ne pas y toucher était la bonne. + `gallery` (O2M,
   alias vers `accueil_vie_campus_teaser_gallery`, ajouté 2026-08-01) — galerie
   de photos supplémentaires vue dans le prototype Figma v2 (mosaïque de
-  plusieurs images en plus du fond) ; **structure prête, collection vide**
-  (`gallery: []`) — les 3 photos réelles existent dans le prototype Figma mais
-  n'ont pas pu être extraites de manière fiable (mêmes limites techniques que
-  les logos partenaires ci-dessus). + `quote_text_fr/en`, `quote_author`,
+  plusieurs images en plus du fond) ; **3 photos réelles fournies 2026-08-03**
+  (`sort` 1-3 : salle de classe, atelier/présentation de projet, cour du
+  campus). Deux des trois sources dépassaient 1 Mo (17,5 Mo et 27,7 Mo en
+  JPEG) — converties en WebP et redimensionnées (~2000px de large) avant
+  upload, résultat 175 Ko / 435 Ko ; la troisième (339 Ko) est restée en PNG
+  (règle projet : conversion WebP uniquement au-delà de 1 Mo). + `quote_text_fr/en`, `quote_author`,
   `quote_program` (ajoutés 2026-08-01, **remplis 2026-08-03** avec le vrai
   contenu du prototype Figma v2) — citation d'un étudiant incrustée sur la
   mosaïque : `quote_text_fr` = "On se sent bien dans les logments" (coquille
