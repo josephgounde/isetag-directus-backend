@@ -103,7 +103,7 @@ contenu de sa page. Il n'y a plus de collection `block_*` générique partagée
 entre plusieurs pages (voir `ISETAG_project_instructions.md`, section
 "Organisation en pages/sections", pour le contexte de ce choix). Convention de
 nommage : `<page_key>_<type_de_bloc>` (`admissions_hero`, `admissions_richtext`,
-`accueil_news_preview`, `actualites_documents_list`, ...).
+`accueil_hero`, `actualites_documents_list`, ...).
 
 Tout se récupère en **un seul appel** grâce au deep-fetch, en listant les
 collections propres à la page demandée dans `sections.item:<collection>.*` :
@@ -256,16 +256,13 @@ contenu réel à ce jour :
   séparément, filtrée par cette catégorie si renseignée)
 
 Deux collections Accueil créées lors de la première passe de restructuration
-existent toujours mais restent **vides et hors de la page** pour l'instant —
-le contenu fourni pour Accueil ne les couvrait pas :
-
-- **`accueil_news_preview`** — heading_fr/en + `limit` (section "dernières
-  actualités" — pas encore de brief éditorial pour cette section)
-- **`accueil_programs_highlight`** — heading_fr/en + `programs` (M2M curaté ;
-  le contenu Accueil actuel met en avant les **pôles**, pas des programmes
-  individuels — voir `accueil_poles_highlight` ci-dessus. Cette collection
-  resterait pertinente si une future section "formations phares" distincte
-  des pôles est ajoutée)
+(`accueil_news_preview`, `accueil_programs_highlight` + sa jonction) ont été
+**supprimées le 2026-08-03** lors d'un nettoyage strict contre le prototype
+Figma v2 : vides depuis leur création, jamais branchées à la page, aucun
+équivalent visuel dans le prototype (celui-ci met en avant les **pôles**, pas
+des programmes individuels — voir `accueil_poles_highlight` ci-dessus). Si une
+section "formations phares" distincte des pôles est demandée un jour, ce sera
+une nouvelle collection à recréer, pas une réactivation.
 
 Programmes, Vie Campus et Contact n'ont pas encore leurs propres collections de
 blocs (hero/richtext/cta_banner, etc.) : elles seront créées au moment où le

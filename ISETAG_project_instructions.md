@@ -868,12 +868,21 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         PDF de la brochure n'a pas été fourni — structure prête, à remplir dès
         réception. Insérée en section 6 (juste après les 3 cartes
         Pré-inscription/Tarifs/Modalités).
-      - **Texte "cérémonie de lauréats"** — présent deux fois dans le
-        prototype sans section dédiée dans Directus depuis le 2026-07-31
-        (jamais traité). Ajouté comme nouvelle ligne `admissions_richtext`
-        (texte repris tel quel, coquilles d'origine du prototype conservées —
-        même principe que la coquille "logments" d'Accueil), insérée juste
-        avant la carte "Prêt à commencer ?".
+      - **Texte "cérémonie de lauréats" — FAUSSE PISTE, corrigée le jour
+        même**. Ce texte, présent deux fois dans le prototype et sans section
+        dédiée depuis le 2026-07-31, avait été traité comme un contenu
+        manquant : une nouvelle ligne `admissions_richtext` avait été créée et
+        insérée avant la carte "Prêt à commencer ?". En revérifiant
+        visuellement le prototype Figma (scroll réel dans le frame, pas
+        seulement le texte brut extrait), il s'est avéré que ce texte est en
+        réalité le **texte de remplacement (placeholder) que Figma affiche
+        comme description sur les deux cartes Bourses** ("Bourse SNK" et
+        "Bourse de l'Université Montplaisir Tunis") — déjà noté comme tel dès
+        le 2026-08-01 ("Figma affiche un texte de test"). Ce n'est donc pas un
+        contenu distinct à ajouter : les vraies descriptions (`scholarships.description`,
+        remplies le 2026-08-03) remplacent déjà correctement ce placeholder.
+        La section ajoutée par erreur a été retirée de `pages_sections` et la
+        ligne `admissions_richtext` supprimée, sur dev et prod, le jour même.
       - **Notes éditoriales internes exposées publiquement** (bug trouvé
         pendant cette revue, pas un écart Figma) : la dernière section de la
         page (`admissions_richtext` id=10, "points signalés par l'équipe
@@ -886,17 +895,71 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         production. Section retirée de `pages_sections` et ligne supprimée de
         `admissions_richtext` (contenu déjà conservé dans ce fichier, aucune
         perte).
-      Page Admissions : 19 → **20 sections**. Vérifié via l'API publique
-      anonyme (page complète, `admissions_brochure`, la nouvelle ligne
-      cérémonie, et confirmation 403 sur l'ancien id=10 supprimé) sur dev et
-      prod. `docs/frontend-api-guide.md` et `docs/openapi-public.json` mis à
-      jour en conséquence.
-      **Confirmé bon à ce jour** (rien à changer) : hero (titre volontairement
-      divergent du prototype, décision utilisateur du 2026-08-03 inchangée),
-      les 3 cartes d'intro, les 4 étapes de pré-inscription, tous les tableaux
-      de tarifs/dates/pièces, la FAQ, et les tarifs maritimes — absents d'une
-      version antérieure du prototype Figma, désormais bien présents dans la
-      v2 et déjà couverts par `tuition_plans`.
+      Page Admissions : 19 sections avant comme après (une section retirée —
+      notes internes —, une ajoutée — brochure — après correction de la fausse
+      piste ci-dessus). Vérifié via l'API publique anonyme (page complète,
+      `admissions_brochure`, confirmation 403 sur l'ancien id=10 et sur la
+      ligne cérémonie corrigée) sur dev et prod. `docs/frontend-api-guide.md`
+      et `docs/openapi-public.json` mis à jour en conséquence.
+      **Confirmé bon à ce jour** : hero (titre volontairement divergent du
+      prototype, décision utilisateur du 2026-08-03 inchangée), les 4 étapes
+      de pré-inscription, tous les tableaux de tarifs/dates/pièces communes, et
+      les tarifs maritimes — absents d'une version antérieure du prototype
+      Figma, désormais bien présents dans la v2 et déjà couverts par
+      `tuition_plans`.
+      **Revu en détail** : les 3 cartes d'intro `admissions_feature`
+      (Pré-inscription/Tarifs & Bourses/Modalités), la FAQ, "Conditions
+      pratiques" (EPI/logement), le détail "Dossier par cycle" par
+      filière/niveau, la carte "Prêt à commencer ?" et le bandeau CTA final —
+      revérifiés un par un en scrollant réellement le frame Figma (pas
+      seulement le texte brut) : aucun ne correspond à un élément visuel du
+      prototype v2 actuel. Suite donnée juste en dessous (sanitization
+      demandée explicitement par l'utilisateur, "strict is strict").
+- [x] (2026-08-03) **Sanitization stricte contre le prototype Figma v2**,
+      demandée explicitement par l'utilisateur ("removing all what is unused
+      respecting the figma prototype" ; scope confirmé = Accueil + Admissions
+      seulement ; niveau confirmé = strict 1:1, pertes de contenu réel
+      acceptées en connaissance de cause après avertissement explicite).
+      - **Admissions — 8 sections supprimées** (contenu + lien `pages_sections`,
+        pas seulement masquées) : les 3 cartes `admissions_feature`
+        (Pré-inscription id=1, Tarifs & Bourses id=2, Modalités id=3, Prêt à
+        commencer id=4 — donc la collection `admissions_feature` est
+        aujourd'hui vide), `admissions_richtext` id=7 (Dossier par cycle),
+        id=8 (Conditions pratiques EPI/logement), id=9 (FAQ complète), et
+        `admissions_cta_banner` id=1 (bandeau final — collection aujourd'hui
+        vide aussi). Page passée de 19 à **11 sections**. Collections
+        `admissions_feature`/`admissions_cta_banner` **conservées dans le
+        schéma** (vides mais non supprimées — seul le contenu a été
+        sanitizé ; suppression de collection non demandée pour celles-ci).
+      - **Accueil — 2 collections supprimées du schéma** (pas seulement
+        vidées) : `accueil_news_preview` et `accueil_programs_highlight` +
+        sa jonction `accueil_programs_highlight_programs` — vides depuis
+        leur création, jamais branchées à la page, aucun équivalent dans le
+        prototype (qui met en avant les pôles, pas des programmes
+        individuels). Retirées de `pages_sections.item.one_allowed_collections`
+        avant suppression ; permissions publiques nettoyées automatiquement
+        par Directus à la suppression (vérifié, aucun résidu).
+      - **Auto-correction en cours de route** : la "cérémonie de lauréats"
+        ajoutée par erreur plus haut a été retirée avant cette passe (c'était
+        du texte de remplacement Figma sur les cartes Bourses, pas un contenu
+        manquant — voir la correction dans l'entrée ci-dessus).
+      - **Piège technique rencontré et documenté** : sur cet environnement,
+        `DELETE /items/<collection>/<id>` répond `204` (succès) et une
+        relecture immédiate via l'API peut encore renvoyer l'ancien contenu
+        pendant un temps indéterminé (pas juste quelques secondes — un
+        `sleep 5` n'a pas suffi), alors que la ligne est déjà réellement
+        supprimée en base. Seule une requête Postgres directe
+        (`docker exec isetag-postgres-<env> psql -U isetag -d isetag -c
+        "SELECT ..."`) donne un état fiable immédiatement ; un redémarrage du
+        conteneur Directus (`docker restart isetag-directus-<env>`) fait
+        ensuite revenir l'API sur le même état que la base. **Pour toute
+        vérification post-suppression future sur cet environnement, vérifier
+        en base directement, ne jamais se fier à une lecture API immédiate.**
+      Vérifié de bout en bout via l'API publique anonyme sur dev et prod
+      après redémarrage des deux conteneurs Directus (page Admissions à 11
+      sections, page Accueil inchangée à 8 sections, 403 sur les 2 collections
+      Accueil supprimées). `scripts/provision_public_read.py` et
+      `docs/frontend-api-guide.md` mis à jour en conséquence.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
