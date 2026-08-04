@@ -1148,6 +1148,25 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         jamais via un `print()` terminal qui peut masquer une vraie
         corruption sous un simple problème d'affichage.**
       Corrigé et vérifié (contenu correct, lecture anonyme) sur dev et prod.
+- [x] (2026-08-04) Nouvelle revue Accueil + Admissions contre le prototype
+      Figma v2, deux écarts trouvés et corrigés :
+      1. `admissions_tuition_highlight` et `admissions_scholarships_highlight`
+         n'avaient pas de champ `eyebrow_fr/en` — le prototype affiche
+         "La Scolarité" au-dessus des deux titres. Champs ajoutés, valeur
+         renseignée sur les deux.
+      2. `admissions_steps` (heading "Le parcours de pré-inscription") et son
+         item 1 ("Choisir sa formation") ne correspondaient plus au texte
+         actuel du prototype, qui affiche "Comment s'inscrire ?" avec un item
+         1 "Je constitue mon dossier d'inscription" (contenu proche de
+         l'ancien `admissions_richtext` id=1, probablement une réécriture).
+         Heading et item 1 mis à jour mot pour mot sur le contenu visible ;
+         items 2 à 4 laissés tels quels (le lecteur Figma n'a pas permis
+         d'accéder aux étapes suivantes malgré plusieurs tentatives — défilement
+         horizontal jusqu'aux deux bords, clic sur le badge numéroté, boutons
+         "Previous/Next frame" qui naviguent en fait entre sections de la page
+         et non entre étapes de ce widget — donc pas de contenu Figma pour
+         confirmer ou corriger les items 2-4).
+      Vérifié via lecture anonyme sur dev et prod.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
