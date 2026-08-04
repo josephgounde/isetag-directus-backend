@@ -1025,6 +1025,39 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         par Djo) : impossible de vérifier depuis ce dépôt si le rendu final
         utilise une balise `<button type="button">` plutôt qu'un `<a>` stylé
         — à confirmer côté frontend si c'est bien ce qui était demandé.
+- [x] (2026-08-04) Deux manques signalés par l'équipe éditoriale sur la page
+      Admissions, section "La Scolarité / Tarifs et Frais d'Inscription" :
+      1. **3 collections orphelines dans la nav Directus** —
+         `admissions_brochure`, `admissions_scholarships_highlight` et
+         `admissions_tuition_highlight` avaient `meta.group: null` au lieu de
+         `"Admissions"`, donc invisibles dans le dossier "Admissions" du
+         menu de contenu (elles existaient bien, juste mal rangées — d'où le
+         signalement "je ne vois pas le bloc brochure"). Corrigé sur dev et
+         prod, capturé dans le snapshot de schéma.
+      2. **3 cartes "Cycle X" (BTS/Licence/Master) sans contenu Directus** —
+         le prototype Figma v2 affiche, au-dessus du tableau de tarifs, une
+         carte par cycle avec niveau requis, date de rentrée et mode
+         d'admission ; rien de tout ça n'existait dans le schéma (probablement
+         codé en dur côté frontend). Nouvelle collection autonome
+         `admissions_tuition_cycles` (3 lignes, une par cycle, `level` sert de
+         clé de correspondance avec `tuition_plans.level` côté frontend) ;
+         **la filière Maritime n'a pas de carte dédiée dans le prototype**,
+         confirmé par extraction complète du texte de la frame Figma — ses 2
+         lignes de tarifs restent uniquement dans le tableau `tuition_plans`.
+         Contenu repris mot pour mot du prototype (mêmes 3 champs identiques
+         pour les 3 cycles : rentrée "11 septembre 2026", mode "Concours
+         et/ou étude de dossier.", seul le niveau requis varie).
+      Schéma appliqué sur prod, contenu inséré séparément sur dev et prod
+      (non capturé par le snapshot), permissions publiques mises à jour,
+      vérifié via lecture anonyme sur les deux environnements.
+      - **Note à part, non corrigée (hors périmètre de cette demande)** : les
+        tarifs (`tuition_plans`) distinguent déjà "Scolarité" (`total_amount`)
+        et "Frais complémentaires" dans le prototype Figma, mais côté Directus
+        le montant des frais complémentaires n'est pas un champ structuré —
+        il est actuellement noyé dans le texte libre de `installments[0].label`
+        (ex. "Inscription : 30 000 FCFA"). Pas de quoi bloquer l'affichage,
+        mais si le frontend a besoin de ce montant séparément et de façon
+        fiable, ça vaudra un champ dédié plus tard.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

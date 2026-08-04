@@ -66,6 +66,7 @@ READ_COLLECTIONS = [
     ("admissions_tuition_highlight", {}, ["*"]),
     ("admissions_scholarships_highlight", {}, ["*"]),
     ("admissions_brochure", {}, ["*"]),
+    ("admissions_tuition_cycles", {}, ["*"]),
     ("accueil_hero", {}, ["*"]),
     ("accueil_poles_highlight", {}, ["*"]),
     ("accueil_reasons", {}, ["*"]),

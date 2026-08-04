@@ -150,7 +150,24 @@ contenu réel à ce jour :
   uniquement (= "Tarifs et Frais d'Inscription", repris du prototype Figma
   v2), même pattern que `accueil_poles_highlight` : le tableau de prix
   lui-même vient directement de la collection partagée `tuition_plans` (les
-  10 lignes, triées par `display_order`, pas de sélection curatée)
+  10 lignes, triées par `display_order`, pas de sélection curatée). Les 3
+  cartes "Cycle X" affichées **au-dessus** du tableau (niveau requis, date de
+  rentrée, mode d'admission) viennent d'une collection séparée, voir
+  `admissions_tuition_cycles` ci-dessous
+- **`admissions_tuition_cycles`** (ajouté 2026-08-04) — collection autonome,
+  **pas une section de page-builder** (comme `tuition_plans`/`scholarships`,
+  appel séparé : `GET {BASE_URL}/items/admissions_tuition_cycles?sort=display_order`).
+  Une ligne par cycle (BTS, Licence, Master — **3 lignes seulement**, la
+  filière Maritime n'a pas de carte dédiée dans le prototype Figma v2, ses
+  tarifs apparaissent uniquement dans le tableau `tuition_plans`) :
+  `heading_fr/en` (ex. "Cycle BTS"), `level` (texte, sert de clé de
+  correspondance avec `tuition_plans.level` — "BTS/HND", "Licence", "Master" —
+  côté frontend pour associer chaque carte à ses lignes de tarifs),
+  `academic_year` (ex. "2026/2027"), `start_date_fr/en` (ex.
+  "11 septembre 2026"), `required_level_fr/en`, `admission_mode_fr/en`,
+  `display_order`. Ce contenu était jusqu'ici absent de Directus (probablement
+  codé en dur côté frontend) — signalé par l'équipe éditoriale, ajouté pour
+  que ce soit éditable comme le reste
 - **`admissions_scholarships_highlight`** (ajouté 2026-08-03) — heading_fr/en
   uniquement (= "Bourses, aides et facilités"), même pattern : les cartes
   viennent directement de `scholarships` (triées par `display_order`)
