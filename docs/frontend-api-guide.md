@@ -146,14 +146,22 @@ contenu réel à ce jour :
   optionnelle (illustration du bloc — ne jamais faire porter une URL d'image
   par le HTML du WYSIWYG lui-même : ça fige l'environnement, un champ fichier
   dédié laisse le frontend construire l'URL avec le bon `BASE_URL`)
-- **`admissions_tuition_highlight`** (ajouté 2026-08-03) — heading_fr/en
-  uniquement (= "Tarifs et Frais d'Inscription", repris du prototype Figma
-  v2), même pattern que `accueil_poles_highlight` : le tableau de prix
-  lui-même vient directement de la collection partagée `tuition_plans` (les
-  10 lignes, triées par `display_order`, pas de sélection curatée). Les 3
-  cartes "Cycle X" affichées **au-dessus** du tableau (niveau requis, date de
+- **`admissions_tuition_highlight`** (ajouté 2026-08-03) — heading_fr/en (=
+  "Tarifs et Frais d'Inscription", repris du prototype Figma v2), même
+  pattern que `accueil_poles_highlight` : le tableau de prix lui-même vient
+  directement de la collection partagée `tuition_plans` (les 10 lignes,
+  triées par `display_order`, pas de sélection curatée). Les 3 cartes
+  "Cycle X" affichées **au-dessus** du tableau (niveau requis, date de
   rentrée, mode d'admission) viennent d'une collection séparée, voir
-  `admissions_tuition_cycles` ci-dessous
+  `admissions_tuition_cycles` ci-dessous.
+  + `common_documents_fr/en` (WYSIWYG, ajouté 2026-08-04) — la liste
+  "Pièces communes" affichée sur chaque carte Cycle. Un seul champ ici plutôt
+  que dupliqué sur les 3 lignes de `admissions_tuition_cycles` : le texte est
+  **identique mot pour mot sur les 3 cartes** dans le prototype Figma v2
+  (vérifié par extraction complète du texte de la frame), donc partagé plutôt
+  que répété. Absent de Directus jusqu'ici — repéré et signalé par l'équipe
+  éditoriale après la première passe sur `admissions_tuition_cycles`, qui
+  n'avait couvert que niveau/rentrée/mode d'admission
 - **`admissions_tuition_cycles`** (ajouté 2026-08-04) — collection autonome,
   **pas une section de page-builder** (comme `tuition_plans`/`scholarships`,
   appel séparé : `GET {BASE_URL}/items/admissions_tuition_cycles?sort=display_order`).

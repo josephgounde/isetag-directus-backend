@@ -1081,6 +1081,73 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         prod — toujours relire la collection cible sur l'environnement visé
         avant un PATCH/DELETE par id.**
       Vérifié via lecture anonyme sur dev (id=5) et prod (id=2).
+- [x] (2026-08-04) **Tentative de mise à jour Directus 11.17.4 → 12.2.0 sur
+      dev, abandonnée et annulée** — investiguée pour tenter de corriger le
+      bug du widget "Sections" (M2A) sur `Pages` dans l'Admin UI ("The
+      relationship is not configured properly or you don't have permission to
+      access it"), bug bloquant pour le personnel ISETAG non technique censé
+      gérer le contenu directement via l'interface, sans script.
+      - Mise à jour testée sur dev (image `directus/directus:12.2.0`,
+        migrations appliquées sans erreur). Résultat : **le bug du widget
+        Sections est identique sur 11.17.4 et 12.2.0** — persiste même avec
+        la modale de licence fermée et un compte admin plein accès. Ce n'est
+        donc pas un problème de version, la mise à jour ne le corrige pas.
+      - **Régression découverte en testant** : Directus 12 sans licence
+        (palier "Core" gratuit) ignore silencieusement toute permission
+        comportant une condition de filtre (`{"status":{"_eq":"published"}}`,
+        le filtre par dossier sur `directus_files`) — les lignes existent
+        toujours en base (vérifié directement en Postgres) mais l'API les
+        exclut, provoquant un `403` sur `pages`, `tuition_plans`,
+        `scholarships`, `documents`, `programs` et l'accès public aux
+        fichiers. Confirmé correspondre à la limitation documentée
+        "custom permission rules ignored" du palier Core. Comme la mise à
+        jour ne corrige pas le bug initial, **acheter une licence n'aurait
+        aucun intérêt ici**.
+      - **Annulé proprement** : image redescendue à `directus/directus:11`
+        sur `docker/dev/docker-compose.yml`, base dev restaurée depuis une
+        sauvegarde prise juste avant la tentative (`pg_dump` avant migration)
+        plutôt qu'un simple retour d'image (les migrations 12.x avaient déjà
+        modifié le schéma système). Contenu, les 2 Flows et l'API publique
+        revérifiés identiques à l'état d'avant tentative. `IP_TRUST_PROXY:
+        "true"` laissé dans `docker/dev/docker-compose.yml` (sans effet sur
+        11.x, deviendra nécessaire si une mise à jour est retentée un jour —
+        le défaut passe de `true` à `false` en v12, et on est derrière nginx).
+      - **Solution retenue pour le personnel non technique** : le bug
+        n'affecte que le widget "Sections" (réorganiser/ajouter/retirer un
+        bloc sur une page) — modifier le *contenu* d'un bloc existant
+        (textes, prix, images) fonctionne normalement en cliquant
+        directement sur sa collection dédiée dans la barre latérale
+        (ex. "Accueil Hero"), sans jamais passer par "Pages > Sections".
+        C'est la quasi-totalité des mises à jour de contenu courantes.
+        Les changements structurels (ajouter/retirer/réordonner un bloc)
+        restent à faire via script en attendant soit un correctif amont chez
+        Directus, soit la mise en place d'un accès de secours sur la
+        collection `pages_sections` (actuellement masquée, champs sans
+        interface) pour un usage occasionnel par quelqu'un de plus à l'aise
+        techniquement — pas une solution pour le personnel le moins technique.
+- [x] (2026-08-04) `admissions_tuition_cycles` — champ manquant repéré par
+      l'équipe éditoriale : la liste "Pièces communes" (pièces justificatives
+      à fournir) affichée sur chaque carte Cycle sur la page Admissions
+      n'existait dans aucune collection. Ajouté comme `common_documents_fr/en`
+      (WYSIWYG) sur `admissions_tuition_highlight` plutôt que dupliqué sur les
+      3 lignes de `admissions_tuition_cycles` — texte vérifié identique mot
+      pour mot sur les 3 cartes (BTS/Licence/Master) par extraction complète
+      du texte de la frame Figma, donc contenu réellement partagé.
+      - **Piège rencontré et corrigé** : un premier envoi du contenu via
+        `curl -d` en ligne de commande a corrompu les caractères accentués
+        (mojibake — `Pièces` devenu `Pi?ces`) à cause de l'encodage du shell
+        Git Bash sur Windows, silencieusement stocké tel quel en base (pas
+        d'erreur HTTP). Détecté en relisant le contenu via un fichier
+        (`Read` direct, pas un `print()` shell qui masque le problème avec le
+        même souci d'encodage de la console Windows). Corrigé en renvoyant le
+        contenu via un script Python (`urllib`, payload encodé explicitement
+        en UTF-8), qui contourne le shell entièrement. **Leçon : ne jamais
+        passer de texte accentué en argument `curl -d` inline sur cet
+        environnement Windows/Git Bash — toujours via un script Python qui
+        encode explicitement en UTF-8, et vérifier via lecture de fichier,
+        jamais via un `print()` terminal qui peut masquer une vraie
+        corruption sous un simple problème d'affichage.**
+      Corrigé et vérifié (contenu correct, lecture anonyme) sur dev et prod.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
