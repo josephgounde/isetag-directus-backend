@@ -1058,6 +1058,29 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         (ex. "Inscription : 30 000 FCFA"). Pas de quoi bloquer l'affichage,
         mais si le frontend a besoin de ce montant séparément et de façon
         fiable, ça vaudra un champ dédié plus tard.
+- [x] (2026-08-04) Logo Université Montplaisir Tunis (`contenu_admission/
+      ADMISSION/UnivMonPlaisir.png`) ajouté à la 2e carte publiée de
+      `scholarships` ("Bourse de l'Université Montplaisir Tunis", la carte
+      qui accompagne "Bourse SNK" sur la page Admissions). Converti en WebP
+      (89 Ko → 63 Ko, cohérent avec le format déjà utilisé sur le flyer
+      "Bourse SNK").
+      - **Piège rencontré : dérive d'ID entre dev et prod.** Sur dev,
+        `scholarships` a 5 lignes (3 brouillons "partenariat Université
+        Montplaisir Tunis" jamais publiées + 2 lignes publiées réelles,
+        id=4 SNK / id=5 UMT). Sur prod, seules les 2 lignes publiées existent,
+        mais avec des id différents (id=1 SNK / id=2 UMT) — les 3 brouillons
+        n'ont jamais été créés côté prod. Un premier `PATCH
+        /items/scholarships/5` sur prod (en copiant l'id de dev sans
+        vérifier) a renvoyé un `200` avec les données du fichier uploadé en
+        écho **sans rien modifier en base** (la ligne 5 n'existe pas sur
+        prod) — pas d'erreur explicite, juste un no-op silencieux. Détecté en
+        relisant anonymement et en obtenant `data: []`. Corrigé en ciblant le
+        bon id (2) après vérification directe du contenu prod via un token
+        admin. **Leçon : ne jamais supposer qu'un id de contenu (par
+        opposition à un id de schéma/collection) est identique entre dev et
+        prod — toujours relire la collection cible sur l'environnement visé
+        avant un PATCH/DELETE par id.**
+      Vérifié via lecture anonyme sur dev (id=5) et prod (id=2).
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
