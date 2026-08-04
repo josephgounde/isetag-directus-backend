@@ -960,6 +960,38 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       sections, page Accueil inchangée à 8 sections, 403 sur les 2 collections
       Accueil supprimées). `scripts/provision_public_read.py` et
       `docs/frontend-api-guide.md` mis à jour en conséquence.
+- [x] (2026-08-04) Accueil — collage image manquant sur le bandeau CTA final
+      (`accueil_cta_banner` id=2, "Commence ton chemin aujourd'hui / Inscris-toi
+      dès maintenant"). Le prototype Figma v2 montre une composition (carte
+      d'identité camerounaise + 2 relevés de notes superposés + stylo, en
+      arrangement pivoté/superposé), mais la collection n'avait **aucun champ
+      image** — pas juste vide, absent du schéma.
+      - Champ `image` ajouté (`uuid`, `special: file`, interface `file`) +
+        relation FK réelle vers `directus_files` (même piège que documenté plus
+        haut pour `admissions_brochure.file` : les métadonnées de champ seules
+        ne suffisent pas, il faut le `POST /relations` explicite).
+      - Les 4 visuels sources exacts utilisés par Figma pour ce collage ont été
+        retrouvés dans `contenuç_accueil/` (`image 2.png` = carte d'identité,
+        `image 3.png` + `image 4.png` = les 2 relevés de notes, `pngwing.com
+        (54) 1.png` = le stylo) et composités en une seule image PNG (fond
+        transparent, rotation + chevauchement reproduisant l'arrangement du
+        prototype) via un script Pillow, ~786 Ko (sous le seuil 1 Mo — pas de
+        conversion WebP nécessaire).
+      - Uploadée dans le dossier "Public" et assignée à `accueil_cta_banner/2`
+        sur dev et prod (prod via script Python exécuté directement sur le VPS,
+        `cms.isetag-univ.net` n'étant pas joignable depuis l'environnement de
+        dev pour l'upload multipart — voir note infra ci-dessous).
+      - `scripts/provision_public_read.py` (`PUBLIC_FILE_FIELDS`) et
+        `docs/frontend-api-guide.md` mis à jour ; schéma appliqué sur prod puis
+        conteneur redémarré ; vérifié via lecture anonyme sur dev et prod.
+      - **Note infra découverte en passant (hors périmètre de cette tâche,
+        signalée mais non corrigée)** : le reverse proxy prod actuel est
+        `isetag-nginx-temp` (HTTP:80 uniquement, `server_name _` catch-all,
+        pas de conteneur TLS/443 publié malgré la doc qui mentionne "Nginx TLS
+        pour prod"). Le domaine public reste peut-être servi en HTTPS par un
+        autre chemin (proxy externe/Cloudflare) non vérifié ici ; à
+        investiguer si des uploads/requêtes externes vers `cms.isetag-univ.net`
+        échouent de façon inattendue.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

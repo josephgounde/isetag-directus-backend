@@ -203,6 +203,11 @@ contenu réel à ce jour :
   (`/admissions#modalites`) et de la section Alumni ci-dessous (`cta_url`,
   `/actualites#success-stories`) sont **déduits**, pas confirmés par le
   frontend — même statut que `/vie-campus/` plus bas
+  + `image` (ajouté 2026-08-04) — fichier `directus_files`, rempli **uniquement
+  sur le bandeau final** (id=2). C'est une composition (collage carte
+  d'identité + relevé de notes + stylo) assemblée à partir des visuels bruts
+  fournis dans `contenuç_accueil/` pour reproduire l'arrangement du prototype
+  Figma v2 ; `null` sur la ligne teaser (id=1)
 - **`accueil_partners_highlight`** — heading_fr/en (= "Nos Entreprises
   Partenaires", corrigé 2026-08-03 pour coller au prototype Figma v2, était
   "Entreprises & Institutions Partenaires") + intro_text_fr/en + `partners`

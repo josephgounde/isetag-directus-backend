@@ -99,6 +99,7 @@ PUBLIC_FILE_FIELDS = [
     ("scholarships", "image"),
     ("accueil_vie_campus_teaser_gallery", "image"),
     ("admissions_brochure", "file"),
+    ("accueil_cta_banner", "image"),
 ]
 
 
