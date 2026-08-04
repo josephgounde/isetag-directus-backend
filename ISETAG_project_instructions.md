@@ -992,6 +992,21 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         autre chemin (proxy externe/Cloudflare) non vérifié ici ; à
         investiguer si des uploads/requêtes externes vers `cms.isetag-univ.net`
         échouent de façon inattendue.
+      - **Corrigé le même jour, après retour utilisateur avec captures du
+        prototype Figma v2** : deux erreurs dans la première passe.
+        1. Le collage n'avait été posé que sur `accueil_cta_banner` id=2 (le
+           bandeau final) — le prototype montre en fait le **même collage sur
+           les deux lignes** (id=1 teaser "Admissions" inclus). Corrigé : les
+           deux lignes pointent maintenant vers le même fichier.
+        2. La disposition/l'agencement du premier collage ne correspondait
+           pas au prototype (ordre d'empilement et échelle incorrects).
+           Recomposé avec le bon ordre (arrière vers avant : relevé de notes 1
+           → relevé de notes 2 → stylo → carte d'identité au premier plan,
+           carte d'identité plus petite et moins chevauchante) confirmé par
+           comparaison directe avec les captures fournies par l'utilisateur.
+        Ancien fichier supprimé de `directus_files` sur dev et prod pour
+        éviter un résidu orphelin ; nouveau fichier (~795 Ko) réuploadé et
+        revérifié via lecture anonyme sur les deux lignes, dev et prod.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
