@@ -1007,6 +1007,24 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         Ancien fichier supprimé de `directus_files` sur dev et prod pour
         éviter un résidu orphelin ; nouveau fichier (~795 Ko) réuploadé et
         revérifié via lecture anonyme sur les deux lignes, dev et prod.
+- [x] (2026-08-04) `accueil_cta_banner.image` — la composition recréée à la
+      main ci-dessus a été **remplacée par le visuel officiel** fourni par
+      l'équipe design dans `contenuç_accueil/CTA image.png`, converti en WebP
+      (326 Ko → 118 Ko, conversion systématique >1 Mo appliquée même sous le
+      seuil ici car demandée explicitement) et assigné aux deux lignes
+      (id=1, id=2) sur dev et prod ; anciens fichiers composés supprimés de
+      `directus_files` sur les deux environnements. Vérifié via lecture
+      anonyme (`type: image/webp`, `filesize: 117682` identique sur les deux
+      lignes, dev et prod).
+      - **Vérification demandée sur les boutons des 2 bandeaux** : les 4
+        champs (`button_url`/`cta2_url` sur id=1 et id=2) pointent bien vers
+        des routes internes réelles et distinctes (`/admissions#pre-inscription`,
+        `/admissions#modalites`, `/programmes`) — aucun champ vide ni
+        placeholder. Le code frontend Angular n'est pas dans ce dépôt
+        (`frontend/` est un squelette de dossiers vide, développement séparé
+        par Djo) : impossible de vérifier depuis ce dépôt si le rendu final
+        utilise une balise `<button type="button">` plutôt qu'un `<a>` stylé
+        — à confirmer côté frontend si c'est bien ce qui était demandé.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`

@@ -203,15 +203,16 @@ contenu réel à ce jour :
   (`/admissions#modalites`) et de la section Alumni ci-dessous (`cta_url`,
   `/actualites#success-stories`) sont **déduits**, pas confirmés par le
   frontend — même statut que `/vie-campus/` plus bas
-  + `image` (ajouté 2026-08-04, corrigé le même jour) — fichier
-  `directus_files`, rempli **sur les deux lignes** (id=1 teaser et id=2 final)
-  — le prototype Figma v2 affiche le même collage sur les deux bandeaux, pas
-  seulement le final. C'est une composition (carte d'identité au premier plan,
-  stylo en diagonale derrière elle, 2 relevés de notes empilés à l'arrière)
-  assemblée à partir des visuels bruts fournis dans `contenuç_accueil/` pour
-  reproduire l'arrangement du prototype Figma v2 ; les deux lignes pointent
-  vers le même fichier (le frontend le recadre différemment selon le
-  conteneur, cf. les deux captures Figma)
+  + `image` (ajouté 2026-08-04) — fichier `directus_files` (WebP), rempli
+  **sur les deux lignes** (id=1 teaser et id=2 final) — le prototype Figma v2
+  affiche le même collage (carte d'identité, stylo, relevés de notes) sur les
+  deux bandeaux, pas seulement le final. D'abord recréé par composition à
+  partir des visuels bruts de `contenuç_accueil/` (deux itérations, corrigées
+  après retour utilisateur), puis **remplacé le même jour par le visuel
+  officiel** fourni par l'équipe design (`contenuç_accueil/CTA image.png`,
+  converti en WebP, 326 Ko → 118 Ko) ; les deux lignes pointent vers le même
+  fichier (le frontend le recadre différemment selon le conteneur, cf. les
+  deux captures Figma)
 - **`accueil_partners_highlight`** — heading_fr/en (= "Nos Entreprises
   Partenaires", corrigé 2026-08-03 pour coller au prototype Figma v2, était
   "Entreprises & Institutions Partenaires") + intro_text_fr/en + `partners`
