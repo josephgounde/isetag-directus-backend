@@ -1219,6 +1219,17 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         l'opération — seul l'accès à l'admin Directus est concerné.
       IP actuellement autorisées : `102.67.200.184` (Djo) et `160.154.233.222`
       (Joseph, sujette à changement — IP résidentielle/mobile dynamique).
+- [x] (2026-08-05) `admissions_steps_items` id=2 mis à jour mot pour mot
+      d'après une capture d'écran fournie par l'utilisateur (étape "2" du
+      prototype Figma v2, non accessible via le navigateur Figma jusqu'ici) :
+      `title_fr` = "Je remplis ma fiche de Pré-Inscription",
+      `description_fr` = sous-titre + 4 puces combinés en texte continu
+      (même convention que l'item 1 : ce champ n'est pas un WYSIWYG, pas de
+      puces réelles stockées). Corrigé sur dev puis sur prod (script copié
+      sur le VPS, exécuté par l'utilisateur lui-même avec le mot de passe
+      admin prod — hors de mon contexte, jamais recherché ni affiché).
+      Vérifié identique sur les deux environnements via lecture anonyme.
+      Items 3 et 4 toujours non confirmés (captures pas encore fournies).
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
