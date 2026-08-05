@@ -1315,10 +1315,51 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       Vérifié : ping, lecture de contenu, en-tête CORS correct pour l'origine
       `https://isetag.web.app`, connexion admin — tous testés en HTTPS après
       chaque changement.
-- [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
-      boîte Gmail personnelle utilisée pour les tests — à remplacer par les
-      identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
-      par la vraie adresse du service des admissions (actuellement une adresse de test)
+- [x] (2026-08-05) **Bug critique trouvé et corrigé : le formulaire de
+      pré-inscription en prod perdait silencieusement les candidatures** —
+      demande explicite de vérifier toute la chaîne jusqu'à la réception de
+      l'email. Test de bout en bout (upload des 3 fichiers requis + trigger
+      du Flow, exactement le circuit attendu côté frontend) : la requête
+      renvoie `HTTP 204` (succès) comme prévu, **mais les logs Directus
+      révèlent que l'envoi d'email échoue silencieusement** :
+      `Email connection failed: connect ECONNREFUSED 127.0.0.1:587`.
+      `EMAIL_SMTP_HOST`/`EMAIL_SMTP_USER` étaient vides sur prod — jamais
+      renseignés depuis le déploiement initial du 2026-07-30. Le Flow ne
+      renvoyant volontairement aucune confirmation détaillée (design
+      RGPD-friendly voir plus haut), l'échec est **invisible côté frontend
+      ET côté visiteur** : une vraie candidature aurait été enregistrée en
+      base (l'opération de création s'exécute avant l'opération d'email) mais
+      **le service des admissions n'aurait jamais été notifié**.
+      - **Corrigé en 2 temps**, chaque fois via le même script de recréation
+        de conteneur que pour `CORS_ORIGIN`/`PUBLIC_URL` (clone de la config
+        exacte + une seule variable modifiée, ancien conteneur renommé comme
+        point de rollback) :
+        1. `EMAIL_SMTP_HOST/PORT/USER/PASSWORD/FROM` alignés sur les
+           identifiants Gmail personnels déjà utilisés en dev (mesure
+           provisoire assumée, à remplacer par de vrais identifiants SMTP
+           institutionnels dès qu'ils seront fournis — même logique que le
+           certificat `sslip.io` : débloquer maintenant, migrer proprement
+           plus tard). Le mot de passe applicatif Gmail n'a **jamais transité
+           par moi** : extrait du conteneur dev directement par
+           l'utilisateur dans son propre terminal PowerShell et injecté dans
+           l'appel SSH côté VPS.
+        2. `ADMISSIONS_EMAIL` (`admissions@isetag-univ.net`, une adresse à
+           laquelle personne n'a accès pour l'instant) changé vers
+           `djopiano@gmail.com` pour permettre une vérification réelle de
+           réception — **à remplacer par la vraie adresse institutionnelle
+           du service des admissions** une fois disponible.
+      - **Vérifié de bout en bout, deux fois** (avant/après chaque fix) :
+        upload des 3 fichiers placeholder → trigger du Flow → absence
+        d'erreur dans les logs Directus → **email effectivement reçu et
+        confirmé par l'utilisateur** sur `djopiano@gmail.com`.
+      - **Données de test laissées dans `admission_applications`** (2 lignes
+        "TEST-AUTOMATISE / NePasTraiter" + 6 fichiers placeholder liés) — à
+        supprimer manuellement via l'admin (`/admin/content/admission_applications`),
+        le rôle Public n'ayant pas de droit de lecture/suppression dessus.
+      **Reste à faire** : remplacer les identifiants SMTP Gmail temporaires
+      par les identifiants institutionnels définitifs, et `ADMISSIONS_EMAIL`
+      par la vraie adresse du service des admissions, dès qu'ils seront
+      fournis (mécanisme de remplacement déjà en place, changement trivial).
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
