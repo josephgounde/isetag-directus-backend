@@ -1167,6 +1167,58 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
          et non entre étapes de ce widget — donc pas de contenu Figma pour
          confirmer ou corriger les items 2-4).
       Vérifié via lecture anonyme sur dev et prod.
+- [x] (2026-08-05) **Restriction d'accès réseau à Directus prod (port 80)
+      corrigée — la règle ufw ne servait à rien** — en vérifiant qui peut
+      atteindre Directus prod sur le VPS (`31.207.34.25`), découverte que la
+      règle ufw existante (`80/tcp ALLOW IN 102.67.200.184`, commentaire
+      "temp Directus proxy for Djo+Joseph") **n'était pas réellement
+      appliquée** : Docker gère son propre `iptables` indépendamment d'ufw,
+      et insère pour tout port publié par un conteneur (ici `isetag-nginx-temp`
+      sur `0.0.0.0:80`) une règle `ACCEPT` dans la chaîne `DOCKER` qui
+      s'applique **avant** qu'ufw n'ait la main — donc port 80 était en
+      réalité ouvert à tout Internet. Confirmé via les logs d'accès nginx
+      montrant une IP non-listée (`160.154.233.222`, IP courante de Joseph)
+      atteignant l'admin sans blocage.
+      - **Correctif appliqué** : règles ajoutées directement dans la chaîne
+        `DOCKER-USER` (seule chaîne que Docker ne réécrit jamais, prévue
+        justement pour ce genre de restriction utilisateur) :
+        `ACCEPT` pour chaque IP autorisée puis `DROP` en catch-all sur
+        `tcp dport 80`. Cette chaîne est évaluée par le kernel au niveau du
+        VPS, avant que le paquet n'atteigne le conteneur — c'est donc bien
+        une sécurité "au portail du VPS", même si elle est invisible dans
+        `ufw status`.
+      - **Incident pendant la mise en place** : l'installation du paquet
+        `iptables-persistent` (pour tenter de persister les règles au
+        redémarrage) a silencieusement **désinstallé le paquet `ufw`**
+        (conflit de dépendances), ce qui a fait basculer la policy par
+        défaut de la chaîne `INPUT` de `DROP` à `ACCEPT` — VPS temporairement
+        exposé sur tous les ports le temps de la correction. Détecté
+        immédiatement en revérifiant `iptables -L INPUT` après l'install,
+        corrigé en réinstallant `ufw` et en le réactivant (`ufw --force
+        enable`), ce qui a aussi désinstallé `iptables-persistent` en retour
+        (conflit dans les deux sens). **Leçon : ne jamais installer
+        `iptables-persistent` sur une machine qui utilise déjà `ufw` — les
+        deux se marchent dessus.**
+      - **Persistance retenue (sans passer par `iptables-persistent`)** :
+        script `/usr/local/sbin/docker-user-firewall.sh` sur le VPS (flush +
+        réapplique les 3 règles) + unité systemd
+        `docker-user-firewall.service` (`After=docker.service`,
+        `RemainAfterExit=yes`, activée via `systemctl enable --now`) — ne
+        touche à aucun fichier ufw, aucun conflit de paquet.
+      - **Vérifier qui a accès** : `ufw status verbose` ne montre **jamais**
+        cette restriction (ufw n'a aucune visibilité sur `DOCKER-USER`).
+        Commande correcte :
+        `iptables -L DOCKER-USER -n -v --line-numbers` (montre les IP
+        autorisées + compteurs paquets/octets prouvant le filtrage actif).
+      - **Mettre à jour une IP** (ex. changement de connexion) : éditer
+        `/usr/local/sbin/docker-user-firewall.sh` sur le VPS (remplacer
+        l'ancienne IP par la nouvelle sur la ligne `-s ...`), puis
+        `systemctl restart docker-user-firewall.service`, puis vérifier avec
+        la commande ci-dessus. Le SSH (port 22) reste ouvert à tous (auth par
+        clé uniquement) donc aucun risque de perdre l'accès VPS pendant
+        l'opération — seul l'accès à l'admin Directus est concerné.
+      IP actuellement autorisées : `102.67.200.184` (Djo) et `160.154.233.222`
+      (Joseph, sujette à changement — IP résidentielle/mobile dynamique).
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
