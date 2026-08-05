@@ -1230,6 +1230,91 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       admin prod — hors de mon contexte, jamais recherché ni affiché).
       Vérifié identique sur les deux environnements via lecture anonyme.
       Items 3 et 4 toujours non confirmés (captures pas encore fournies).
+- [x] (2026-08-05) **Directus prod passé en HTTPS (mixed content) + CORS
+      corrigé — l'équipe frontend ne pouvait plus rien charger** — rapporté
+      via la console du navigateur : `Mixed Content` sur tous les
+      `assets/...` et un `NetworkError` bloquant sur `/items/poles` etc.
+      Cause : `https://isetag.web.app` (frontend Angular hébergé sur
+      Firebase) appelait Directus en `http://31.207.34.25` — les navigateurs
+      bloquent ce genre de requête active depuis une page HTTPS. Un second
+      bug indépendant a été trouvé en vérifiant : `CORS_ORIGIN` sur prod ne
+      contenait pas `https://isetag.web.app`, donc même après correction du
+      HTTPS, ces appels auraient continué à échouer (bloqués côté navigateur
+      par la policy CORS, faute d'en-tête `Access-Control-Allow-Origin`).
+      - **Pas d'accès au panneau DNS LWS pour l'instant** → solution sans
+        dépendre du DNS : hostname public `31-207-34-25.sslip.io` (service
+        wildcard DNS public, résout automatiquement vers l'IP embarquée dans
+        le nom, zéro configuration DNS nécessaire), certificat Let's Encrypt
+        réel et validé par le navigateur obtenu dessus. À terme, migrer vers
+        `cms.isetag-univ.net` (config déjà prête dans
+        `nginx/conf.d/isetag-prod.conf`) dès l'accès au panneau LWS obtenu —
+        remplacement du hostname + ré-émission du certificat uniquement, rien
+        à jeter de ce qui suit.
+      - **`isetag-nginx-temp` remplacé par `isetag-nginx-prod`** (nginx
+        `1.27-alpine`, config dans `/opt/isetag/nginx-prod/conf.d/`) :
+        sert le challenge ACME + proxy sur port 80, et un vrai bloc HTTPS
+        (port 443, cert Let's Encrypt) sur `31-207-34-25.sslip.io`.
+        `isetag-nginx-temp` laissé arrêté (pas supprimé) comme filet de
+        sécurité.
+      - **`CORS_ORIGIN` et `PUBLIC_URL` mis à jour sur `isetag-directus-prod`**
+        — a nécessité de **recréer le conteneur** (pas un simple
+        `docker compose up`, aucune valeur d'env ne peut être changée sur un
+        conteneur déjà démarré) :
+        - **Découverte importante en cours de route** : le fichier
+          `docker/prod/docker-compose.yml` de ce repo n'est **pas** ce qui a
+          réellement lancé le conteneur en prod (pas de `.env` dans
+          `/opt/isetag/docker/prod/`, et il référence un service `frontend`
+          jamais déployé). Un premier essai de `docker compose up -d
+          directus` a été interrompu à temps par une erreur de validation
+          (service `frontend` sans image) — sinon le conteneur aurait
+          redémarré avec tous les secrets vides (mot de passe DB, clés de
+          chiffrement, mot de passe admin).
+        - Approche retenue à la place : script clonant la config exacte du
+          conteneur actif (`docker inspect` — image, toutes les variables
+          d'env, tous les points de montage, les deux réseaux Docker,
+          `restart: always`) et ne changeant que la variable ciblée,
+          avec renommage (pas suppression) de l'ancien conteneur comme point
+          de rollback immédiat.
+        - **Deux bugs shell rencontrés et corrigés pendant la mise au point**
+          (repérés en mode `--dry-run`, sans toucher au conteneur réel avant
+          d'être sûr) : une ligne vide dans la sortie de `docker inspect`
+          provoquant un argument `-e ""` invalide, et surtout
+          `IFS= read -r src dst rw` qui désactive complètement la césure par
+          espace (bug classique) — corrigé en `read -r src dst rw` (sans
+          `IFS=` pour cette lecture à 3 variables). Une coupure de service
+          d'environ une minute a eu lieu lors du tout premier essai (avant
+          les corrections), immédiatement suivie d'un rollback vers l'ancien
+          conteneur puis nouvel essai après correction — chaque étape
+          ultérieure a été revérifiée fonctionnelle (ping, lecture de
+          contenu, connexion admin) avant de continuer.
+      - **Pare-feu `DOCKER-USER` rouvert sur les ports 80 et 443** — la
+        restriction Djo+Joseph mise en place plus tôt (voir entrée
+        précédente) n'avait de sens que tant que Directus était en HTTP
+        simple (risque d'admin en clair). Une fois le HTTPS réel en place,
+        le port 443 doit rester ouvert à tous : c'est par là que **tout
+        visiteur du site public** lit le contenu (`/items`, `/files`), pas
+        seulement l'admin. Le port 80 doit rester ouvert en continu pour le
+        renouvellement automatique du certificat (les serveurs de validation
+        Let's Encrypt appellent depuis des IP arbitraires, non prévisibles).
+        La protection de l'admin repose désormais sur l'authentification
+        Directus elle-même (comme la quasi-totalité des déploiements Directus
+        réels), plus seulement sur un filtrage réseau.
+        Script `/usr/local/sbin/docker-user-firewall.sh` mis à jour en
+        conséquence.
+      - **Renouvellement automatique du certificat** : timer systemd
+        `certbot-renew.timer` (vérification quotidienne, `certbot renew`
+        + `nginx -s reload` via `/usr/local/sbin/certbot-renew.sh`) — le
+        certificat expire le 2026-11-03, aucune action manuelle requise tant
+        que le renouvellement automatique tourne.
+      - **URL à communiquer à Djo pour le frontend** :
+        `https://31-207-34-25.sslip.io` (remplace `http://31.207.34.25`
+        partout dans la config du frontend). L'ancien accès HTTP simple
+        reste actif en parallèle pour l'instant (transition en douceur,
+        aucun consommateur existant cassé), à retirer une fois le frontend
+        confirmé migré.
+      Vérifié : ping, lecture de contenu, en-tête CORS correct pour l'origine
+      `https://isetag.web.app`, connexion admin — tous testés en HTTPS après
+      chaque changement.
 - [ ] `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` de dev pointent actuellement vers une
       boîte Gmail personnelle utilisée pour les tests — à remplacer par les
       identifiants SMTP définitifs avant la mise en production, et `ADMISSIONS_EMAIL`
