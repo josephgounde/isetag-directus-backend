@@ -1360,6 +1360,97 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       par les identifiants institutionnels définitifs, et `ADMISSIONS_EMAIL`
       par la vraie adresse du service des admissions, dès qu'ils seront
       fournis (mécanisme de remplacement déjà en place, changement trivial).
+- [x] (2026-08-10) **Nouvelle mise à jour du prototype Figma (Accueil +
+      Admissions uniquement, périmètre confirmé par l'utilisateur) — revue
+      complète et synchronisation Directus**, en plusieurs passes après que
+      deux écarts aient d'abord été manqués lors d'une première revue
+      superficielle (carte "Cycle Maritime" ajoutée, carte "Bourse SNK"
+      retirée) et signalés directement par l'utilisateur. Reprise systématique
+      en confrontant le contenu réellement stocké (lecture API, pas seulement
+      le souvenir des entrées précédentes) au prototype scrollé image par
+      image, à deux largeurs de viewport différentes pour éviter de manquer
+      une colonne coupée à l'écran. Cinq écarts confirmés et corrigés,
+      appliqués sur dev puis sur prod avec le même script Python idempotent
+      (login admin, une fonction par écart, vérifiable/rejouable
+      indépendamment) :
+      1. **Ajout — carte "Cycle Maritime"** dans `admissions_tuition_cycles`
+         (4e ligne, `level: "Maritime"` — même clé que les lignes maritimes
+         déjà existantes dans `tuition_plans`, id 9-10, pour que la
+         correspondance frontend continue de fonctionner sans changement).
+         Contenu identique aux 3 autres cartes (rentrée "11 septembre 2026",
+         mode "Concours et/ou étude de dossier.", même niveau requis affiché
+         par Figma sur les 4 cartes — voir note plus bas).
+      2. **Retrait — carte "Bourse SNK"** : ligne `scholarships` id=4 (dev) /
+         id=1 (prod) passée de `status: published` à `status: draft` —
+         **désactivée, pas supprimée**, récupérable en un `PATCH` si le
+         partenariat revient. Seule la carte "Bourse de l'Université
+         Montplaisir Tunis" reste publique.
+      3. **Correction de titre** — `admissions_tuition_highlight.heading_fr`
+         changé de "Tarifs et Frais d'Inscription" à "Nos différents Cycles",
+         qui est le texte affiché par le prototype actuel pour cette section.
+         Indice qui a mené à l'écart suivant : le titre stocké parlait encore
+         de tarifs alors qu'aucun montant ne s'affiche plus nulle part sur
+         ou autour des cartes Cycle dans le prototype.
+      4. **Retrait — 6 blocs `admissions_richtext`** (calendrier "Repères
+         2026-2027", liste exhaustive des filières par cycle, paragraphe
+         "Tarifs & Bourses 2026-2027", bloc "Bourses, aides et facilités" en
+         doublon avec `admissions_scholarships_highlight`, tableau "Modalités
+         d'admission" avec pièces communes) — après relecture attentive et
+         répétée du prototype du début à la fin, aucun de ces six blocs ne
+         correspond plus à un élément visible : la page a été simplifiée à
+         hero+étapes → bannière brochure → cartes Cycle sans tarif → une
+         seule carte Bourse → footer. Les 6 liens `pages_sections`
+         (`admissions_richtext`, sorts 2/4/5/7/8/11) et les 6 lignes de
+         contenu correspondantes ont été supprimés (collection
+         `admissions_richtext` conservée dans le schéma, vide — même
+         convention que `admissions_feature`/`admissions_cta_banner` depuis
+         la sanitization du 2026-08-03). **C'est le changement le plus
+         important en volume de contenu réel retiré** (dates d'inscription,
+         montants, listes de filières) — confirmation explicite demandée et
+         obtenue avant exécution, contrairement aux 4 autres points qui
+         suivaient un écart déjà bien identifié.
+      5. **Ajout — nouvelle section Accueil "Bienvenue à l'ISETAG / Le mot du
+         promoteur"**, absente de tout schéma ou contenu existant (recherche
+         du texte et de "promoteur"/"PAMEN" dans tout ce fichier :
+         aucune occurrence avant cette entrée). Nouvelle collection
+         `accueil_promoter_message` créée (`heading_fr/en`, `subheading_fr/en`,
+         `body_fr/en` en WYSIWYG, `author`), ajoutée à
+         `pages_sections.item.one_allowed_collections` (relation M2A),
+         permission de lecture publique créée, contenu français inséré
+         (essai retranscrit du prototype, signé "Pasteur PAMEN FLAUBERT") —
+         **`_en` laissés vides**, structure prête, traduction à fournir.
+         Section insérée dans `pages_sections` de la page Accueil à `sort=4`
+         (entre la bannière CTA admissions et "5 Raisons de choisir
+         ISETAG", position exacte du prototype), les sections suivantes
+         décalées de +1 (`accueil_reasons` 4→5, `accueil_partners_highlight`
+         5→6, `accueil_testimonials_highlight` 6→7,
+         `accueil_vie_campus_teaser` 7→8, 2e `accueil_cta_banner` 8→9).
+      - **Note non corrigée, signalée mais volontairement laissée telle
+        quelle** : le prototype affiche le même "Baccalauréat, GCE Advanced
+        Level ou équivalent" comme niveau requis sur les 4 cartes Cycle
+        (BTS/Licence/Master/Maritime), alors que Directus a des valeurs
+        correctement différenciées par cycle (Licence exige BTS/DUT/HND,
+        Master exige une Licence) — probable artefact de duplication de
+        composant côté Figma plutôt qu'un changement voulu ; les valeurs
+        Directus, plus exactes, n'ont pas été alignées sur ce texte.
+      - **Gestion des identifiants admin prod** : script exécuté localement
+        contre `https://31-207-34-25.sslip.io`, credentials lus depuis un
+        fichier `.env.prod` temporaire (hors dépôt, dans le répertoire de
+        travail temporaire de la session) que l'utilisateur a rempli
+        lui-même après extraction directe depuis les variables d'environnement
+        du conteneur prod en cours d'exécution (`docker exec
+        isetag-directus-prod env`) via sa propre session SSH — mot de passe
+        jamais tapé ni affiché dans mon contexte. Fichier supprimé après
+        usage. **Piège rencontré** : `Set-Content -Encoding utf8` de
+        PowerShell écrit un BOM UTF-8 en tête de fichier, ce qui empêchait la
+        toute première clé (`DIRECTUS_ADMIN_EMAIL`) d'être reconnue par un
+        parseur `utf-8` strict côté script (`grep`/Python) — corrigé en
+        lisant le fichier en `utf-8-sig` plutôt qu'en renvoyant l'utilisateur
+        régénérer le fichier.
+      Vérifié : lecture anonyme complète sur dev puis sur prod pour chacun
+      des 5 points (contenu, encodage des accents, ordre des sections),
+      script rejoué sans effet de bord une fois les changements déjà en
+      place (idempotent).
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
