@@ -109,8 +109,15 @@ Tout se récupère en **un seul appel** grâce au deep-fetch, en listant les
 collections propres à la page demandée dans `sections.item:<collection>.*` :
 
 ```
-GET {BASE_URL}/items/pages?filter[key][_eq]=admissions&fields=*,sections.collection,sections.sort,sections.item:admissions_hero.*,sections.item:admissions_richtext.*,sections.item:admissions_feature.*,sections.item:admissions_steps.items.*,sections.item:admissions_cta_banner.*,sections.item:admissions_tuition_highlight.*,sections.item:admissions_scholarships_highlight.*,sections.item:admissions_brochure.*
+GET {BASE_URL}/items/pages?filter[key][_eq]=admissions&fields=*,sections.collection,sections.sort,sections.item:admissions_hero.*,sections.item:admissions_steps.items.*,sections.item:admissions_brochure.*,sections.item:admissions_tuition_highlight.*,sections.item:admissions_scholarships_highlight.*
 ```
+
+(`admissions_richtext` et `admissions_feature` ont été retirées de cette
+requête le 2026-08-10 : les deux collections existent toujours dans le schéma
+mais n'ont plus aucune ligne liée à `pages_sections` sur la page Admissions —
+le prototype Figma mis à jour ne montre plus ce contenu, voir
+`ISETAG_project_instructions.md`. Inutile de les interroger, la réponse serait
+vide.)
 
 `admissions_tuition_highlight` et `admissions_scholarships_highlight` ne
 portent que le `heading_fr/en` — le frontend doit faire un appel séparé pour
@@ -123,7 +130,7 @@ Exemple pour Accueil (noter le `.partners.partners_id.*` et
 données réelles) :
 
 ```
-GET {BASE_URL}/items/pages?filter[key][_eq]=accueil&fields=*,sections.collection,sections.sort,sections.item:accueil_hero.*,sections.item:accueil_poles_highlight.*,sections.item:accueil_reasons.heading_fr,sections.item:accueil_reasons.heading_en,sections.item:accueil_reasons.items.*,sections.item:accueil_cta_banner.*,sections.item:accueil_partners_highlight.heading_fr,sections.item:accueil_partners_highlight.intro_text_fr,sections.item:accueil_partners_highlight.partners.partners_id.*,sections.item:accueil_testimonials_highlight.heading_fr,sections.item:accueil_testimonials_highlight.testimonials.testimonials_id.*,sections.item:accueil_vie_campus_teaser.*,sections.item:accueil_vie_campus_teaser.gallery.image,sections.item:accueil_vie_campus_teaser.gallery.sort
+GET {BASE_URL}/items/pages?filter[key][_eq]=accueil&fields=*,sections.collection,sections.sort,sections.item:accueil_hero.*,sections.item:accueil_poles_highlight.*,sections.item:accueil_cta_banner.*,sections.item:accueil_promoter_message.*,sections.item:accueil_reasons.heading_fr,sections.item:accueil_reasons.heading_en,sections.item:accueil_reasons.items.*,sections.item:accueil_partners_highlight.heading_fr,sections.item:accueil_partners_highlight.intro_text_fr,sections.item:accueil_partners_highlight.partners.partners_id.*,sections.item:accueil_testimonials_highlight.heading_fr,sections.item:accueil_testimonials_highlight.testimonials.testimonials_id.*,sections.item:accueil_vie_campus_teaser.*,sections.item:accueil_vie_campus_teaser.gallery.image,sections.item:accueil_vie_campus_teaser.gallery.sort
 ```
 
 La réponse contient `sections` = liste ordonnée (`sort`) d'objets
@@ -147,7 +154,10 @@ contenu réel à ce jour :
   par le HTML du WYSIWYG lui-même : ça fige l'environnement, un champ fichier
   dédié laisse le frontend construire l'URL avec le bon `BASE_URL`)
 - **`admissions_tuition_highlight`** (ajouté 2026-08-03) — heading_fr/en (=
-  "Tarifs et Frais d'Inscription", repris du prototype Figma v2), même
+  "Nos différents Cycles" depuis le 2026-08-10 — c'était "Tarifs et Frais
+  d'Inscription" jusque-là, corrigé pour coller au texte affiché par le
+  prototype Figma mis à jour, qui ne parle plus de tarifs à cet endroit),
+  même
   pattern que `accueil_poles_highlight` : le tableau de prix lui-même vient
   directement de la collection partagée `tuition_plans` (les 10 lignes,
   triées par `display_order`, pas de sélection curatée). Les 3 cartes
@@ -165,9 +175,9 @@ contenu réel à ce jour :
 - **`admissions_tuition_cycles`** (ajouté 2026-08-04) — collection autonome,
   **pas une section de page-builder** (comme `tuition_plans`/`scholarships`,
   appel séparé : `GET {BASE_URL}/items/admissions_tuition_cycles?sort=display_order`).
-  Une ligne par cycle (BTS, Licence, Master — **3 lignes seulement**, la
-  filière Maritime n'a pas de carte dédiée dans le prototype Figma v2, ses
-  tarifs apparaissent uniquement dans le tableau `tuition_plans`) :
+  Une ligne par cycle (BTS, Licence, Master, **Maritime** — 4 lignes depuis
+  le 2026-08-10 ; la carte Maritime a été ajoutée au prototype Figma à cette
+  date, elle était absente des versions précédentes) :
   `heading_fr/en` (ex. "Cycle BTS"), `level` (texte, sert de clé de
   correspondance avec `tuition_plans.level` — "BTS/HND", "Licence", "Master" —
   côté frontend pour associer chaque carte à ses lignes de tarifs),
@@ -213,6 +223,14 @@ contenu réel à ce jour :
   métier) — **conservées telles quelles délibérément** : les photos réelles de
   l'institution sont préférées aux silhouettes stock du prototype, à moins
   que l'équipe design ne demande explicitement l'alignement visuel
+- **`accueil_promoter_message`** (ajouté 2026-08-10) — heading_fr/en (=
+  "Bienvenue à l'ISETAG"), subheading_fr/en (= "Le mot du promoteur"),
+  body_fr/en (WYSIWYG, texte libre), `author` (texte simple, non traduit —
+  ex. "Pasteur PAMEN FLAUBERT"). Nouvelle section apparue dans la mise à jour
+  du prototype Figma du 2026-08-10, absente avant cette date. Insérée dans
+  `pages_sections` de la page Accueil juste après la bannière CTA Admissions
+  (`sort=4`). **`_en` vide pour l'instant** — traduction anglaise à fournir,
+  structure prête (même convention que `admissions_brochure.file`).
 - **`accueil_reasons`** — heading_fr/en + `items` (O2M ordonné par `sort` :
   title_fr/en, description_fr/en, `image`) — le carrousel "5 raisons de
   choisir l'ISETAG"
