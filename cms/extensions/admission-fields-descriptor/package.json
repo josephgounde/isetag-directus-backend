@@ -1,0 +1,14 @@
+{
+  "name": "admission-fields-descriptor",
+  "version": "1.0.0",
+  "description": "Endpoint public en lecture seule exposant les descripteurs de champs (type, interface, choices) du formulaire de pré-inscription, sans jamais exposer les candidatures elles-mêmes.",
+  "keywords": ["directus", "directus-extension", "directus-custom-endpoint"],
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "directus:extension": {
+    "type": "endpoint",
+    "path": "dist/index.js",
+    "source": "dist/index.js",
+    "host": "^11.0.0"
+  }
+}
