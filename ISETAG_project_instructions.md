@@ -1587,6 +1587,23 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       Vérifié après coup : site + `/admission-fields-descriptor` +
       `/items/pages` toujours 200 en HTTPS, `git status` propre à
       `/opt/isetag`, `.env.prod` restauré avec permissions `600`.
+- [x] (2026-08-13) **`tuition_plans` dépublié (10 lignes, dev + prod).**
+      Question posée en parcourant l'admin Directus : cette collection avec
+      les tarifs (montants, échéanciers) a-t-elle encore une utilité alors
+      qu'`admissions_tuition_cycles` + `admissions_tuition_highlight`
+      couvrent déjà le nouveau format à 4 cartes ? Vérification directe sur
+      le prototype Figma à jour (node-id=4182-950) : chaque carte de cycle
+      (BTS, Licence, Master, Maritime) affiche seulement Rentrée, Niveau
+      requis, Mode d'admission, Pièces communes — aucun tarif, aucun
+      échéancier, nulle part entre les cartes et la section "Bourses, Aides
+      et facilités" qui suit. Retrait confirmé, même famille que la carte
+      Bourse SNK et les 6 blocs richtext retirés le 2026-08-10 — la donnée
+      existait toujours mais la maquette ne l'affiche plus. Dépublication
+      (`status` → `draft`, pas de suppression, réversible) plutôt que
+      suppression pour rester cohérent avec le traitement de Bourse SNK.
+      Vérifié : `/items/tuition_plans` renvoie `200` avec `0` ligne en lecture
+      anonyme sur dev et prod (la collection reste lisible, filtrée à
+      `status=published`), `/items/admissions_tuition_cycles` inchangé.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
