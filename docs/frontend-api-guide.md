@@ -36,7 +36,9 @@ pour un projet Angular.
 
 Notez que `admission_applications` n'apparaît **volontairement pas** dans cette
 spec anonyme : ces données sont RGPD-sensibles et jamais lisibles publiquement
-(voir plus bas, section Admissions).
+(voir plus bas, section Admissions). Pour connaître la forme du formulaire
+(champs, choix) sans lire les candidatures, voir "Descripteurs de champs du
+formulaire d'admission" plus bas.
 
 ## Images et fichiers
 
@@ -437,6 +439,49 @@ service admissions avec liens sécurisés). Aucune confirmation de soumission
 n'est renvoyée avec les données de la candidature (la réponse du Flow est
 volontairement minimale) — prévoir un message de succès générique côté UI une
 fois le `POST` en étape 2 résolu sans erreur HTTP.
+
+## Descripteurs de champs du formulaire d'admission
+
+Ne recopiez plus à la main les listes de choix (`sexe`, `dernier_diplome`,
+`cycle`, `domaine`, `regime`, etc.) : un ajout/retrait de valeur côté Directus
+resterait invisible tant que personne ne relivre un nouvel export — c'est le
+problème qui s'est déjà produit avec les cycles de formation. À la place :
+
+```
+GET {BASE_URL}/admission-fields-descriptor
+```
+
+Public, sans authentification. Renvoie tous les champs du formulaire de
+pré-inscription (hors champs de gestion `status`/`source`/`annee_academique`/
+`desired_program`, gérés côté back), triés par `sort` :
+
+```json
+{
+  "data": [
+    {
+      "field": "sexe",
+      "type": "string",
+      "interface": "select-radio",
+      "required": true,
+      "sort": 15,
+      "note": null,
+      "choices": [
+        {"text": "Féminin", "value": "Féminin"},
+        {"text": "Masculin", "value": "Masculin"},
+        {"text": "Autre", "value": "Autre"}
+      ]
+    }
+  ]
+}
+```
+
+`interface` indique le type de contrôle à construire (`input`, `input-multiline`,
+`select-dropdown`, `select-radio`, `boolean`, `datetime`, `file`, `list-m2m`).
+`choices` n'est présent (non `null`) que pour les champs à liste fermée —
+utilisez `text` pour l'affichage et `value` pour ce qui doit être envoyé dans
+la requête de soumission (section suivante). Cet endpoint ne renvoie que la
+description des champs, jamais le contenu des candidatures — il reste
+impossible de lire `admission_applications` (403, volontaire).
 
 ## Formulaire de contact — simple POST JSON direct
 

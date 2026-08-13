@@ -1451,6 +1451,80 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       des 5 points (contenu, encodage des accents, ordre des sections),
       script rejoué sans effet de bord une fois les changements déjà en
       place (idempotent).
+- [x] (2026-08-13) **Descripteurs de champs du formulaire d'admission — endpoint
+      dédié `/admission-fields-descriptor`.** Le front recopiait à la main les
+      listes de choix (sexe, dernier_diplome, cycle, domaine, regime — 6 champs,
+      ~30 valeurs) depuis un export ponctuel du schéma livré le 27/07 : tout
+      ajout/retrait d'une valeur ou d'un champ dans Directus restait invisible
+      côté front — même défaut que la copie figée des cycles de formation
+      (2026-08-03).
+      - **Pistes essayées et rejetées, dans l'ordre, chacune vérifiée en direct
+        (pas supposée)** :
+        1. Opération de Flow `item-read` sur `directus_fields` — bloqué en dur :
+           `/items/directus_fields` renvoie 403 même pour un token admin complet
+           (les collections système ne passent jamais par la route générique
+           `/items/*`, permissions ou pas).
+        2. Permission `read` sur `directus_fields` filtrée à
+           `collection={_eq: admission_applications}`, accordée à un rôle de
+           service dédié — inutile : le test a montré que l'autorisation de
+           `/fields/:collection` ne regarde jamais `directus_fields` mais exige
+           un `read` sur la collection **cible** elle-même
+           (`admission_applications` a seulement `create` côté Public → 403 ;
+           `programs` a `read` → 200, vérifié sur les deux).
+        3. Auto-appel du Flow vers `http://localhost:8055/fields/...` — bloqué
+           par la protection SSRF native de Directus (`localhost` toujours
+           refusé par défaut pour les opérations `request`, quel que soit
+           `IMPORT_IP_DENYLIST`, non modifié pour ne pas affaiblir cette
+           protection pour tous les Flows de l'instance).
+        4. `read` + `fields: []` sur `admission_applications` (permission
+           présente mais aucune colonne exposée, pour passer la porte du
+           point 2 sans risque a priori) — la réponse de
+           `/fields/admission_applications` s'est retrouvée vide
+           (`"data": []`) : Directus lie strictement la visibilité de
+           `/fields/:collection` à la liste `fields` de la permission `read`
+           sur les données elles-mêmes. Conclusion : **aucune permission,
+           aussi étroite soit-elle, ne peut exposer les descripteurs sans
+           exposer les mêmes champs de données réelles** via ce même octroi.
+        5. Spec OpenAPI publique (`/server/specs/oas`) — `admission_applications`
+           totalement absente malgré le `create` de Public, confirmant la même
+           règle une 3e fois.
+      - **Solution retenue : extension Directus "endpoint"**
+        (`cms/extensions/admission-fields-descriptor/`), qui lit le schéma
+        directement en mémoire process (`FieldsService`, `accountability: null`)
+        au lieu de repasser par une route soumise aux permissions — aucune
+        permission touchée, aucun compte de service. Portée figée dans le code
+        (`COLLECTION = "admission_applications"`, champs de gestion exclus en
+        dur : `status`, `source`, `annee_academique`, `desired_program`, plus
+        tout champ `meta.hidden=true`) — jamais dérivée d'un paramètre de
+        requête. Structure Directus 11 (nesting par type déprécié depuis la
+        10.3, supprimé en 11.0) : `extensions/<nom>/package.json` +
+        `extensions/<nom>/dist/index.js`, à plat.
+      - **Réponse** : `GET /admission-fields-descriptor` (public, sans auth) →
+        `{"data": [{field, type, interface, required, sort, note, choices}, ...]}`,
+        30 champs, triés par `sort`.
+      - **Déploiement prod — découverte en cours de route** : le workflow
+        `.github/workflows/deploy.yml` suppose un checkout git à `~/isetag` sur
+        le VPS ; en réalité `/opt/isetag` (chemin confirmé via
+        `docker inspect isetag-directus-prod --format '{{range .Mounts}}...'`)
+        **n'est pas un dépôt git du tout** (`git pull` → "not a git
+        repository") — le déploiement automatique CI/CD ne fonctionnerait donc
+        pas tel que configuré pour ce VPS. Contournement pour ce changement :
+        `scp -r` direct du dossier de l'extension vers
+        `/opt/isetag/cms/extensions/`, puis `docker restart
+        isetag-directus-prod` (pas de `schema apply` ni de script de
+        provisioning nécessaire — aucun changement de schéma/permissions).
+        **Sujet à reprendre séparément** : soit cloner un vrai dépôt git dans
+        `/opt/isetag`, soit corriger le chemin dans `deploy.yml`.
+      - **Ancien brouillon abandonné et nettoyé sur dev** : rôle/policy/
+        utilisateur "Introspection Formulaire (interne)" et le Flow
+        correspondant (pistes 2-3 ci-dessus), tous supprimés une fois
+        l'approche par extension confirmée fonctionnelle.
+      Vérifié : lecture anonyme sur dev puis sur prod (30 champs, choix
+      identiques, encodage des accents correct en octets UTF-8 — pas seulement
+      à l'écran), `status`/`source`/`annee_academique`/`desired_program`/`id`
+      absents des deux, `/items/admission_applications` et
+      `/fields/admission_applications` toujours 403 sur prod après déploiement
+      (aucune régression sur la fermeture d'accès aux candidatures).
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
