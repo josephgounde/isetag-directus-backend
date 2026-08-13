@@ -24,6 +24,10 @@ docker/**/data/
 # Sauvegardes locales (générées par scripts/backup.sh sur le VPS)
 backups/
 
+# Certs Let's Encrypt réels (isetag-nginx-prod monte /opt/isetag/certbot en
+# bind mount sur ce VPS précis) — ne doivent jamais être commités.
+/certbot/
+
 # Logs
 *.log
 
