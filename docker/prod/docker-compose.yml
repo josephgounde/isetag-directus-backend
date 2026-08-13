@@ -56,10 +56,11 @@ services:
       CACHE_ENABLED: "true"
       CACHE_STORE: memory
       CORS_ENABLED: "true"
-      # TEMP: localhost:4200/4201 added for Djo's local Angular dev against prod
-      # content while cms.isetag-univ.net DNS isn't set up yet — remove once
-      # Nginx/TLS is the real ingress.
-      CORS_ORIGIN: "https://isetag-univ.net,https://www.isetag-univ.net,http://localhost:4200,http://localhost:4201"
+      # isetag-univ.net/www: futur domaine réel (DNS pas encore basculé, WordPress
+      # dessus pour l'instant) ; isetag.web.app: hébergement Firebase actuel du
+      # frontend ; 31-207-34-25.sslip.io: origine directe utilisée pour les tests ;
+      # localhost:4200/4201: dev local de Djo contre le contenu prod.
+      CORS_ORIGIN: "https://isetag-univ.net,https://www.isetag-univ.net,https://isetag.web.app,https://31-207-34-25.sslip.io,http://localhost:4200,http://localhost:4201"
       EMAIL_TRANSPORT: smtp
       EMAIL_SMTP_HOST: ${SMTP_HOST}
       EMAIL_SMTP_PORT: ${SMTP_PORT}
@@ -86,9 +87,14 @@ services:
     networks:
       - isetag_edge
 
+  # Config cible une fois le DNS isetag-univ.net/cms.isetag-univ.net basculé
+  # vers ce VPS (sert nginx/conf.d/isetag-prod.conf). Pas encore ce qui tourne
+  # réellement aujourd'hui : voir isetag-nginx-prod (nginx-prod/conf.d/,
+  # hostname sslip.io) plus bas, actuellement démarré manuellement en dehors
+  # de ce compose. À fusionner une fois le DNS prêt.
   nginx:
     image: nginx:alpine
-    container_name: isetag-nginx
+    container_name: isetag-nginx-prod
     restart: always
     depends_on:
       - directus

@@ -78,7 +78,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
-            cd ~/isetag
+            cd /opt/isetag
             git pull origin main
             FRONTEND_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TARGET_ENV }} \
               ./scripts/deploy.sh ${{ env.TARGET_ENV }}

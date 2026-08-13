@@ -1525,6 +1525,62 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       absents des deux, `/items/admission_applications` et
       `/fields/admission_applications` toujours 403 sur prod après déploiement
       (aucune régression sur la fermeture d'accès aux candidatures).
+- [ ] (2026-08-13) **Fix du checkout git de `/opt/isetag` sur le VPS prod —
+      en cours, phase A terminée.** Découvert en déployant
+      `admission-fields-descriptor` (entrée ci-dessus) : `/opt/isetag` (chemin
+      réel, confirmé via `docker inspect isetag-directus-prod --format
+      '{{range .Mounts}}...'`) n'est **pas un dépôt git** (`git pull` →
+      "not a git repository"), alors que `.github/workflows/deploy.yml`
+      suppose `~/isetag`. Avant de remplacer le dossier, comparaison complète
+      du contenu réel du VPS (tar récupéré via `scp`, jamais collé en clair)
+      contre `main` pour ne rien perdre — deux catégories de dérive trouvées :
+      - **Corrections faites en direct sur le VPS, jamais commitées** :
+        - `nginx-prod/conf.d/directus.conf` — la config nginx **réellement
+          active** (conteneur `isetag-nginx-prod`, démarré manuellement, hors
+          compose) : HTTPS réel sur `31-207-34-25.sslip.io` avec vrais certs
+          Let's Encrypt, mise en place le 2026-08-05 (voir entrée "Directus
+          prod passé en HTTPS") mais jamais versionnée. Rapatriée dans le
+          dépôt tel quel.
+        - `nginx-temp/default.conf` — l'ancien stopgap HTTP-only
+          (`isetag-nginx-temp`, arrêté mais conservé comme filet de sécurité).
+          Également rapatrié.
+        - `docker/prod/docker-compose.yml` — `CORS_ORIGIN` sur le fichier VPS
+          listait déjà `isetag.web.app` et l'origine sslip.io en plus de ce
+          que git avait (version pré-HTTPS, avec un commentaire "TEMP"
+          obsolète). **Un 3e écart** trouvé en plus : la valeur `CORS_ORIGIN`
+          réellement active sur le conteneur `isetag-directus-prod` en cours
+          d'exécution (`docker inspect ... .Config.Env`) ne correspondait à
+          aucune des deux versions fichier (juste `https://isetag-univ.net`
+          seul — changer un env Directus exige de recréer le conteneur, pas
+          un simple restart). Décision (validée) : liste la plus large comme
+          source de vérité unique — `isetag-univ.net`, `www.isetag-univ.net`,
+          `isetag.web.app` (hébergement Firebase actuel du front),
+          `31-207-34-25.sslip.io` (tests directs), `localhost:4200`/`4201`
+          (dev local Djo). Commentaire "TEMP" retiré (HTTPS/nginx est
+          maintenant la vraie entrée). `container_name` du service `nginx`
+          corrigé `isetag-nginx` → `isetag-nginx-prod` pour matcher ce qui
+          tourne vraiment ; commentaire ajouté précisant que ce service
+          compose reste la cible **future** (once DNS basculé vers
+          `nginx/conf.d/isetag-prod.conf`), pas ce qui sert aujourd'hui.
+      - **Fichiers simplement obsolètes côté VPS (git plus à jour, écrasement
+        sans risque)** : `scripts/deploy.sh` (antérieur à l'ajout de
+        `provision_roles.py` au pipeline), `scripts/provision_public_read.py`
+        (antérieur à la refonte Accueil — référençait encore
+        `accueil_news_preview`/`accueil_programs_highlight`, des collections
+        depuis remplacées). `cms/snapshots/current.yaml` et le reste de
+        `nginx/` déjà identiques, aucun écart.
+      - **`deploy.yml` corrigé** : `cd ~/isetag` → `cd /opt/isetag`.
+      - **Restant à faire (phases B et C, pas encore exécutées)** : (B)
+        échange sécurisé de `/opt/isetag` contre un vrai clone git — cloner à
+        côté, recopier `.env.prod` + `cms/uploads/` (115 Mo de fichiers réels,
+        RGPD) + `certbot/conf/` (certs + clés privées réelles, jamais dans
+        git) depuis l'ancien dossier renommé en `.bak` (filet de sécurité, pas
+        supprimé), sans redémarrer aucun conteneur (leurs bind mounts pointent
+        déjà sur des chemins absolus `/opt/isetag/...` figés à leur création —
+        repeupler le même chemin ne les perturbe pas) ; (C) recréation du
+        conteneur `isetag-directus-prod` pour appliquer le nouveau
+        `CORS_ORIGIN` (impossible par simple restart) — seule étape avec une
+        interruption de service brève, à faire séparément et confirmée.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
