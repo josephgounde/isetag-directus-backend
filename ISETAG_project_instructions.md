@@ -1605,7 +1605,7 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       anonyme sur dev et prod (la collection reste lisible, filtrée à
       `status=published`), `/items/admissions_tuition_cycles` inchangé.
 - [x] (2026-08-13) **`accueil_testimonials_highlight` repensé en carrousel
-      d'actualités (dev seulement, pas encore appliqué prod).** Question
+      d'actualités (dev + prod).** Question
       posée en parcourant l'admin : "la section Alumni a une nouvelle image
       de fond, le texte a peut-être changé aussi". Vérification sur le
       prototype Figma à jour : la section n'a pas juste un nouveau fond,
@@ -1646,10 +1646,14 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         de terminaison `/fields` au lieu de `/fields/:collection` pour créer
         les champs de la jonction) — une ligne `news` dupliquée créée puis
         supprimée manuellement après coup.
-      Vérifié en lecture anonyme sur dev : carrousel renvoie bien l'actualité
-      GAP Motors avec accents corrects, `heading_fr` vide comme prévu,
-      ancienne jonction `testimonials` bien absente. **Pas encore appliqué
-      sur prod** — en attente de confirmation utilisateur.
+      Vérifié en lecture anonyme sur dev et prod : carrousel renvoie bien
+      l'actualité GAP Motors avec accents corrects, `heading_fr` vide comme
+      prévu, ancienne jonction `testimonials` bien absente,
+      `/items/accueil_testimonials_highlight_testimonials` renvoie `403`
+      (collection supprimée). Script prod exécuté sans accroc au premier
+      passage (bug `/fields` déjà corrigé) ; seul `cta_url` avait été fixé à
+      la main sur dev après coup sans être reporté dans le script — rattrapé
+      séparément sur prod par un second passage de credentials.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
