@@ -1604,6 +1604,52 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       Vérifié : `/items/tuition_plans` renvoie `200` avec `0` ligne en lecture
       anonyme sur dev et prod (la collection reste lisible, filtrée à
       `status=published`), `/items/admissions_tuition_cycles` inchangé.
+- [x] (2026-08-13) **`accueil_testimonials_highlight` repensé en carrousel
+      d'actualités (dev seulement, pas encore appliqué prod).** Question
+      posée en parcourant l'admin : "la section Alumni a une nouvelle image
+      de fond, le texte a peut-être changé aussi". Vérification sur le
+      prototype Figma à jour : la section n'a pas juste un nouveau fond,
+      **son contenu a changé de nature** — l'ancien "Les Alumnis de ISETAG"
+      (témoignages d'anciens étudiants) est devenu "Actualités de ISETAG"
+      (carrousel d'actualités réelles, ex. "Immersion professionnelle chez
+      GAP Motors", visite d'étudiants MAVA/MKA chez ce partenaire en février
+      2026).
+      - Collection **conservée** (`accueil_testimonials_highlight`, pour ne
+        pas casser la clé `sections.item:accueil_testimonials_highlight.*`
+        déjà documentée côté front) mais repurposée : `eyebrow_fr` → "Actualités
+        de ISETAG", `cta_label_fr` → "Découvrez nos actualités", `cta_url` →
+        `/actualites` (au lieu de `/actualites#success-stories`, ancre
+        obsolète), `heading_fr/en` → `null` (le titre affiché vient
+        désormais de chaque actualité, pas d'un heading statique du bloc).
+      - Ancienne relation `testimonials` (champ alias + jonction
+        `accueil_testimonials_highlight_testimonials`) **supprimée** — plus
+        utilisée par ce bloc. La collection `testimonials` elle-même et
+        `actualites_testimonials_highlight` (page Actualités, distincte) ne
+        sont pas affectées.
+      - Nouvelle relation M2M **`news`** créée (jonction
+        `accueil_testimonials_highlight_news`, même mécanique que `partners`
+        sur `accueil_partners_highlight`) — sélection manuelle et ordonnée
+        (`sort`) d'actualités à mettre en avant, plutôt que les N dernières
+        automatiquement, pour rester cohérent avec le reste du page-builder.
+      - Première actualité créée dans la collection `news` (jusque-là vide,
+        0 ligne) : slug `immersion-professionnelle-gap-motors`, `category`
+        = `vie_campus` (le plus proche des 5 choix existants — à ajuster si
+        l'équipe éditoriale préfère `partenariat`, GAP Motors étant
+        l'entreprise hôte), `date_published` = 2026-02-01 (le prototype dit
+        seulement "en février 2026", jour exact non précisé), image fournie
+        par l'utilisateur (`contenuç_accueil/alumni_image.png`, 697 Ko —
+        sous le seuil de 1 Mo, conservée en PNG sans conversion WebP) uploadée
+        dans le dossier Public.
+      - **Piège rencontré** : le cache Directus (`CACHE_ENABLED=true` en dev)
+        a fait rater la vérification d'idempotence de la création `news` au
+        premier re-run après un bug corrigé en cours de route (mauvais point
+        de terminaison `/fields` au lieu de `/fields/:collection` pour créer
+        les champs de la jonction) — une ligne `news` dupliquée créée puis
+        supprimée manuellement après coup.
+      Vérifié en lecture anonyme sur dev : carrousel renvoie bien l'actualité
+      GAP Motors avec accents corrects, `heading_fr` vide comme prévu,
+      ancienne jonction `testimonials` bien absente. **Pas encore appliqué
+      sur prod** — en attente de confirmation utilisateur.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus

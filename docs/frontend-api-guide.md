@@ -128,11 +128,11 @@ et `GET {BASE_URL}/items/scholarships?filter[status][_eq]=published&sort=display
 (même pattern que `poles` pour la section pôles d'Accueil).
 
 Exemple pour Accueil (noter le `.partners.partners_id.*` et
-`.testimonials.testimonials_id.*` pour traverser les jonctions M2M jusqu'aux
-données réelles) :
+`.news.news_id.*` pour traverser les jonctions M2M jusqu'aux données
+réelles) :
 
 ```
-GET {BASE_URL}/items/pages?filter[key][_eq]=accueil&fields=*,sections.collection,sections.sort,sections.item:accueil_hero.*,sections.item:accueil_poles_highlight.*,sections.item:accueil_cta_banner.*,sections.item:accueil_promoter_message.*,sections.item:accueil_reasons.heading_fr,sections.item:accueil_reasons.heading_en,sections.item:accueil_reasons.items.*,sections.item:accueil_partners_highlight.heading_fr,sections.item:accueil_partners_highlight.intro_text_fr,sections.item:accueil_partners_highlight.partners.partners_id.*,sections.item:accueil_testimonials_highlight.heading_fr,sections.item:accueil_testimonials_highlight.testimonials.testimonials_id.*,sections.item:accueil_vie_campus_teaser.*,sections.item:accueil_vie_campus_teaser.gallery.image,sections.item:accueil_vie_campus_teaser.gallery.sort
+GET {BASE_URL}/items/pages?filter[key][_eq]=accueil&fields=*,sections.collection,sections.sort,sections.item:accueil_hero.*,sections.item:accueil_poles_highlight.*,sections.item:accueil_cta_banner.*,sections.item:accueil_promoter_message.*,sections.item:accueil_reasons.heading_fr,sections.item:accueil_reasons.heading_en,sections.item:accueil_reasons.items.*,sections.item:accueil_partners_highlight.heading_fr,sections.item:accueil_partners_highlight.intro_text_fr,sections.item:accueil_partners_highlight.partners.partners_id.*,sections.item:accueil_testimonials_highlight.eyebrow_fr,sections.item:accueil_testimonials_highlight.cta_label_fr,sections.item:accueil_testimonials_highlight.cta_url,sections.item:accueil_testimonials_highlight.news.news_id.*,sections.item:accueil_vie_campus_teaser.*,sections.item:accueil_vie_campus_teaser.gallery.image,sections.item:accueil_vie_campus_teaser.gallery.sort
 ```
 
 La réponse contient `sections` = liste ordonnée (`sort`) d'objets
@@ -265,18 +265,29 @@ contenu réel à ce jour :
   Les 8 partenaires existent déjà (mêmes 8 que le prototype Figma v2) et
   **`partners.logo` est rempli sur les 8 lignes** (logos réels fournis par
   l'utilisateur le 2026-08-03, fichiers PNG légers donc non convertis en WebP)
-- **`accueil_testimonials_highlight`** — heading_fr/en (= sous-titre affiché,
-  "Que deviennent nos anciens étudiants ?") + `testimonials` (M2M curaté à la
-  main, via jonction `accueil_testimonials_highlight_testimonials`) — section
-  Alumni de la page Accueil (ne pas confondre avec
-  `actualites_testimonials_highlight`, section différente de la page
-  Actualités). + `eyebrow_fr/en` (ajouté 2026-08-03) — grand titre affiché
-  au-dessus du heading dans Figma (= "Les Alumnis de ISETAG" ; le nom de champ
-  "eyebrow" est trompeur ici, visuellement c'est le plus gros des deux titres,
-  gardé pour cohérence avec les autres blocs). + `cta_label_fr/en`/`cta_url`
-  (ajoutés 2026-08-03) — bouton "Découvez nos success stories" (coquille
-  d'origine dans Figma, conservée telle quelle) ; même pattern que
-  `actualites_testimonials_highlight` qui avait déjà ces champs
+- **`accueil_testimonials_highlight`** (nom de collection conservé pour ne pas
+  casser `sections.item:accueil_testimonials_highlight.*` côté frontend, mais
+  **section entièrement repensée le 2026-08-13** — ce n'est plus une section
+  Alumni). Avant cette date : heading_fr/en + `testimonials` (M2M vers
+  `testimonials`), eyebrow "Les Alumnis de ISETAG", CTA "Découvez nos success
+  stories". Le prototype Figma mis à jour a remplacé tout ça par un carrousel
+  d'actualités réelles ("Actualités de ISETAG") — même refonte que les autres
+  écarts déjà traités ce mois-ci (contenu retiré/remplacé par le prototype).
+  **Nouveaux champs** : `eyebrow_fr/en` (= "Actualités de ISETAG"),
+  `cta_label_fr/en` (= "Découvrez nos actualités"), `cta_url` (=
+  `/actualites`), `heading_fr/en` (laissé `null` — le titre affiché par
+  carte vient de l'actualité elle-même, pas d'un heading statique du bloc),
+  et surtout `news` (M2M curaté à la main, via jonction
+  `accueil_testimonials_highlight_news`, même mécanique que `partners` —
+  `sections.item:accueil_testimonials_highlight.news.news_id.*` pour
+  traverser jusqu'aux vraies données `news`). L'ancien champ `testimonials`
+  et sa jonction ont été supprimés (plus jamais utilisés sur ce bloc — le
+  reste de la collection `testimonials` et
+  `actualites_testimonials_highlight` sur la page Actualités ne sont pas
+  affectés). Premier élément du carrousel : l'actualité
+  "Immersion professionnelle chez GAP Motors" (`news.slug =
+  immersion-professionnelle-gap-motors`), `cover_image` = la photo fournie
+  par l'équipe.
 - **`accueil_vie_campus_teaser`** — heading_fr/en, text_fr/en, `image`, +
   `cta_label_fr/en`/`cta_url` (ajoutés 2026-08-01) — court teaser en bas de la
   page Accueil. Contenu réel actuel : `cta_label_fr` = "Découvrez notre
