@@ -1654,6 +1654,24 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       passage (bug `/fields` déjà corrigé) ; seul `cta_url` avait été fixé à
       la main sur dev après coup sans être reporté dans le script — rattrapé
       séparément sur prod par un second passage de credentials.
+- [x] (2026-08-13) **`admissions_scholarships_highlight.intro_text_fr/en`
+      ajouté (dev + prod).** Signalé via capture d'écran : un paragraphe sous
+      le titre "Bourses, aides et facilités" ("Des avantages ou bourses
+      peuvent être proposés dans le cadre de partenariats académiques et de
+      campagnes spécifiques.") n'existait pas encore dans Directus — la
+      collection n'avait jusqu'ici que `heading_fr/en` + `eyebrow_fr/en`
+      (voir entrée admissions_tuition_highlight/scholarships du 2026-08-03).
+      **Correction en cours de route** : première lecture avait fait
+      confondre ce paragraphe de section avec le texte plus long de la carte
+      "Bourse de l'Université Montplaisir Tunis" (`scholarships.description`,
+      id=5 en dev / id=2 en prod) — modifié par erreur puis **immédiatement
+      annulé** sur dev avant tout déploiement prod, sur indication explicite
+      de l'utilisateur ("il n'y a rien à modifier là"). `scholarships.description`
+      n'a donc subi aucun changement net, sur aucun environnement.
+      Champs ajoutés : `intro_text_fr/en` (type `text`, interface
+      `input-multiline`, même pattern que `accueil_partners_highlight.intro_text_fr`).
+      Vérifié : lecture anonyme correcte sur dev et prod (accents corrects en
+      octets UTF-8), `scholarships` (id=2 prod, published) inchangé.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus

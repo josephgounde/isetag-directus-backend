@@ -189,7 +189,10 @@ contenu réel à ce jour :
   codé en dur côté frontend) — signalé par l'équipe éditoriale, ajouté pour
   que ce soit éditable comme le reste
 - **`admissions_scholarships_highlight`** (ajouté 2026-08-03) — heading_fr/en
-  uniquement (= "Bourses, aides et facilités"), même pattern : les cartes
+  (= "Bourses, aides et facilités") + `eyebrow_fr/en` (= "La Scolarité") +
+  `intro_text_fr/en` (ajouté 2026-08-13, = "Des avantages ou bourses peuvent
+  être proposés dans le cadre de partenariats académiques et de campagnes
+  spécifiques.") ; même pattern que le reste du bloc : les cartes
   viennent directement de `scholarships` (triées par `display_order`)
 - **`admissions_brochure`** (ajouté 2026-08-03) — heading_fr/en, text_fr/en,
   cta_label_fr/en + `file` (relation directe vers `directus_files`, interface
