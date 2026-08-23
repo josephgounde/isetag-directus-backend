@@ -402,6 +402,43 @@ Résumé :
   dans le prototype, `cta_url` laissé `null` — pas de cible confirmée).
   Branchée sur la page Admissions via la nouvelle section
   `admissions_scholarships_highlight` (voir plus bas).
+- **Page Vie Campus — collections créées le 2026-08-23** pour matcher le
+  prototype Figma "Vie Campus - Desktop" (1233×9809). La page n'avait aucun
+  contenu structuré avant (seule `campus_services` existait, vide). Toutes en
+  lecture publique.
+  - **vie_campus_hero** (singleton, 1 ligne) — `eyebrow_fr/en`,
+    `heading_fr/en`, `body_fr/en`, `image` (**`null`** — aucune photo fournie
+    pour cette page, à compléter, cf. `contenu_programmes/` pour le pattern
+    attendu)
+  - **vie_campus_highlights** (6 lignes, section "Notre campus c'est :") —
+    `title_fr/en`, `description_fr/en`, `display_order`
+  - **vie_campus_residence** (singleton, 1 ligne, section "La Cité
+    Universitaire") — `heading_fr/en`, `image` (`null`), `description_fr/en`
+    (texte de gauche), `details_fr/en` (texte de droite, tarifs), `gallery`
+    (JSON — liste d'UUID fichiers, **vide `[]`**, 3 photos manquantes)
+  - **campus_services** (collection existante, était vide — **8 lignes**,
+    section "Services du campus") — `name_fr/en` (existant),
+    **`description_fr/en` et `display_order` ajoutés** (nouveaux champs)
+  - **vie_campus_service_details** (7 lignes, nouvelle collection) — les 3
+    blocs détaillés du prototype (Santé/restauration, Mobilité/sport/connexion,
+    Infrastructures) aplatis en une liste avec `group_fr` (titre du bloc
+    parent), `group_image` (`null`), `title_fr/en`, `body_fr/en`,
+    `bullets_fr` (JSON liste de chaînes), `display_order`
+  - **vie_campus_clubs** (4 lignes, section "Clubs & Associations") —
+    `name_fr/en`, `description_fr/en`, `display_order`
+  - **vie_campus_staff** (4 lignes, section "Enseignants et encadreurs") —
+    **contenu placeholder du prototype Figma inséré tel quel sur demande
+    explicite de l'utilisateur** : les 4 lignes sont identiques ("Dr Marina
+    Walter" / "Ingénieure en énergies renouvelables" / `photo: null`) — **pas
+    de vraies données enseignants dans le prototype**, à remplacer quand le
+    contenu réel sera fourni
+  - **vie_campus_sections** (singleton, 1 ligne) — 3 paragraphes d'intro de
+    section (`services_intro_fr`, `clubs_intro_fr`, `staff_intro_fr`) qui ne
+    rentraient pas naturellement ailleurs
+  - **Non repris** : les paragraphes d'intro `_en` (tous `null`, comme
+    ailleurs — contenu FR uniquement dans le prototype), et le bandeau CTA
+    "Commence Ton Chemin Aujourd'hui" (identique à celui de la page
+    Programmes, non construit ici — hors périmètre de cette passe)
 - **tuition_plans** — `cycle_name`, `level` (BTS/HND, Licence, Master,
   Maritime), `total_amount`, `installments` (JSON), `note`, `display_order`,
   `status` (**filtrer `_eq: published`**) — **10 lignes réelles**, désormais

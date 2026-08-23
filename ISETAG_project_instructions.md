@@ -1712,6 +1712,43 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       au niveau octet, comptes par cycle corrects, images correctement liées).
       **Pas encore appliqué en prod** — abonnement VPS LWS expiré, en attente
       de renouvellement par l'utilisateur avant tout accès prod.
+- [x] (2026-08-23) **Page Vie Campus construite de zéro (dev)** à partir du
+      prototype Figma "Vie Campus - Desktop" (1233×9809). La page n'avait
+      aucun contenu structuré (`campus_services` existait mais était vide,
+      aucune autre collection dédiée). 7 nouvelles collections créées
+      (`vie_campus_hero`, `vie_campus_highlights`, `vie_campus_residence`,
+      `vie_campus_service_details`, `vie_campus_clubs`, `vie_campus_staff`,
+      `vie_campus_sections`) + `campus_services` étendue (2 champs ajoutés,
+      8 lignes insérées) — détail des champs dans
+      `docs/frontend-api-guide.md`. Contenu inséré : hero, 6 highlights
+      ("Notre campus c'est :"), bloc "La Cité Universitaire" (tarif 22 000
+      FCFA/mois), 8 services, 7 blocs détaillés répartis en 3 groupes
+      (Santé/restauration, Mobilité/sport/connexion, Infrastructures), 4
+      clubs, 3 paragraphes d'intro de section.
+      **Deux limites signalées explicitement, pas des bugs** :
+      1. Aucune photo disponible pour cette page (pas de dossier
+         `contenu_vie_campus/` fourni, contrairement à `contenu_programmes/`
+         pour la page Programmes) — tous les champs image (`vie_campus_hero.image`,
+         `vie_campus_residence.image`, `.gallery`, `vie_campus_service_details.group_image`,
+         `vie_campus_staff.photo`) sont `null`/`[]` en attendant. Tentative
+         d'export direct depuis Figma en mode invité infructueuse (clic droit
+         et outil de sélection déclenchent systématiquement l'écran de
+         connexion Figma) — demandé à l'utilisateur de fournir les photos.
+      2. Section "Enseignants et encadreurs" : le prototype Figma ne contient
+         que des données de remplacement (4 cartes strictement identiques —
+         "Dr Marina Walter", "Ingénieure en énergies renouvelables", même
+         photo). **Insérées telles quelles sur demande explicite de
+         l'utilisateur** ("put the placeholder datas") plutôt que d'être
+         omises — à remplacer par les vraies données enseignants quand elles
+         seront fournies.
+      Script : `scratchpad/rebuild_vie_campus.py` (idempotent — vide et
+      réinsère à chaque exécution). Vérifié en lecture anonyme sur dev :
+      tous les comptes exacts (1/6/1/8/7/4/4/1), accents UTF-8 corrects au
+      niveau octet sur l'ensemble du contenu, y compris "Mhurai" (nom de
+      l'hôpital partenaire, orthographe incertaine — confirmé lettre par
+      lettre par zoom Figma à 200 %, à valider auprès de l'ISETAG).
+      **Pas encore appliqué en prod** — abonnement VPS LWS expiré (voir
+      entrée Programmes ci-dessus).
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
