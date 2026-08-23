@@ -1672,6 +1672,46 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       `input-multiline`, même pattern que `accueil_partners_highlight.intro_text_fr`).
       Vérifié : lecture anonyme correcte sur dev et prod (accents corrects en
       octets UTF-8), `scholarships` (id=2 prod, published) inchangé.
+- [x] (2026-08-23) **Page Programmes reconstruite (dev)** à partir du nouveau
+      prototype Figma ("Programmes - Desktop", 1280×8112) : hero, 4 sections
+      Pôle (Maritime/Industriel/Gestion/Communication), section "Référentiel
+      de nos formations" (6 onglets par cycle), footer standard. Fichier
+      Figma parcouru en mode invité (pas de compte connecté) — pas d'accès à
+      l'Inspect panel ni au zoom-sur-sélection, navigation entièrement au
+      pan/zoom manuel de la souris.
+      **`poles`** (5→4 lignes) : suppression de "Pôle Santé & Paramédical"
+      (absent du nouveau design, ses 4 filières `programs` supprimées aussi),
+      les 4 pôles restants réécrits avec le contenu du prototype et réordonnés
+      (`display_order` : Maritime=1, Industriel=2, Gestion=3, Communication=4,
+      ordre du prototype). 11 nouveaux champs ajoutés (`subtitle_fr/en`,
+      `notes_fr/en`, `deadline_fr/en`, `featured_name_fr/en`,
+      `featured_description_fr/en`, `tags_fr` JSON) — voir détail dans
+      `docs/frontend-api-guide.md`. 4 nouvelles photos uploadées depuis
+      `contenu_programmes/` (`pole maritime 3.png`, `industriel 3.png`,
+      `gestion 3.png`, `communication 3.png` — identifiées par comparaison
+      visuelle directe avec les sections Figma correspondantes ; les anciennes
+      photos stock restent dans la bibliothèque Fichiers, inutilisées).
+      **`programs`** (27→77 lignes) : nouveau champ `cycle`
+      (bts/hnd/licence/master/maritime/certifiante) pour matcher les 6 onglets
+      du "Référentiel de nos formations". Répartition : `bts` 39, `certifiante`
+      18, `licence` 8, `maritime` 6 (contenu réel du prototype, `pole: null`
+      — le référentiel est un catalogue transversal par cycle, non rattaché à
+      un pôle précis dans le design). `hnd` : **6 lignes héritées conservées
+      telles quelles** (`cycle` rétro-rempli sur les anciennes lignes
+      `level="HND"`, aucune insertion neuve) — l'onglet HND du prototype ne
+      contient que du texte de remplissage en anglais ("Civil Engineering",
+      "Wood Works"...), non exploitable. `master` : **0 ligne, aucune
+      insertion** — l'onglet Master du prototype est une copie exacte du
+      contenu Licence (pas de contenu réel distinct). Décision utilisateur
+      explicite sur ces deux onglets : garder l'ancien contenu Directus tel
+      quel plutôt que d'insérer du texte de remplissage/dupliqué.
+      Script : `scratchpad/rebuild_programmes.py` (idempotent sur les champs
+      de schéma, non ré-exécutable tel quel sur les données — insertions
+      directes sans vérification d'idempotence, à adapter si ré-exécution
+      nécessaire). Vérifié en lecture anonyme sur dev (accents UTF-8 corrects
+      au niveau octet, comptes par cycle corrects, images correctement liées).
+      **Pas encore appliqué en prod** — abonnement VPS LWS expiré, en attente
+      de renouvellement par l'utilisateur avant tout accès prod.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus

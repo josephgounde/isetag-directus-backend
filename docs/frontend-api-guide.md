@@ -354,14 +354,43 @@ admissions compose leur contenu via l'Admin UI Directus.
 Champs exacts consultables via la spec OpenAPI ou `GET {BASE_URL}/fields/<collection>`.
 Résumé :
 
-- **poles** — `slug`, `name_fr`, `name_en`, `icon`, `color`, `display_order`,
-  `description_fr`, `description_en` (WYSIWYG, ajoutés pour la section pôles
-  de la page Accueil), `image` (carte carrousel — ajouté pour la section
-  pôles de la page Accueil ; **4 pôles sur 5 ont une image** au 2026-07-31,
-  il manque celle de `maritime-logistique`, `image: null` en attendant)
-- **programs** — `slug`, `name_fr`, `name_en`, `pole` (relation → poles), `level`,
-  `is_hnd`, `schedule` (`jour`/`soir`/`jour_soir`), `seo_title_fr`,
-  `seo_description_fr`, `cover_image`, `status` (**filtrer `_eq: published`**)
+- **poles** — **reconstruite le 2026-08-23** pour matcher le nouveau prototype
+  Figma de la page Programmes. **4 lignes** (le 5ᵉ pôle "Santé & Paramédical"
+  a été supprimé, absent du nouveau design) : `slug`, `name_fr`, `name_en`,
+  `icon`, `color`, `display_order` (1=Maritime, 2=Industriel, 3=Gestion,
+  4=Communication, ordre du prototype), `image` (photo héro du pôle),
+  `description_fr/en` (ancien champ, conservé), et les nouveaux champs
+  ajoutés pour matcher le prototype : `subtitle_fr/en` (sous-titre court sous
+  le nom du pôle), `notes_fr/en` (bloc de notes/puces : régimes de cours,
+  tutelle académique, date limite d'admission), `deadline_fr/en` (ligne
+  "Date limite de recevabilité des dossiers : 16 septembre 2026" — identique
+  sur les 4 pôles actuellement), `featured_name_fr/en` (nom de la filière
+  phare mise en avant sur la carte du pôle), `featured_description_fr/en`
+  (paragraphe descriptif de cette filière phare), `tags_fr` (JSON — liste des
+  autres filières/spécialités affichées en pastilles sous la filière phare).
+  Les champs `_en` sont tous `null` pour l'instant (contenu FR uniquement
+  dans le prototype).
+- **programs** — **reconstruite le 2026-08-23** pour matcher le "Référentiel
+  de nos formations" du nouveau prototype Figma (liste par cycle avec 6
+  onglets). Champs : `slug`, `name_fr`, `name_en`, `pole` (relation → poles,
+  **`null` pour toutes les nouvelles lignes** — le référentiel du prototype
+  n'associe pas ces filières à un pôle précis, c'est un catalogue académique
+  transversal par cycle), `cycle` (**nouveau champ**, valeurs :
+  `bts`/`hnd`/`licence`/`master`/`maritime`/`certifiante`), `level`, `is_hnd`,
+  `schedule` (anciens champs, conservés uniquement sur les lignes `cycle:
+  "hnd"` héritées), `seo_title_fr`, `seo_description_fr`, `cover_image`,
+  `status` (**filtrer `_eq: published`**).
+  Répartition actuelle (77 lignes) : `bts` 39, `certifiante` 18, `licence` 8,
+  `maritime` 6, `hnd` 6 (**anciennes lignes conservées telles quelles** —
+  le prototype Figma n'a que du texte de remplissage anglais pour l'onglet
+  HND, non utilisable), `master` 0 (**aucun contenu réel dans le prototype**
+  pour cet onglet — c'est une copie exacte du contenu Licence, donc rien n'a
+  été inséré ; à compléter quand le contenu réel sera fourni). Pour les
+  cycles `licence` et `certifiante`, chaque puce du prototype (ex. "Génie
+  Civil : Bâtiments ; Réseaux hydrauliques ... ; Voies et Ouvrages d'art.")
+  est stockée comme **une seule ligne `name_fr`** avec les sous-spécialités
+  séparées par `;` à l'intérieur du texte, plutôt que d'être éclatée en
+  lignes séparées.
 - **scholarships** — `name`, `amount`, `description`, `conditions`,
   `display_order`, `status` (**filtrer `_eq: published`**), + `image`,
   `cta_label_fr/en`, `cta_url` (ajoutés 2026-08-01 pour matcher les cartes
