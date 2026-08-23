@@ -407,34 +407,48 @@ Résumé :
   contenu structuré avant (seule `campus_services` existait, vide). Toutes en
   lecture publique.
   - **vie_campus_hero** (singleton, 1 ligne) — `eyebrow_fr/en`,
-    `heading_fr/en`, `body_fr/en`, `image` (**`null`** — aucune photo fournie
-    pour cette page, à compléter, cf. `contenu_programmes/` pour le pattern
-    attendu)
+    `heading_fr/en`, `body_fr/en`, `image` (photo cour ISETAG)
   - **vie_campus_highlights** (6 lignes, section "Notre campus c'est :") —
     `title_fr/en`, `description_fr/en`, `display_order`
   - **vie_campus_residence** (singleton, 1 ligne, section "La Cité
-    Universitaire") — `heading_fr/en`, `image` (`null`), `description_fr/en`
+    Universitaire") — `heading_fr/en`, `image` (photo bâtiment), `description_fr/en`
     (texte de gauche), `details_fr/en` (texte de droite, tarifs), `gallery`
-    (JSON — liste d'UUID fichiers, **vide `[]`**, 3 photos manquantes)
+    (JSON — 3 UUID fichiers)
   - **campus_services** (collection existante, était vide — **8 lignes**,
     section "Services du campus") — `name_fr/en` (existant),
-    **`description_fr/en` et `display_order` ajoutés** (nouveaux champs)
+    **`description_fr/en` et `display_order` ajoutés** (nouveaux champs).
+    Pas d'image par ligne — la bannière de section vit sur
+    `vie_campus_sections.services_image`.
   - **vie_campus_service_details** (7 lignes, nouvelle collection) — les 3
     blocs détaillés du prototype (Santé/restauration, Mobilité/sport/connexion,
     Infrastructures) aplatis en une liste avec `group_fr` (titre du bloc
-    parent), `group_image` (`null`), `title_fr/en`, `body_fr/en`,
-    `bullets_fr` (JSON liste de chaînes), `display_order`
+    parent), `group_image` (photo du bloc, répétée sur chaque ligne du même
+    groupe), `title_fr/en`, `body_fr/en`, `bullets_fr` (JSON liste de
+    chaînes), `display_order`, `gallery` (JSON — **uniquement renseigné sur
+    la dernière ligne du groupe "Infrastructures d'apprentissage et de
+    pratique"**, id=7 "Amphithéâtre" — c'est le seul des 3 groupes à avoir
+    une galerie de 3 photos dans le prototype ; convention à connaître côté
+    frontend : ne pas s'attendre à une galerie sur les groupes Santé/Mobilité)
   - **vie_campus_clubs** (4 lignes, section "Clubs & Associations") —
     `name_fr/en`, `description_fr/en`, `display_order`
   - **vie_campus_staff** (4 lignes, section "Enseignants et encadreurs") —
     **contenu placeholder du prototype Figma inséré tel quel sur demande
     explicite de l'utilisateur** : les 4 lignes sont identiques ("Dr Marina
-    Walter" / "Ingénieure en énergies renouvelables" / `photo: null`) — **pas
+    Walter" / "Ingénieure en énergies renouvelables" / même `photo`) — **pas
     de vraies données enseignants dans le prototype**, à remplacer quand le
-    contenu réel sera fourni
+    contenu réel sera fourni. Photo source `enseignant.jpg` (11,9 Mo, fournie
+    par l'utilisateur) convertie en WebP + redimensionnée à 1600px de large
+    avant upload (règle projet : toute image > 1 Mo est convertie), résultat
+    97 Ko / 1600×1066.
   - **vie_campus_sections** (singleton, 1 ligne) — 3 paragraphes d'intro de
-    section (`services_intro_fr`, `clubs_intro_fr`, `staff_intro_fr`) qui ne
+    section (`services_intro_fr`, `clubs_intro_fr`, `staff_intro_fr`) +
+    3 bannières photo (`services_image`, `clubs_image`, `staff_image`) qui ne
     rentraient pas naturellement ailleurs
+  - **Photos** : 14 photos réelles uploadées depuis `contenu vie campus/`
+    (dossier fourni par l'utilisateur le 2026-08-23, après la première passe
+    de contenu texte) + 1 convertie en WebP (voir `vie_campus_staff`
+    ci-dessus). Associées par comparaison visuelle directe avec les sections
+    Figma correspondantes, comme pour `contenu_programmes/`.
   - **Non repris** : les paragraphes d'intro `_en` (tous `null`, comme
     ailleurs — contenu FR uniquement dans le prototype), et le bandeau CTA
     "Commence Ton Chemin Aujourd'hui" (identique à celui de la page

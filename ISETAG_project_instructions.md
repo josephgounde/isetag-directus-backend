@@ -1749,6 +1749,22 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       lettre par zoom Figma à 200 %, à valider auprès de l'ISETAG).
       **Pas encore appliqué en prod** — abonnement VPS LWS expiré (voir
       entrée Programmes ci-dessus).
+- [x] (2026-08-23, suite) **Photos Vie Campus intégrées (dev)** — l'utilisateur
+      a fourni `contenu vie campus/` (16 fichiers) après la passe de contenu
+      texte. 14 photos réelles uploadées et liées (hero, bâtiment + galerie
+      "La Cité Universitaire" à 3 photos, bannières des 3 groupes détaillés,
+      galerie "Infrastructures" à 3 photos — **présente uniquement sur ce
+      groupe**, ni Santé ni Mobilité n'ont de galerie dans le prototype,
+      bannières Clubs et Enseignants). `enseignant.jpg` (11,9 Mo, photo
+      placeholder du personnel) converti en WebP + réduit à 1600px de large
+      avant upload (règle projet du seuil 1 Mo), résultat 97 Ko — utilisé sur
+      les 4 lignes `vie_campus_staff` (contenu toujours placeholder, cf.
+      entrée précédente). 2 champs image ajoutés à `vie_campus_sections`
+      (`services_image`, `clubs_image`, `staff_image` — bannières de section
+      qui n'avaient pas de champ dédié) et `gallery` à
+      `vie_campus_service_details`. Toutes les images vérifiées identiques
+      en taille d'octet aux fichiers sources (upload non corrompu). Script :
+      `scratchpad/wire_vie_campus_images.py`. Toujours pas appliqué en prod.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
