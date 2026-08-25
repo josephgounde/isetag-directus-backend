@@ -1801,6 +1801,31 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       aucune ligne `kind: "filiere"` avec `has_content: true` et description
       vide. Collection additive — `poles` et `programs` non modifiées.
       Toujours pas appliqué en prod.
+- [x] (2026-08-25, suite) **Photos `pole_filieres` intégrées (dev)** —
+      l'utilisateur a fourni `contenu_programmes/poles_images/` (26 fichiers
+      "Rectangle 65 (n).png", exports Figma sans nom exploitable).
+      Identification faite **par inspection visuelle** de chaque fichier,
+      sans indication de l'utilisateur sur la correspondance. 25 photos
+      uploadées, 27 lignes liées (le flyer "Formations certifiantes" est
+      réutilisé sur les 3 pôles qui en ont un ; 3 photos de salle
+      informatique génériques réparties sur les 3 filières qui en ont
+      besoin — Informatique réseaux Industriel, Gestion des systèmes
+      d'information Gestion, Infographie Web Design Communication).
+      **2 lignes sur 33 restent sans photo, aucun fichier correspondant
+      trouvé dans le dossier fourni** : Maritime GLPM (photo attendue :
+      port/porte-conteneurs, vue dans le prototype Figma) et Communication
+      "Communication des Organisations & Communication option Publicité"
+      (photo attendue : interview/micro dans la rue, vue dans le prototype
+      Figma) — à combler dès que l'utilisateur fournira ces 2 photos.
+      Deux correspondances faites par élimination plutôt que par
+      confirmation visuelle directe avec la capture Figma d'origine
+      (photo "deux femmes en entretien" → Comptabilité/contrôle/audit ;
+      photo "deux personnes en tenue de sécurité" → Électronique,
+      automatismes & maintenance informatique) — signalé à l'utilisateur,
+      à corriger s'il identifie une meilleure correspondance. Aucune image
+      >1 Mo dans le lot (~110-190 Ko chacune), pas de conversion WebP
+      nécessaire. Script : `scratchpad/wire_pole_filieres_images.py`.
+      Toujours pas appliqué en prod.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus

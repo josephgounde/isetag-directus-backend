@@ -412,8 +412,17 @@ Résumé :
   `certifiante_groups` (JSON — liste de `{group_fr, items_fr}` ; `group_fr`
   est `null` pour Maritime et Gestion qui n'ont qu'une liste plate, rempli
   pour Industriel qui a 5 groupes nommés type "Génie Civil"), `image`
-  (photo dédiée par filière — **pas encore uploadée**, champ vide en
-  attendant un dossier de photos du même type que `contenu_programmes`),
+  (photo dédiée par filière — **25 photos uploadées et liées le
+  2026-08-25** depuis `contenu_programmes/poles_images/` fourni par
+  l'utilisateur, 27 lignes servies au total en réutilisant la même image
+  du flyer "Formations certifiantes" sur les 3 pôles qui en ont une ;
+  identification faite par inspection visuelle, les fichiers Figma exportés
+  n'ayant aucun nom exploitable ("Rectangle 65 (n).png"). **2 lignes encore
+  sans photo, aucun fichier correspondant fourni** : Maritime GLPM (photo
+  attendue : port/porte-conteneurs) et Communication "Communication des
+  Organisations & Communication option Publicité" (photo attendue :
+  interview/micro dans la rue, vue dans le prototype Figma mais absente du
+  dossier fourni) — à combler quand la photo sera disponible),
   `has_content` (booléen — `false` sur 4 lignes du pôle Communication qui
   n'ont pas encore de contenu réel dans le prototype : "Communication option
   Publicité", "E-Commerce et Marketing numérique", "Marketing Digital",
