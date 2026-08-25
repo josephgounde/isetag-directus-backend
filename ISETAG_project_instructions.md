@@ -1765,6 +1765,42 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       `vie_campus_service_details`. Toutes les images vérifiées identiques
       en taille d'octet aux fichiers sources (upload non corrompu). Script :
       `scratchpad/wire_vie_campus_images.py`. Toujours pas appliqué en prod.
+- [x] (2026-08-25) **Nouvelle collection `pole_filieres` créée (dev)** —
+      contenu de la rangée de boutons filtrables sous l'en-tête de chaque
+      section "Pôle X" de la page Programmes (clic sur un bouton = la
+      description + photo en dessous changent). Découvert **après coup** en
+      observant le fichier Figma "Test 1" (zone node-id=4190-1478, même
+      mécanique de bande de variantes empilées que le "Référentiel des
+      formations" repéré plus tôt) : ce contenu n'existait dans aucune
+      collection existante — `poles` porte l'en-tête de chaque section (déjà
+      construit le 2026-08-23) et `programs` porte le catalogue plat du
+      Référentiel (également déjà construit), mais aucune des deux ne
+      couvrait cette troisième zone de la page. Contenu observé bouton par
+      bouton avec l'utilisateur (clic désactivé côté automatisation
+      navigateur — l'utilisateur a navigué lui-même dans le fichier Figma et
+      partagé les captures, une par bouton). **33 lignes** insérées :
+      Maritime 10 (GLPM, EMN, PM, AQ, SSPPM, SN, Douane et Transit,
+      Formations certifiantes, Port Shipping Management, Gestion logistique
+      et Transport), Industriel 9 (8 filières + Formations certifiantes à 5
+      groupes nommés), Gestion 8 (7 filières/groupe + Formations
+      certifiantes), Communication 6 (2 avec contenu réel — Communication
+      des Organisations/Publicité combinées, Infographie Web Design — et
+      **4 sans contenu signalées explicitement par l'utilisateur** :
+      "Communication option Publicité" séparée, "E-Commerce et Marketing
+      numérique", "Marketing Digital", "Formations certifiantes digitales" —
+      insérées avec `has_content: false` et champs texte vides plutôt
+      qu'omises, puisque les boutons existent bel et bien dans le design).
+      Champs détaillés dans `docs/frontend-api-guide.md`. **Aucune photo
+      uploadée** — chaque filière a sa propre photo dans le prototype
+      (distincte des photos de pôle de `contenu_programmes/`), dossier pas
+      encore fourni par l'utilisateur ; `image` est `null` sur les 33 lignes
+      en attendant. Script : `scratchpad/rebuild_pole_filieres.py`
+      (idempotent — vide et réinsère à chaque exécution). Vérifié en lecture
+      anonyme sur dev : 33/33 lignes, accents UTF-8 corrects au niveau
+      octet, aucun doublon `(pole, display_order)`, aucun `title_fr` vide,
+      aucune ligne `kind: "filiere"` avec `has_content: true` et description
+      vide. Collection additive — `poles` et `programs` non modifiées.
+      Toujours pas appliqué en prod.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus

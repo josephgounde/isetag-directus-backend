@@ -391,6 +391,37 @@ Résumé :
   est stockée comme **une seule ligne `name_fr`** avec les sous-spécialités
   séparées par `;` à l'intérieur du texte, plutôt que d'être éclatée en
   lignes séparées.
+- **pole_filieres** — **nouvelle collection créée le 2026-08-25**, distincte
+  de `programs`/`poles`. Elle porte le contenu de la rangée de boutons
+  filtrables affichée sous l'en-tête de chaque section "Pôle X" de la page
+  Programmes (mécanique repérée dans le fichier Figma "Test 1", zone
+  node-id=4190-1478 — même principe de bande de variantes empilées que pour
+  le "Référentiel des formations"). Cliquer un bouton change le texte et la
+  photo affichés en dessous ; ce n'est **pas** le même contenu que le
+  catalogue plat `programs`. **33 lignes** : Maritime 10, Industriel 9,
+  Gestion 8, Communication 6. Champs : `pole` (relation → poles),
+  `display_order`, `code` (sigle court affiché sur le bouton non-sélectionné
+  quand il existe, ex. `GLPM`/`EMN`/`PM`/`AQ`/`SSPPM`/`SN` — `null` sinon),
+  `button_label_fr` (texte exact du bouton), `title_fr` (nom complet utilisé
+  en tête de la description), `kind` (`filiere` = description en
+  paragraphes, ou `certifiante` = intro + liste à puces groupée),
+  `description_fr` (JSON — liste de paragraphes, utilisé si `kind:
+  "filiere"`), `intro_fr` (texte d'intro des cartes `certifiante`, identique
+  sur les 3 pôles qui en ont une : "Formations courtes de 4 à 9 mois,
+  proposées en cours du jour et du soir, avec 75 % de pratique annoncé."),
+  `certifiante_groups` (JSON — liste de `{group_fr, items_fr}` ; `group_fr`
+  est `null` pour Maritime et Gestion qui n'ont qu'une liste plate, rempli
+  pour Industriel qui a 5 groupes nommés type "Génie Civil"), `image`
+  (photo dédiée par filière — **pas encore uploadée**, champ vide en
+  attendant un dossier de photos du même type que `contenu_programmes`),
+  `has_content` (booléen — `false` sur 4 lignes du pôle Communication qui
+  n'ont pas encore de contenu réel dans le prototype : "Communication option
+  Publicité", "E-Commerce et Marketing numérique", "Marketing Digital",
+  "Formations certifiantes digitales" — les boutons existent dans le design
+  mais le frontend doit soit les masquer, soit afficher un état "contenu à
+  venir"), `status`. Le bouton "Je me pré-inscris" visible sur chaque carte
+  Figma est un CTA générique identique partout — non stocké en base,
+  à coder en dur côté frontend.
 - **scholarships** — `name`, `amount`, `description`, `conditions`,
   `display_order`, `status` (**filtrer `_eq: published`**), + `image`,
   `cta_label_fr/en`, `cta_url` (ajoutés 2026-08-01 pour matcher les cartes
