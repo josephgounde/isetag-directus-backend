@@ -354,6 +354,12 @@ admissions compose leur contenu via l'Admin UI Directus.
 Champs exacts consultables via la spec OpenAPI ou `GET {BASE_URL}/fields/<collection>`.
 Résumé :
 
+- **programmes_hero** — **nouvelle collection créée le 2026-08-25**, singleton.
+  Section hero de la page Programmes (même pattern que `admissions_hero`/
+  `vie_campus_hero`, sans les champs CTA — pas de bouton dans le prototype
+  Figma pour cette section). Champs : `title_fr/en`, `subtitle_fr/en`,
+  `image`. `_en` vide pour l'instant (contenu FR uniquement dans le
+  prototype).
 - **poles** — **reconstruite le 2026-08-23** pour matcher le nouveau prototype
   Figma de la page Programmes. **4 lignes** (le 5ᵉ pôle "Santé & Paramédical"
   a été supprimé, absent du nouveau design) : `slug`, `name_fr`, `name_en`,

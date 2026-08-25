@@ -1879,6 +1879,21 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       valeur `group` en cache légèrement en retard sur l'endpoint unitaire
       `GET /collections/<name>` juste après un PATCH — attendre un instant
       ou re-vérifier avant de conclure qu'un correctif n'a pas pris.
+- [x] (2026-08-25, suite) **`programmes_hero` créée (dev + prod)** —
+      troisième et dernière pièce manquante de la structure Programmes
+      confirmée avec l'utilisateur (hero / poles+pole_filieres /
+      référentiel). Contrairement à `admissions_hero`/`vie_campus_hero`,
+      pas de champs CTA : le hero du prototype Figma pour cette page n'a
+      pas de bouton. Contenu inséré : titre "Trouvez la formation adaptée à
+      votre projet", sous-titre "Explorez l'offre officielle de l'ISETAG
+      par domaine et par cycle. Chaque fiche indique les intitulés
+      confirmés, le régime disponible, la langue et le niveau d'accès à
+      vérifier dans la rubrique Admissions.", photo `contenu_programmes/
+      program hero.png` (943 Ko, sous le seuil WebP). Décision utilisateur
+      confirmée séparément : **pas de renommage** de `poles`/`programs` en
+      `programmes_poles`/`programmes_referentiel` pour l'instant — rangement
+      dans le dossier Content "Programmes" jugé suffisant. Script :
+      `scratchpad/rebuild_programmes_hero.py`.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
