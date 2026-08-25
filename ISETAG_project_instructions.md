@@ -1862,6 +1862,23 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       l'utilisateur l'a retapé dans PowerShell) — **mot de passe admin prod
       à changer par l'utilisateur dès que possible**, indépendamment du
       succès de cette mise à jour.
+- [x] (2026-08-25, suite) **Bug de rangement corrigé : `pole_filieres` et
+      les 7 collections `vie_campus_*` n'étaient rangées dans aucun dossier
+      Content**. Repéré par l'utilisateur directement dans l'admin Directus
+      prod ("i can't understand the schema of page programmes... what is
+      all this mess") — `meta.group` n'avait jamais été renseigné à la
+      création de ces 8 collections (contrairement à `poles`/`programs`,
+      qui étaient bien rangées sous "Programmes"), donc elles apparaissaient
+      à plat dans le menu Content au lieu d'être groupées sous leur dossier
+      de page, cassant la convention "une collection par page" établie plus
+      tôt dans le projet (voir « Organisation du menu Content » ci-dessus).
+      Corrigé sur dev et prod : `pole_filieres` -> dossier "Programmes",
+      les 7 `vie_campus_*` -> dossier "Vie Campus" (`meta.group`, pas une
+      migration de données — contenu inchangé). Un piège rencontré en
+      vérifiant : l'endpoint liste `GET /collections` peut renvoyer une
+      valeur `group` en cache légèrement en retard sur l'endpoint unitaire
+      `GET /collections/<name>` juste après un PATCH — attendre un instant
+      ou re-vérifier avant de conclure qu'un correctif n'a pas pris.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
