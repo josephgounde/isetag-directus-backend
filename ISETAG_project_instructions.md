@@ -1958,6 +1958,48 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       erreur (c'est justement ce qui rend ce bug silencieux : tout
       fonctionne à l'écriture, seul l'affichage admin — et potentiellement
       les requêtes API "deep fetch" avec `fields=image.*` — est cassé).
+- [x] (2026-08-25, suite) **Vérification demandée explicitement par
+      l'utilisateur après le correctif ci-dessus** ("check the other images
+      now... you're already doing too much mistakes this must change") —
+      a révélé **deux problèmes supplémentaires**, non détectés par la
+      première passe de correctifs :
+      1. **`pole_filieres.pole` (la relation M2O vers `poles` elle-même,
+         pas une image) avait exactement le même bug** que les champs
+         image : créée via `POST /fields` avec un `schema.foreign_key_*`
+         renseigné directement dans l'appel de création de champ, ce qui
+         ne suffit pas non plus à créer une vraie relation Directus.
+         L'admin affichait "The relationship is not configured properly".
+         Trouvé par un audit systématique de tous les champs à interface
+         relationnelle sur toutes les collections touchées cette session
+         (`scratchpad/audit_all_relations.py`), pas seulement les champs
+         image — leçon : **toute création de champ avec une interface
+         relationnelle (`select-dropdown-m2o`, `file-image`, etc.) doit
+         être suivie d'un `POST /relations` explicite, quel que soit le
+         type de relation.** Corrigé sur dev et prod.
+      2. **`vie_campus_staff.photo` était resté `null` sur les 4 lignes en
+         prod uniquement** (dev était correct) — la boucle de
+         `wire_vie_campus_images.py` qui PATCH les 4 lignes n'a jamais
+         vérifié le code de statut de chacun de ses appels, donc un échec
+         partiel/transitoire sur prod est passé inaperçu malgré le message
+         "= staff photos (4 rows)" affiché sans condition. Corrigé
+         directement sur prod (les 4 lignes re-PATCHées avec succès,
+         status 200 vérifié).
+      **Après ces deux correctifs, vérification complète par deep-fetch**
+      (`scratchpad/verify_all_images_prod.py`, interroge chaque champ
+      image/fichier de chaque collection touchée avec
+      `fields=champ.id,champ.filename_download,champ.filesize` pour
+      confirmer que la relation **résout** vraiment un fichier, pas
+      seulement qu'un UUID est stocké) : 50 champs vérifiés, 4 `null`
+      attendus (les lignes Communication sans contenu), **0 cassé**. Puis
+      confirmation visuelle directe dans l'admin Directus prod (vignette
+      d'image ET sélecteur de pôle tous les deux fonctionnels sur
+      `pole_filieres` id=1). **Piège rencontré pendant cette vérification** :
+      après avoir créé une relation ou corrigé une donnée, un
+      rafraîchissement de page classique dans l'admin ne suffit pas
+      toujours — l'app Directus garde son propre cache de schéma
+      côté client chargé à la connexion ; il faut un rechargement complet
+      de la page (pas juste une navigation interne) pour que l'admin
+      relise le schéma à jour.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
