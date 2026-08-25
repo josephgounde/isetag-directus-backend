@@ -1921,6 +1921,43 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       toujours écrire via `PATCH /items/<collection>` sans ID, jamais
       `POST`, et vérifier le code de statut de chaque appel d'écriture au
       lieu de supposer le succès à partir d'un print inconditionnel.
+- [x] (2026-08-25, suite) **Bug bien plus large corrigé : 9 champs image/fichier
+      créés par script cette session n'avaient jamais de vraie relation
+      Directus vers `directus_files`** — signalé par l'utilisateur
+      ("no image in the programme hero collection") après un rafraîchissement
+      qui n'a rien changé. La valeur UUID était bien stockée et l'API
+      publique/`/assets/<id>` fonctionnait parfaitement (vérifié : fichier
+      accessible, bon poids, bonnes dimensions), donc **ce n'était pas un
+      problème de données** — mais l'admin Directus ne pouvait pas afficher
+      la vignette/le sélecteur de fichier car la relation M2O vers
+      `directus_files` (table `directus_relations`) n'avait jamais été créée
+      au niveau schéma : `POST /fields` avec `type: "uuid"` +
+      `meta.special: ["file"]` seul **ne suffit pas**, contrairement à ce
+      que tous les scripts de cette session supposaient — il faut un appel
+      supplémentaire `POST /relations` (`{collection, field,
+      related_collection: "directus_files", schema: {on_delete: "SET
+      NULL"}}`). Détecté en comparant `GET /fields/<coll>/<field>` d'un
+      champ cassé vs un champ qui marchait (`admissions_hero.image`,
+      créé plus tôt dans le projet probablement via l'UI Admin, qui crée
+      la relation automatiquement) : `schema.foreign_key_table` était
+      `null` sur les champs cassés au lieu de `"directus_files"`. **9 champs
+      concernés, corrigés sur dev et prod** : `pole_filieres.image`,
+      `programmes_hero.image`, `vie_campus_hero.image`,
+      `vie_campus_residence.image`, `vie_campus_sections.services_image`
+      / `.clubs_image` / `.staff_image`, `vie_campus_service_details.
+      group_image`, `vie_campus_staff.photo`. Vérifié visuellement dans
+      l'admin Directus prod après coup (vignette de `programmes_hero.image`
+      s'affiche correctement). Script : `scratchpad/fix_file_relations.py`
+      (idempotent — vérifie l'existence de la relation avant de la créer).
+      **Leçon générale supplémentaire pour toute future création de champ
+      fichier/image par script dans ce projet** : après
+      `ensure_field(..., type="uuid", meta={"special": ["file"], ...})`,
+      toujours suivre d'un appel `POST /relations` explicite — ne jamais
+      supposer que `special: ["file"]` seul suffit à créer la relation
+      réelle, même si l'API accepte l'écriture de la valeur UUID sans
+      erreur (c'est justement ce qui rend ce bug silencieux : tout
+      fonctionne à l'écriture, seul l'affichage admin — et potentiellement
+      les requêtes API "deep fetch" avec `fields=image.*` — est cassé).
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
