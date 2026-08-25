@@ -1829,7 +1829,39 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       à corriger s'il identifie une meilleure correspondance. Aucune image
       >1 Mo dans le lot (~110-190 Ko chacune), pas de conversion WebP
       nécessaire. Script : `scratchpad/wire_pole_filieres_images.py`.
-      Toujours pas appliqué en prod.
+      Toujours pas appliqué en prod (à cette date-là).
+- [x] (2026-08-25, suite) **Tout le contenu dev ci-dessus appliqué en prod**
+      (Programmes `poles`/`programs`, Vie Campus 7 collections + photos,
+      `pole_filieres` + photos). VPS LWS de nouveau opérationnel (voir
+      [[lws_vps_not_ordered]] pour l'historique de l'expiration). Scripts
+      copiés dans `prod_push_2026-08-25/` (hors dépôt git, dossier local
+      temporaire) et exécutés contre `http://31.207.34.25` avec le compte
+      admin prod dédié (distinct du compte admin dev). **Deux bugs de script
+      corrigés en cours de route** : `rebuild_pole_filieres.py` et
+      `wire_pole_filieres_images.py` lisaient toujours les identifiants
+      depuis le `.env` **dev** local au lieu de respecter les variables
+      d'environnement `DIRECTUS_ADMIN_EMAIL`/`PASSWORD` passées pour cibler
+      prod (contrairement aux autres scripts qui géraient déjà ce cas) — les
+      trois premiers échecs de connexion en `Invalid user credentials`
+      pendant la session n'étaient donc pas un problème de mot de passe côté
+      utilisateur, corrigé avant de relancer avec succès. Un run partiel de
+      `wire_vie_campus_images.py` (crash sur un fichier manquant côté script,
+      corrigé) avait aussi laissé 14 fichiers doublons non référencés dans
+      `/files` sur prod — nettoyés via un script dédié
+      (`check_and_clean_duplicates.py`) qui ne supprime que les copies non
+      référencées par un item, jamais celle qui l'est. Vérifié en lecture
+      admin sur prod après coup (`verify_prod.py`) : `poles` 4 lignes avec
+      image, `programs` 77 lignes (mêmes comptes par cycle que dev),
+      Vie Campus 1/6/1/8/7/4/4/1, `pole_filieres` 33/33 lignes réparties
+      10/9/8/6 par pôle avec seulement les 4 lignes Communication
+      sans-contenu-connu sans image (identique à dev). **Incident de
+      sécurité à noter** : le mot de passe admin prod a été affiché en clair
+      dans cette session à deux reprises (un script d'inspection de
+      structure de fichier n'a pas anonymisé une ligne de commentaire
+      contenant les identifiants prod stockés en bas du `.env` local, puis
+      l'utilisateur l'a retapé dans PowerShell) — **mot de passe admin prod
+      à changer par l'utilisateur dès que possible**, indépendamment du
+      succès de cette mise à jour.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
