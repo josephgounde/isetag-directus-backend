@@ -1894,6 +1894,33 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       `programmes_poles`/`programmes_referentiel` pour l'instant — rangement
       dans le dossier Content "Programmes" jugé suffisant. Script :
       `scratchpad/rebuild_programmes_hero.py`.
+- [x] (2026-08-25, suite) **Bug corrigé : `programmes_hero` était resté
+      totalement vide sur dev ET prod malgré un script qui affichait
+      "+ row 1 inserted"**. Repéré en ouvrant l'admin Directus prod pour
+      vérifier visuellement le nouveau rangement par dossier — tous les
+      champs de la fiche singleton apparaissaient vides. Cause réelle :
+      **les collections singleton Directus n'exposent que `GET`/`PATCH` sur
+      `/items/<collection>` (sans ID) ; un `POST` renvoie une erreur trompeuse
+      "Route /items/<collection> doesn't exist" au lieu d'un 405 explicite**,
+      et le script utilisait `POST` pour l'insertion initiale sans vérifier
+      le code de statut de cet appel précis — l'échec était donc totalement
+      silencieux. Corrigé : le script utilise maintenant `PATCH` (upsert)
+      pour toute collection singleton, avec vérification systématique du
+      statut. **Piège annexe rencontré pendant le diagnostic** : après le
+      premier `PATCH` réussi, une lecture immédiate via `GET
+      /items/programmes_hero` renvoyait encore `{"id": null}` — pas un
+      problème de données mais un délai de cache-schéma côté Directus,
+      confirmé en interrogeant la même ligne via un filtre explicite
+      (`?filter[id][_gt]=0`) qui la trouvait normalement, puis résolu en
+      appelant `POST /utils/cache/clear` et en réessayant après un court
+      délai. Corrigé et revérifié (contenu + image liée) sur dev et prod,
+      confirmé visuellement dans l'admin Directus prod après coup.
+      **Leçon générale pour toute future collection singleton dans ce
+      projet** (candidats existants : `admissions_hero`, `vie_campus_hero`,
+      `vie_campus_residence`, `vie_campus_sections`, `programmes_hero`) :
+      toujours écrire via `PATCH /items/<collection>` sans ID, jamais
+      `POST`, et vérifier le code de statut de chaque appel d'écriture au
+      lieu de supposer le succès à partir d'un print inconditionnel.
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
