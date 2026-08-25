@@ -1811,12 +1811,16 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       informatique génériques réparties sur les 3 filières qui en ont
       besoin — Informatique réseaux Industriel, Gestion des systèmes
       d'information Gestion, Infographie Web Design Communication).
-      **2 lignes sur 33 restent sans photo, aucun fichier correspondant
-      trouvé dans le dossier fourni** : Maritime GLPM (photo attendue :
-      port/porte-conteneurs, vue dans le prototype Figma) et Communication
-      "Communication des Organisations & Communication option Publicité"
-      (photo attendue : interview/micro dans la rue, vue dans le prototype
-      Figma) — à combler dès que l'utilisateur fournira ces 2 photos.
+      **2 lignes restées sans photo dans cette passe ont été comblées
+      juste après** — l'utilisateur a rappelé que Maritime GLPM et
+      Communication "Communication des Organisations & Communication
+      option Publicité" sont déjà les filières "featured" de leur pôle
+      respectif dans `poles` (`featured_name_fr`/`featured_description_fr`,
+      texte identique mot pour mot, déjà vérifié lors de la reconstruction
+      `poles`/`programs` du 2026-08-23) — `poles.image` ("Pôle Maritime -
+      photo port", "Pôle Communication - photo interview") réutilisée
+      directement sur ces 2 lignes `pole_filieres`, aucun nouvel upload
+      nécessaire. **33/33 lignes ont désormais une image.**
       Deux correspondances faites par élimination plutôt que par
       confirmation visuelle directe avec la capture Figma d'origine
       (photo "deux femmes en entretien" → Comptabilité/contrôle/audit ;
