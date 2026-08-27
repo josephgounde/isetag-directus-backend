@@ -333,7 +333,7 @@ des programmes individuels — voir `accueil_poles_highlight` ci-dessus). Si une
 section "formations phares" distincte des pôles est demandée un jour, ce sera
 une nouvelle collection à recréer, pas une réactivation.
 
-Programmes, Vie Campus et Contact n'ont pas encore leurs propres collections de
+Programmes et Vie Campus n'ont pas encore leurs propres collections de
 blocs (hero/richtext/cta_banner, etc.) : elles seront créées au moment où le
 contenu de ces pages sera saisi, en suivant la même convention de nommage et le
 même schéma de champs que les collections `admissions_*`/`accueil_*` ci-dessus
@@ -341,19 +341,35 @@ même schéma de champs que les collections `admissions_*`/`accueil_*` ci-dessus
 fait, la spec OpenAPI live (`GET {BASE_URL}/server/specs/oas`) reste la source
 de vérité pour savoir exactement quelles collections existent à un instant donné.
 
+**Contact** a été construite le 2026-08-27 (dev uniquement, pas encore poussée
+en prod) : `contact_hero` (title_fr/en, subtitle_fr/en, pas d'image) au-dessus
+du formulaire, puis le même bandeau CTA final que Accueil/Programmes/
+Actualités — réutilisé tel quel via `accueil_cta_banner` id=2, pas une nouvelle
+collection (`accueil_cta_banner` est un composant multi-pages, comme
+`partners`/`stats_counters`). Le formulaire de contact lui-même reste géré par
+`contact_messages` (voir « Formulaire de contact » plus bas) — 4 champs
+(nom, email, fonction, message), `email` étant `required` même si le design
+Figma n'a que 3 champs visibles (Nom/Fonction/Message) : ajouté côté schéma
+pour permettre une réponse au message.
+
 Les 6 pages existent déjà (`accueil`, `programmes`, `admissions`, `vie_campus`,
 `actualites`, `contact`, toutes `status: published`, + `a_propos` conservée
 mais probablement inutile vu que son contenu vit dans le hero Accueil).
-`accueil` (8 sections) et `admissions` (19 sections, depuis l'ajout des
-sections tarifs/bourses le 2026-08-03) ont du contenu réel ; les
-4 autres renvoient `sections: []` en attendant que l'équipe communication/
-admissions compose leur contenu via l'Admin UI Directus.
+`accueil` (9 sections), `admissions` (19 sections, depuis l'ajout des
+sections tarifs/bourses le 2026-08-03) et `contact` (2 sections, depuis le
+2026-08-27) ont du contenu réel ; `programmes`, `vie_campus` et `actualites`
+renvoient `sections: []` en attendant que l'équipe communication/admissions
+compose leur contenu via l'Admin UI Directus.
 
 ## Référence des collections publiques
 
 Champs exacts consultables via la spec OpenAPI ou `GET {BASE_URL}/fields/<collection>`.
 Résumé :
 
+- **contact_hero** — **nouvelle collection créée le 2026-08-27**, non-singleton
+  (id=1). Section hero de la page Contact, au-dessus du formulaire. Champs :
+  `title_fr/en`, `subtitle_fr/en`, pas d'image (fond décoratif fixe, pas un
+  champ éditorial dans le design Figma). `_en` vide pour l'instant.
 - **programmes_hero** — **nouvelle collection créée le 2026-08-25**, singleton.
   Section hero de la page Programmes (même pattern que `admissions_hero`/
   `vie_campus_hero`, sans les champs CTA — pas de bouton dans le prototype
@@ -643,8 +659,11 @@ actuellement : `fa3531bf-e3e9-4059-bc1c-bf36a60fa03a`.
 Testé de bout en bout (item créé dans `contact_messages`, email envoyé au
 service communication). Comme pour l'admission, aucune lecture publique n'est
 possible sur `contact_messages` (rôle Public en `create` uniquement) — prévoir
-un message de succès générique côté UI. Les 4 champs ci-dessus sont une
-hypothèse basée sur les champs visibles dans le prototype Figma (Nom, Fonction,
-Message + email déduit) — **à confirmer avec l'équipe frontend** contre le
-formulaire HTML réel une fois construit, comme cela avait été fait pour le
-formulaire de pré-inscription.
+un message de succès générique côté UI.
+
+**Mise à jour 2026-08-27**, après revue du vrai fichier Figma design (pas
+seulement le prototype) : le formulaire n'a réellement que **3 champs
+visibles** — Nom, Fonction, Message — pas de champ email dans la maquette.
+`email` a néanmoins été gardé `required` côté schéma (décision produit :
+sans email, impossible de répondre à un message reçu) — le champ doit donc
+être ajouté à l'UI même s'il n'apparaît pas dans le design Figma tel quel.

@@ -81,6 +81,7 @@ READ_COLLECTIONS = [
     ("actualites_testimonials_highlight", {}, ["*"]),
     ("actualites_testimonials_highlight_testimonials", {}, ["*"]),
     ("actualites_documents_list", {}, ["*"]),
+    ("contact_hero", {}, ["*"]),
 ]
 
 # (collection, file_field) dont l'upload par défaut doit viser le dossier "Public"

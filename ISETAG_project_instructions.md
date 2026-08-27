@@ -2003,4 +2003,70 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
 - [ ] Front à adapter pour le nouveau circuit de soumission du formulaire de
       pré-inscription (upload des fichiers un par un avec id généré côté client, puis
       un seul POST JSON vers le Flow) — voir section dédiée ci-dessus
+- [x] **Page Contact construite** (2026-08-27, dev uniquement) depuis le fichier
+      Figma design (`https://www.figma.com/design/kEkYbSJe16rNaEnZRwOTZE/Untitled`,
+      frame "Contacts - Desktop"), pas le prototype cette fois. Structure réelle :
+      hero (titre + sous-titre) au-dessus du formulaire, puis le même bandeau CTA
+      final que Accueil/Programmes/Actualités, puis le footer sitewide.
+      - `contact_hero` créée (`title_fr/en`, `subtitle_fr/en`, pas d'image — le
+        fond du hero est un simple habillage graphique, pas un champ éditorial),
+        groupe Content "Contact", lecture publique accordée, contenu :
+        title_fr "Une question ou préoccupation ?", subtitle_fr "Ecrivez-nous
+        directement".
+      - **Le bandeau CTA n'est PAS une nouvelle collection.** Zoom Figma (pan +
+        zoom-to-100%, `Shift+1`/`Ctrl+scroll` ne fonctionnent pas dans ce
+        environnement de navigateur, il faut driver la molette+glisser à la
+        main) a confirmé qu'il est visuellement identique au bandeau bas de
+        page Accueil ("Commence Ton Chemin Aujourd'hui" / "Inscris-toi dès
+        maintenant" / boutons "Je me pré-inscris" + "Découvrir nos
+        Programmes") — confirmé par l'utilisateur ("c'est la même bannière CTA
+        que les autres pages"). Réutilisé tel quel : `accueil_cta_banner`
+        id=2 (déjà existant, déjà branché sur Accueil sort=9) rebranché en
+        plus sur `pages.contact.sections` sort=2, via une nouvelle ligne
+        `pages_sections`. `accueil_cta_banner` est donc un composant
+        multi-pages légitime (même statut que `partners`/`stats_counters`),
+        pas une exception à la règle "un dossier/une collection = une page".
+      - Formulaire de contact : le design Figma n'a que **3 champs** (Votre
+        Nom, Votre Fonction, Votre Message), pas de champ email — écart réel
+        par rapport à l'hypothèse initiale de 4 champs posée le 2026-08-25.
+        Vérifié aussi que `contact_messages.email` existait déjà mais en
+        optionnel. Décision utilisateur (2026-08-27) : garder un champ email
+        malgré son absence du design, sinon aucune réponse possible aux
+        messages reçus — `contact_messages.email` passé en `required: true`.
+      - `pages.contact.sections` : `[contact_hero/1 (sort 1), accueil_cta_banner/2
+        (sort 2)]`. Vérifié par deep-fetch **anonyme** réel (pas juste l'appel
+        admin) :
+        `GET /items/pages?filter[key][_eq]=contact&fields=*,sections.collection,sections.item:contact_hero.*,sections.item:accueil_cta_banner.*`
+        — les deux sections résolvent correctement (0 `item: null` après fix,
+        voir piège ci-dessous).
+      - **Nouveau piège Directus (M2A `one_allowed_collections`)** : pour
+        ajouter une collection à la liste des collections autorisées d'un
+        champ M2A (ex. `pages_sections.item`), `PATCH /fields/<coll>/<field>`
+        avec `meta.one_allowed_collections` **ne persiste rien** — c'est un
+        no-op silencieux (relire le champ juste après confirme `null`). La
+        vraie configuration vit sur la **relation**, pas le champ : il faut
+        `PATCH /relations/<coll>/<field>` avec le même `meta.one_allowed_collections`.
+        Symptôme observé : la ligne `pages_sections` était bien créée avec le
+        bon `collection`/`item`, mais le deep-fetch anonyme résolvait
+        `item: null` pour `contact_hero` alors qu'un `GET /items/contact_hero/1`
+        direct fonctionnait parfaitement — donc pas un problème de contenu ni
+        de permissions, mais l'allowlist M2A elle-même qui bloquait la
+        résolution du polymorphisme. Un `POST /utils/cache/clear` n'a rien
+        changé (ce n'était pas un problème de cache). Ajouté à
+        `directus_singleton_gotcha.md` (mémoire persistante).
+      - Vérification admin UI : l'écran d'édition de `pages/contact` affiche
+        "The relationship is not configured properly or you don't have
+        permission to access it" sur le champ Sections — **mais ce même
+        message apparaît identiquement sur `pages/admissions`**, dont le
+        contenu est pourtant confirmé correct par ailleurs. Pré-existant, pas
+        introduit par ce travail — probablement une limite d'affichage de
+        l'interface `list-m2a` dans cet environnement, à ne pas confondre avec
+        une vraie relation cassée (le test qui fait foi reste le deep-fetch
+        anonyme, pas l'écran d'édition).
+      - Script : `scripts/rebuild_contact.py` (idempotent, corrigé pour
+        utiliser `/relations` plutôt que `/fields` pour l'allowlist M2A).
+        `scripts/provision_public_read.py` mis à jour (`contact_hero` ajouté).
+      - **Pas encore fait** : push vers prod (resté volontairement en dev cette
+        fois, à la demande explicite de l'utilisateur — "let's move there on
+        dev first").
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur
