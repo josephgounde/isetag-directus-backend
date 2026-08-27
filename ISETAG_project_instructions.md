@@ -2069,4 +2069,65 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       - **Pas encore fait** : push vers prod (resté volontairement en dev cette
         fois, à la demande explicite de l'utilisateur — "let's move there on
         dev first").
+- [x] **Page Actualités construite** (2026-08-27, dev uniquement) depuis le
+      même fichier Figma design (`https://www.figma.com/design/kEkYbSJe16rNaEnZRwOTZE/Untitled`,
+      node-id=6-461, frame "Actualites - Desktop"). Structure réelle, plus
+      simple que ce que l'ancienne revue du prototype avait fait supposer :
+      hero (titre + sous-titre + photo) → "À la Une" (l'actualité la plus
+      récente, en grand) → "Lire Aussi" (grille paginée des autres actualités,
+      9 par page, jusqu'à 7 pages dans la maquette) → même bandeau CTA partagé
+      que toutes les autres pages → footer sitewide.
+      - `actualites_hero` créée (`title_fr/en`, `subtitle_fr/en`, `image` —
+        cette fois un vrai champ éditorial, contrairement à `contact_hero` :
+        le fond du hero est une vraie photo/collage, pas un simple
+        habillage). Contenu : title_fr "Actualités ISETAG", subtitle_fr
+        "Découvrez les événements, les filières, les portraits, les
+        partenariats et les dispositifs de bourse qui font vivre l'ISETAG.
+        Cette rubrique met en lumière les expériences proposées aux
+        étudiants, les collaborations de l'Institut et les parcours qui
+        incarnent ses valeurs." — **`image` laissé vide**, aucune photo hero
+        fournie par l'utilisateur pour cette page (pas de dossier
+        `contenu_actualites` sur le disque, contrairement à
+        `contenu_programmes`/`contenuç_accueil`) ; à uploader plus tard.
+      - **"À la Une" et "Lire Aussi" ne sont PAS des blocs page-builder.**
+        Contrairement à Admissions/Accueil/Contact, ce ne sont pas des
+        collections `actualites_*` éditoriales : ce sont un vrai listing live
+        piloté directement par la collection `news` (l'actualité la plus
+        récente = "à la Une", les autres paginées = "Lire Aussi"), même
+        logique que les listings `poles`/`programs` ailleurs dans le projet.
+        Aucune nouvelle collection créée pour ces deux sections — juste
+        `pages.actualites.sections` avec `actualites_hero` + le bandeau CTA
+        partagé (`accueil_cta_banner` id=2, même schéma de réutilisation que
+        pour Contact).
+      - **Collections retirées** (confirmé avec l'utilisateur avant
+        suppression, action destructive) : `actualites_testimonials_highlight`
+        (+ sa jonction `actualites_testimonials_highlight_testimonials`) et
+        `actualites_documents_list` — les deux à 0 ligne depuis leur création,
+        toutes deux issues d'une revue antérieure du **prototype** (pas ce
+        fichier design), et sans aucune contrepartie visuelle dans la vraie
+        maquette (pas de carrousel témoignages, pas de bibliothèque
+        documents/ressources sur cette page). Même précédent que le nettoyage
+        `accueil_news_preview`/`accueil_programs_highlight` du 2026-08-03 :
+        retirer un schéma mort plutôt que le laisser trainer. **La collection
+        `documents` et le champ `testimonials` restent intacts** — seuls les
+        deux blocs de page vides ont été supprimés, pas les données de
+        référence sous-jacentes (`documents`/`testimonials` sont utilisées
+        ailleurs, ex. `accueil_testimonials_highlight`).
+      - Vérifié par deep-fetch anonyme réel :
+        `GET /items/pages?filter[key][_eq]=actualites&fields=*,sections.collection,sections.item:actualites_hero.*,sections.item:accueil_cta_banner.*`
+        — les deux sections résolvent correctement dès le premier essai (la
+        correction du piège M2A `one_allowed_collections` faite pour Contact
+        a bien tenu). Suppression des 3 collections vérifiée aussi (`403` en
+        lecture anonyme, comme pour toute collection inexistante/sans
+        permission dans ce projet), `news`/`documents`/`testimonials`
+        inchangées (`200`).
+      - Scripts : `scripts/rebuild_actualites.py` (création, idempotent) +
+        `scripts/retire_stale_actualites.py` (suppression, exécuté séparément
+        après confirmation explicite — la suppression de collections est
+        bloquée par le classifieur de sécurité de Claude Code si elle est
+        mêlée à un script de construction, doit être son propre script
+        autonome). `scripts/provision_public_read.py` mis à jour
+        (`actualites_hero` ajouté, les 3 entrées retirées supprimées).
+      - **Pas encore fait** : upload de l'image hero, push vers prod (même
+        choix que Contact — reste en dev pour l'instant).
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur

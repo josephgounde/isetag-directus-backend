@@ -90,7 +90,7 @@ mention est obsolète, à ne plus utiliser comme référence.
 | Fiche filière | `programs` (par `slug`), `testimonials` (filtrées par `program`) | Pas de page-builder — page 1:1 avec un `programs`. |
 | Admissions | `pages` (`key=admissions`) → sections, + `tuition_plans`, `scholarships`, `documents` (`filter[category][_eq]=admission`) | Sections éditoriales (dont le guide "Comment s'inscrire" en étapes numérotées), tarifs/bourses/documents en listing direct. Le formulaire de pré-inscription est un cas à part, voir section dédiée ci-dessous — **pas un simple GET**. |
 | Vie Campus | `pages` (`key=vie_campus`) → sections, + `campus_services` | Sections éditoriales (hero, mise en avant), puis listing `campus_services` (filtrer par `display_section` si plusieurs zones). |
-| Actualités *(nav "Ressources" → renommée)* | `pages` (`key=actualites`) → sections, + `news`, `documents` | Une seule page qui contient : une section "Success Stories" (témoignages curatés, `actualites_testimonials_highlight` — déjà créée, vide), une section actualités (`news`, triée par `date_published`), une section "ressources" (`actualites_documents_list` — déjà créée, vide, bibliothèque de documents à télécharger, filtrable par `category`), et un bandeau CTA (`actualites_cta_banner` — à créer, même contenu éditorial que celui de la page Programmes mais sa propre collection). |
+| Actualités *(nav "Ressources" → renommée)* | `pages` (`key=actualites`) → sections, + `news` | Hero éditorial (`actualites_hero`), puis un listing **live** (pas des blocs page-builder) piloté directement par `news` : l'actualité la plus récente en "À la Une" (grand format), les autres paginées en grille "Lire Aussi" (9/page) — trier `news` par `date_published` desc, la 1ère ligne = "À la Une", le reste = "Lire Aussi". Puis le même bandeau CTA partagé que les autres pages (`accueil_cta_banner` id=2, pas de collection dédiée). **`actualites_testimonials_highlight`/`actualites_documents_list` ont été retirées le 2026-08-27** : aucune contrepartie dans le vrai fichier Figma design (pas de section "Success Stories" ni "ressources" sur cette page) — ne plus s'y référer. |
 | Contact | `pages` (`key=contact`) → sections | Hero éditorial + formulaire de contact. Le formulaire est un cas à part, voir section dédiée ci-dessous — **pas un simple GET**. |
 
 ## Pages composées de sections (page-builder)
@@ -105,7 +105,7 @@ contenu de sa page. Il n'y a plus de collection `block_*` générique partagée
 entre plusieurs pages (voir `ISETAG_project_instructions.md`, section
 "Organisation en pages/sections", pour le contexte de ce choix). Convention de
 nommage : `<page_key>_<type_de_bloc>` (`admissions_hero`, `admissions_richtext`,
-`accueil_hero`, `actualites_documents_list`, ...).
+`accueil_hero`, `contact_hero`, `actualites_hero`, ...).
 
 Tout se récupère en **un seul appel** grâce au deep-fetch, en listant les
 collections propres à la page demandée dans `sections.item:<collection>.*` :
@@ -285,9 +285,9 @@ contenu réel à ce jour :
   `sections.item:accueil_testimonials_highlight.news.news_id.*` pour
   traverser jusqu'aux vraies données `news`). L'ancien champ `testimonials`
   et sa jonction ont été supprimés (plus jamais utilisés sur ce bloc — le
-  reste de la collection `testimonials` et
-  `actualites_testimonials_highlight` sur la page Actualités ne sont pas
-  affectés). Premier élément du carrousel : l'actualité
+  reste de la collection `testimonials` n'est pas affecté ;
+  `actualites_testimonials_highlight`, elle, a depuis été retirée entièrement
+  le 2026-08-27, voir plus bas). Premier élément du carrousel : l'actualité
   "Immersion professionnelle chez GAP Motors" (`news.slug =
   immersion-professionnelle-gap-motors`), `cover_image` = la photo fournie
   par l'équipe.
@@ -316,13 +316,20 @@ contenu réel à ce jour :
   "logments" présente telle quelle dans la maquette source, conservée à
   l'identique — à signaler à l'équipe contenu), `quote_author` = "Charles
   Mengue", `quote_program` = "L3 Banques et Finance"
-- **`actualites_testimonials_highlight`** — heading_fr/en + cta_label_fr/en +
-  cta_url optionnels + `testimonials` (M2M curaté à la main, via jonction
-  `actualites_testimonials_highlight_testimonials`) — section "Success Stories"
-  de la page Actualités, pas Accueil (voir la table de correspondance ci-dessus)
-- **`actualites_documents_list`** — heading_fr/en + intro_fr/en (texte libre
-  court) + `category_filter` optionnel (le frontend requête `documents`
-  séparément, filtrée par cette catégorie si renseignée)
+- **`actualites_testimonials_highlight` / `actualites_documents_list`** —
+  **retirées le 2026-08-27**, 0 ligne depuis leur création et aucune
+  contrepartie dans le vrai fichier Figma design de la page Actualités (voir
+  entrée ci-dessous). Ne plus s'y référer — mention conservée ici uniquement
+  pour l'historique, au cas où d'anciennes notes en parlent encore ailleurs.
+- **`actualites_hero`** — **nouvelle collection créée le 2026-08-27**,
+  non-singleton (id=1). Section hero de la page Actualités : `title_fr/en`,
+  `subtitle_fr/en`, `image` (vrai champ éditorial cette fois, contrairement à
+  `contact_hero` — le fond est une vraie photo/collage dans le design, pas un
+  simple habillage décoratif). `image` laissée `null` pour l'instant, aucune
+  photo hero fournie par l'utilisateur pour cette page. Le reste de la page
+  (**"À la Une" + "Lire Aussi"**) n'a **pas** de collection dédiée : c'est un
+  listing live directement piloté par `news`, voir la table de correspondance
+  plus haut.
 
 Deux collections Accueil créées lors de la première passe de restructuration
 (`accueil_news_preview`, `accueil_programs_highlight` + sa jonction) ont été
@@ -352,14 +359,23 @@ collection (`accueil_cta_banner` est un composant multi-pages, comme
 Figma n'a que 3 champs visibles (Nom/Fonction/Message) : ajouté côté schéma
 pour permettre une réponse au message.
 
+**Actualités** a aussi été construite le 2026-08-27 (dev uniquement) :
+`actualites_hero` (title_fr/en, subtitle_fr/en, `image`) au-dessus d'un
+listing live piloté par `news` ("À la Une" = actualité la plus récente,
+"Lire Aussi" = le reste, paginé), puis le même bandeau CTA partagé
+(`accueil_cta_banner` id=2). Les deux anciennes collections
+`actualites_testimonials_highlight`/`actualites_documents_list` ont été
+retirées (0 ligne, aucune contrepartie dans ce fichier design).
+
 Les 6 pages existent déjà (`accueil`, `programmes`, `admissions`, `vie_campus`,
 `actualites`, `contact`, toutes `status: published`, + `a_propos` conservée
 mais probablement inutile vu que son contenu vit dans le hero Accueil).
 `accueil` (9 sections), `admissions` (19 sections, depuis l'ajout des
-sections tarifs/bourses le 2026-08-03) et `contact` (2 sections, depuis le
-2026-08-27) ont du contenu réel ; `programmes`, `vie_campus` et `actualites`
-renvoient `sections: []` en attendant que l'équipe communication/admissions
-compose leur contenu via l'Admin UI Directus.
+sections tarifs/bourses le 2026-08-03), `contact` (2 sections, depuis le
+2026-08-27) et `actualites` (2 sections, depuis le 2026-08-27) ont du
+contenu réel ; `programmes` et `vie_campus` renvoient `sections: []` en
+attendant que l'équipe communication/admissions compose leur contenu via
+l'Admin UI Directus.
 
 ## Référence des collections publiques
 

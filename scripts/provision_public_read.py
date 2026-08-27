@@ -78,10 +78,11 @@ READ_COLLECTIONS = [
     ("accueil_testimonials_highlight_testimonials", {}, ["*"]),
     ("accueil_vie_campus_teaser", {}, ["*"]),
     ("accueil_vie_campus_teaser_gallery", {}, ["*"]),
-    ("actualites_testimonials_highlight", {}, ["*"]),
-    ("actualites_testimonials_highlight_testimonials", {}, ["*"]),
-    ("actualites_documents_list", {}, ["*"]),
     ("contact_hero", {}, ["*"]),
+    ("actualites_hero", {}, ["*"]),
+    # actualites_testimonials_highlight / _testimonials / actualites_documents_list
+    # retired 2026-08-27 (0 rows, no counterpart in the real Figma design file
+    # for the page Actualites -- see ISETAG_project_instructions.md).
 ]
 
 # (collection, file_field) dont l'upload par défaut doit viser le dossier "Public"
@@ -102,6 +103,7 @@ PUBLIC_FILE_FIELDS = [
     ("accueil_vie_campus_teaser_gallery", "image"),
     ("admissions_brochure", "file"),
     ("accueil_cta_banner", "image"),
+    ("actualites_hero", "image"),
 ]
 
 
