@@ -86,7 +86,7 @@ mention est obsolète, à ne plus utiliser comme référence.
 | Page | Collection(s) | Notes |
 |---|---|---|
 | Accueil | `pages` (`key=accueil`) → sections | Page composée de sections éditoriales ordonnées. Le contenu "À propos" (accroche "Choisir l'ISETAG") est intégré dans le hero de cette page, pas une page séparée. |
-| Programmes | `pages` (`key=programmes`) → sections, + `poles`, `programs` | Sections éditoriales en tête de page (ex. mise en avant d'un pôle) + un bandeau CTA ("Commence ton chemin aujourd'hui", `programmes_cta_banner` — à créer) en fin de page, puis catalogue filtrable en listing direct. Filtrer `programs` par `pole`, `schedule`, `is_hnd` (`filter[pole][_eq]=...`). |
+| Programmes | `pages` (`key=programmes`) → sections (**actuellement vide, voir note**), + `poles`, `pole_filieres`, `programs` | 3 parties : (1) hero (`programmes_hero`, contenu prêt sur dev et prod mais **pas encore lié à `pages.programmes.sections`** — trouvé le 2026-08-27, à corriger avant de considérer la page finie), (2) les 4 `poles`, chacun avec ses filières/options réelles dans `pole_filieres` filtré par `pole` (pas dans `poles` lui-même — voir l'entrée `featured_name_fr`/`tags_fr` retirés ci-dessous), (3) `programs` = "Référentiel de nos formations", catalogue filtrable en listing direct (`filter[pole][_eq]=...`, `schedule`, `is_hnd`). Bandeau CTA final probablement le même partagé que les autres pages (`accueil_cta_banner`), à confirmer/wire comme pour Contact/Actualités. |
 | Fiche filière | `programs` (par `slug`), `testimonials` (filtrées par `program`) | Pas de page-builder — page 1:1 avec un `programs`. |
 | Admissions | `pages` (`key=admissions`) → sections, + `tuition_plans`, `scholarships`, `documents` (`filter[category][_eq]=admission`) | Sections éditoriales (dont le guide "Comment s'inscrire" en étapes numérotées), tarifs/bourses/documents en listing direct. Le formulaire de pré-inscription est un cas à part, voir section dédiée ci-dessous — **pas un simple GET**. |
 | Vie Campus | `pages` (`key=vie_campus`) → sections, + `campus_services` | Sections éditoriales (hero, mise en avant), puis listing `campus_services` (filtrer par `display_section` si plusieurs zones). |
@@ -408,17 +408,20 @@ Résumé :
   a été supprimé, absent du nouveau design) : `slug`, `name_fr`, `name_en`,
   `icon`, `color`, `display_order` (1=Maritime, 2=Industriel, 3=Gestion,
   4=Communication, ordre du prototype), `image` (photo héro du pôle),
-  `description_fr/en` (ancien champ, conservé), et les nouveaux champs
-  ajoutés pour matcher le prototype : `subtitle_fr/en` (sous-titre court sous
-  le nom du pôle), `notes_fr/en` (bloc de notes/puces : régimes de cours,
-  tutelle académique, date limite d'admission), `deadline_fr/en` (ligne
-  "Date limite de recevabilité des dossiers : 16 septembre 2026" — identique
-  sur les 4 pôles actuellement), `featured_name_fr/en` (nom de la filière
-  phare mise en avant sur la carte du pôle), `featured_description_fr/en`
-  (paragraphe descriptif de cette filière phare), `tags_fr` (JSON — liste des
-  autres filières/spécialités affichées en pastilles sous la filière phare).
-  Les champs `_en` sont tous `null` pour l'instant (contenu FR uniquement
-  dans le prototype).
+  `description_fr/en` (ancien champ, conservé), et les champs ajoutés pour
+  matcher le prototype : `subtitle_fr/en` (sous-titre court sous le nom du
+  pôle), `notes_fr/en` (bloc de notes/puces : régimes de cours, tutelle
+  académique, date limite d'admission), `deadline_fr/en` (ligne "Date limite
+  de recevabilité des dossiers : 16 septembre 2026" — identique sur les 4
+  pôles actuellement). Les champs `_en` sont tous `null` pour l'instant
+  (contenu FR uniquement dans le prototype).
+  **`featured_name_fr/en`/`featured_description_fr/en`/`tags_fr` retirés le
+  2026-08-27** : doublon confirmé de `pole_filieres` (le texte de la
+  filière phare de chaque pôle était copié-collé mot pour mot depuis sa
+  ligne `pole_filieres` correspondante, et `tags_fr` ne listait que les noms
+  des autres filières sans lien/description/image) — utiliser `pole_filieres`
+  filtré par `pole` pour tout ce qui concerne les filières d'un pôle, plus
+  ces champs sur `poles` lui-même.
 - **programs** — **reconstruite le 2026-08-23** pour matcher le "Référentiel
   de nos formations" du nouveau prototype Figma (liste par cycle avec 6
   onglets). Champs : `slug`, `name_fr`, `name_en`, `pole` (relation → poles,

@@ -2332,4 +2332,80 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
           `POST /utils/cache/clear` (encore le piège de cache habituel :
           les `DELETE` avaient renvoyé `204` mais un `GET` immédiatement
           après montrait encore les 3 lignes).
+- [x] **Revue de la page Programmes (dev + prod)** (2026-08-27) — utilisateur
+      a redemandé confirmation de la structure attendue (1. `programme_hero`,
+      2. les pôles avec leurs options, 3. le référentiel des formations) en
+      disant ne plus comprendre ce qu'il voyait dans l'admin prod. Deux
+      constats réels :
+      - **`pages.programmes.sections` est vide sur dev ET prod** —
+        `programmes_hero` existe et a du vrai contenu des deux côtés, mais
+        n'a jamais été branché à la page (contrairement à `contact_hero`/
+        `actualites_hero` cette session). **Pas encore corrigé** — signalé
+        à l'utilisateur, correction proposée mais pas exécutée (il a
+        redirigé la conversation vers `poles`/`pole_filieres` d'abord).
+      - **`poles.featured_name_fr/en`, `poles.featured_description_fr/en`,
+        `poles.tags_fr` retirés (dev + prod)** : confirmé être un doublon
+        exact de `pole_filieres` — le texte "filière phare" de chaque pôle
+        était copié-collé mot pour mot depuis sa ligne `pole_filieres`
+        correspondante (ex. `featured_description_fr` du Pôle Industriel
+        identique à `pole_filieres` id=11), et `tags_fr` listait juste les
+        noms des *autres* filières en texte brut, sans lien/description/
+        image — les deux entièrement supersédés par `pole_filieres` (33
+        lignes, construites après la vraie revue du fichier Figma design).
+        Script `scripts/retire_poles_duplicate_fields.py` (idempotent,
+        rejoué sur dev puis prod). Vérifié par lecture anonyme explicite
+        (pas `fields=*`, voir piège ci-dessous) : les 4 pôles ne renvoient
+        plus que 16 champs (contre 21), tout le reste du contenu intact.
+      - **Piège rencontré pendant la vérification prod** : juste après ces
+        `DELETE /fields`, `GET .../poles/1?fields=*` s'est mis à alterner
+        `200`/`500` de façon quasi parfaitement 50/50, y compris après un
+        redémarrage complet du conteneur. Creusé jusqu'à la vraie cause :
+        `isetag-directus-prod` tourne sous PM2 en **mode cluster (2
+        processus worker)** avec `CACHE_ENABLED=true` + `CACHE_STORE=memory`
+        — chaque worker garde son propre cache de schéma en mémoire, donc
+        après une écriture de schéma, seul le worker qui a traité l'écriture
+        voit le changement ; l'autre continue de servir l'ancien schéma
+        jusqu'à son propre invalidation, d'où l'alternance quasi parfaite
+        (nginx round-robine implicitement entre les deux processus PM2
+        derrière le même port). Un simple `docker restart` ne règle rien
+        durablement (confirmé) : les deux workers redémarrent avec le même
+        problème structurel, prêts à re-diverger à la prochaine écriture de
+        schéma. **Corrigé à la racine**, sur confirmation explicite de
+        l'utilisateur : `CACHE_ENABLED` passé à `"false"` dans
+        `docker/prod/docker-compose.yml` (et sur le VPS). Comme ce conteneur
+        prod n'a **jamais été géré par `docker compose`** (confirmé : aucun
+        label `com.docker.compose.*` sur le conteneur vivant, malgré le
+        fichier `docker-compose.yml` existant comme référence — déployé à la
+        main depuis le début), `docker compose up` a échoué avec un conflit
+        de nom (a bien failli recréer un mauvais conteneur — voir plus bas)
+        ; recréé à la main à la place (`docker stop`/`rm`/`run` avec les 27
+        mêmes variables d'environnement + volumes + réseaux capturés par
+        `docker inspect`, uniquement `CACHE_ENABLED` changé). **Incident
+        pendant la recréation** : un premier essai a échoué avec une erreur
+        `-e` vide (ligne vide en fin de fichier), laissant le site **coupé**
+        quelques secondes entre le `docker rm` de l'ancien conteneur et le
+        nouveau `docker run` réussi — corrigé immédiatement, site revérifié
+        opérationnel juste après. Revérifié : 15 `GET .../poles/1?fields=*`
+        strictement séquentiels → `200` à chaque fois (contre l'alternance
+        d'avant), toutes les vérifs anonymes habituelles (pages, `news`
+        public, images) repassées avec succès.
+      - **Conteneurs fantômes trouvés et supprimés (prod)** : en tentant le
+        déploiement via `docker compose up`, celui-ci a tenté de recréer un
+        conteneur nommé `isetag-directus-prod-backup-20260805103004` sous le
+        nom `isetag-directus-prod` déjà pris par le vrai conteneur vivant —
+        échec avec conflit de nom, mais **a supprimé ce conteneur backup au
+        passage** (effet de bord non voulu). Investigation (sur confirmation
+        explicite utilisateur) : 3 autres conteneurs `isetag-directus-prod-
+        backup-<date>` trouvés, tous créés le 5 août 2026 (à quelques heures
+        d'intervalle), tous connectés à la **même base Postgres** et aux
+        **mêmes réseaux Docker** que le conteneur vivant, aucun label
+        `docker compose`, aucun script/cron actif n'en crée — des reliquats
+        d'anciennes tentatives de redéploiement manuel jamais nettoyés.
+        Jamais ciblés par nginx (qui route uniquement par le nom exact
+        `isetag-directus-prod`), donc sans impact sur le site, mais
+        consommaient des ressources pour rien et sont la cause directe du
+        conflit rencontré. Supprimés (`docker stop`/`rm` sur les 3) après
+        confirmation explicite ; conteneurs actifs sur le VPS réduits aux 3
+        vrais services (`isetag-directus-prod`, `isetag-nginx-prod`,
+        `isetag-postgres-prod`).
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur

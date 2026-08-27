@@ -53,8 +53,19 @@ services:
       PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
       STORAGE_LOCATIONS: local
       STORAGE_LOCAL_ROOT: /directus/uploads
-      CACHE_ENABLED: "true"
-      CACHE_STORE: memory
+      # CACHE_ENABLED=false (2026-08-27) -- was "true" + CACHE_STORE=memory,
+      # which is broken under this container's PM2 cluster mode (2 worker
+      # processes, confirmed via `ps aux`): each worker keeps its own
+      # in-process cache, so schema/permission changes are only visible to
+      # whichever worker happened to handle the write, causing the OTHER
+      # worker to keep serving stale field lists/403s on `fields=*` queries
+      # -- confirmed via 10 sequential fields=* requests flapping ~50/50
+      # even right after a full container restart. Real fix is a shared
+      # cache (Redis) or disabling cache outright; traffic is low enough
+      # that disabling is the simpler, safe choice for now. Explicit
+      # field-list queries were unaffected either way (100% reliable before
+      # this change) -- only `fields=*` wildcard expansion flapped.
+      CACHE_ENABLED: "false"
       CORS_ENABLED: "true"
       # isetag-univ.net/www: futur domaine réel (DNS pas encore basculé, WordPress
       # dessus pour l'instant) ; isetag.web.app: hébergement Firebase actuel du
