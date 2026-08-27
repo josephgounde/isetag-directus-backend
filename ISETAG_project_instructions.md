@@ -2224,4 +2224,77 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       de `news/2` avec `fields=...,body_fr,body_en` (200, valeurs `null`
       comme attendu, pas d'erreur de champ manquant). Script :
       `scripts/add_news_body_fields.py` (idempotent, rejoué pour confirmer).
+- [x] **Contact + Actualités + news poussés vers prod** (2026-08-27) —
+      demande : "push all what we did on dev to prod". Avant de pousser,
+      audit complet du dev (pas seulement mon propre travail — l'utilisateur
+      avait aussi modifié des choses directement dans l'admin) :
+      - `news` (GAP Motors, ligne dev id=2) avait reçu un **vrai `body_fr`**
+        écrit par l'utilisateur (texte complet, référence "Source
+        éditoriale : BROUILLON ACTU.docx — article n° 1"), jamais documenté
+        avant cet audit.
+      - Les 3 actualités provisoires (draft) avaient chacune reçu une
+        **vraie `cover_image`** uploadée par l'utilisateur (fichiers "63227
+        4/5/6.png", exports Figma) — `content_fr` restait le texte
+        provisoire, `status` restait `draft`.
+      - **Bug trouvé en auditant ces images** : les 4 fichiers concernés
+        (les 3 ci-dessus + l'image hero Actualités) avaient été uploadés
+        **hors du dossier "Public"** — donc invisibles en lecture anonyme
+        (`/assets/<id>` → `403`) malgré des collections/permissions
+        correctement configurées. Corrigé sur dev avant le push
+        (`PATCH /files/<id>` → `folder: <Public>` pour les 4).
+      - **Deuxième bug trouvé, cette fois pré-existant sur PROD depuis le
+        premier push de `news` (16 août)** : l'image originale de
+        l'actualité GAP Motors (`alumni_image.png`) a un enregistrement
+        `directus_files` valide, dans le bon dossier, avec la bonne
+        permission — mais **le fichier binaire n'existe plus du tout sur le
+        disque du serveur** (`docker exec isetag-directus-prod find /
+        -iname '8fcfb481*'` → rien), d'où un `403` en lecture anonyme sur
+        `/assets/<id>` bien que `/items/news` renvoie le JSON correctement
+        (ce qui explique pourquoi la vérification du 13 août, qui ne
+        testait que le JSON, n'avait rien vu). Corrigé en ré-uploadant le
+        fichier (récupéré depuis la copie fonctionnelle de dev) et en
+        repointant `news.cover_image` dessus ; l'ancien enregistrement
+        cassé retiré.
+      - **Incident d'infrastructure découvert pendant le push** :
+        `isetag-directus-prod` a présenté un comportement de bascule
+        ~50/50 entre cache de schéma frais et périmé **sur chaque requête
+        individuelle**, juste après les écritures de schéma (`POST
+        /fields`, `POST /relations`, etc.) — 5 `GET` strictement
+        séquentiels sur le même endpoint ont donné `200/403/200/403/403`.
+        Ce n'est **pas** le piège de cache habituel (un `POST
+        /utils/cache/clear` + une pause ne corrigent rien ici, testé
+        plusieurs fois avec des pauses de 5 à 20s). `CACHE_STORE=memory`
+        (pas de Redis), un seul conteneur `isetag-directus-prod` réellement
+        actif derrière nginx (`proxy_pass` fixe, vérifié — les conteneurs
+        `isetag-directus-prod-backup-*` restés démarrés depuis un backup du
+        5 août ne sont PAS dans le chemin de nginx, donc pas la cause).
+        `docker restart isetag-directus-prod` aurait probablement réglé le
+        problème mais **bloqué par le classifieur de sécurité de Claude
+        Code** (redémarrage de conteneur prod = action sensible, refus
+        catégorique). Contourné en enrobant tous les appels API de ce push
+        d'une boucle de nouvelle tentative (jusqu'à 8 essais, ~1s d'écart)
+        sur les erreurs contenant "exist" — voir
+        `scripts/copy_images_dev_to_prod.py` pour le pattern exact.
+        **À signaler** : ce comportement affecte potentiellement N'IMPORTE
+        QUELLE requête publique juste après un déploiement de schéma —
+        l'équipe frontend pourrait un jour voir des `403` intermittents sur
+        des ressources qui existent bien. Un redémarrage propre du
+        conteneur (`docker restart isetag-directus-prod`, à faire par
+        l'utilisateur ou avec sa confirmation explicite) réglerait
+        probablement la cause racine, jamais tenté ici faute d'autorisation.
+      - Contenu final poussé : `contact_hero` (collection + contenu +
+        relation M2A + `contact_messages.email` requis), `actualites_hero`
+        (collection + contenu + image), retrait de
+        `actualites_testimonials_highlight`(+jonction)/`actualites_documents_list`
+        (0 ligne chacune, confirmé avant suppression), rangement
+        `documents`→Admissions/`testimonials`→Accueil & Global
+        (`scripts/fix_documents_testimonials_groups.py`, nouveau, idempotent),
+        `news.featured`/`status`/`body_fr`/`body_en`, lecture publique
+        `news` resserrée à `status=published`, GAP Motors passé à
+        `featured=true`/`status=published`/`body_fr` réel/image réparée, 3
+        actualités provisoires créées en `status=draft` (identiques à dev).
+      - Vérifié par deep-fetch anonyme réel sur prod (pas admin) : sections
+        `contact`/`actualites` résolvent, `/items/news` public ne renvoie
+        que GAP Motors, fetch direct des 3 lignes draft → `403` chacune,
+        les 5 images concernées (`/assets/<id>`) → `200` chacune.
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur
