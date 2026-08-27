@@ -2184,4 +2184,26 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         Aussi" reste sans collection dédiée (grille = `news` triée
         `-date_published`, en excluant la ligne `featured`, paginée) — voir
         `docs/frontend-api-guide.md` pour la requête exacte.
+- [x] **3 actualités provisoires seedées** (2026-08-27, dev) — demande
+      utilisateur : "add a few more news articles so lire aussi isn't
+      empty". Aucun contenu réel disponible (pas de dossier
+      `contenu_actualites` comme pour les autres pages) → confirmé avec
+      l'utilisateur (choix explicite : « Placeholder articles, clearly
+      marked ») avant de fabriquer quoi que ce soit. Reprend les 3 titres
+      déjà visibles dans la maquette Figma elle-même (répétés pour remplir
+      la grille du mock) — `renforcement-des-capacites-a-l-isetag`,
+      `moment-de-detente-a-kribi`, `l-isetag-au-feminin` — avec un
+      `content_fr` explicitement étiqueté "[Contenu provisoire — ... Ne pas
+      publier tel quel.]", aucun fait inventé sur des personnes/événements
+      réels, pas de `cover_image` (aucune vraie photo disponible).
+      **`status=draft`** pour les 3 : elles existent pour tester la grille
+      côté admin/dev, mais **ne remplissent pas "Lire Aussi" sur le site
+      public** — c'est voulu, publier du texte placeholder aux vrais
+      visiteurs serait pire que de laisser la grille vide. Vérifié : lecture
+      anonyme de `/items/news` ne renvoie toujours que GAP Motors (`200`,
+      1 ligne) ; fetch direct d'une des 3 lignes provisoires → `403`.
+      Script : `scripts/seed_placeholder_news.py` (idempotent, dédupliqué
+      par `slug`). **À faire** : remplacer par du vrai contenu/photos puis
+      passer en `status=published` dès que l'équipe communication fournit
+      la matière — ou supprimer ces 3 lignes si elles ne sont plus voulues.
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur
