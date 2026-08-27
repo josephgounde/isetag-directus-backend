@@ -90,7 +90,7 @@ mention est obsolète, à ne plus utiliser comme référence.
 | Fiche filière | `programs` (par `slug`), `testimonials` (filtrées par `program`) | Pas de page-builder — page 1:1 avec un `programs`. |
 | Admissions | `pages` (`key=admissions`) → sections, + `tuition_plans`, `scholarships`, `documents` (`filter[category][_eq]=admission`) | Sections éditoriales (dont le guide "Comment s'inscrire" en étapes numérotées), tarifs/bourses/documents en listing direct. Le formulaire de pré-inscription est un cas à part, voir section dédiée ci-dessous — **pas un simple GET**. |
 | Vie Campus | `pages` (`key=vie_campus`) → sections, + `campus_services` | Sections éditoriales (hero, mise en avant), puis listing `campus_services` (filtrer par `display_section` si plusieurs zones). |
-| Actualités *(nav "Ressources" → renommée)* | `pages` (`key=actualites`) → sections, + `news` | Hero éditorial (`actualites_hero`), puis un listing **live** (pas des blocs page-builder) piloté directement par `news` : l'actualité la plus récente en "À la Une" (grand format), les autres paginées en grille "Lire Aussi" (9/page) — trier `news` par `date_published` desc, la 1ère ligne = "À la Une", le reste = "Lire Aussi". Puis le même bandeau CTA partagé que les autres pages (`accueil_cta_banner` id=2, pas de collection dédiée). **`actualites_testimonials_highlight`/`actualites_documents_list` ont été retirées le 2026-08-27** : aucune contrepartie dans le vrai fichier Figma design (pas de section "Success Stories" ni "ressources" sur cette page) — ne plus s'y référer. |
+| Actualités *(nav "Ressources" → renommée)* | `pages` (`key=actualites`) → sections, + `news` | Hero éditorial (`actualites_hero`), puis un listing **live** (pas des blocs page-builder) piloté directement par `news` : `filter[featured][_eq]=true` (curation manuelle, un choix éditorial — pas juste "la plus récente") pour "À la Une" (grand format), le reste trié `sort=-date_published` et paginé (9/page) pour la grille "Lire Aussi". Toujours filtrer `filter[status][_eq]=published` (comme `documents`/`scholarships`/`tuition_plans`). Puis le même bandeau CTA partagé que les autres pages (`accueil_cta_banner` id=2, pas de collection dédiée). **`actualites_testimonials_highlight`/`actualites_documents_list` ont été retirées le 2026-08-27** : aucune contrepartie dans le vrai fichier Figma design (pas de section "Success Stories" ni "ressources" sur cette page) — ne plus s'y référer. |
 | Contact | `pages` (`key=contact`) → sections | Hero éditorial + formulaire de contact. Le formulaire est un cas à part, voir section dédiée ci-dessous — **pas un simple GET**. |
 
 ## Pages composées de sections (page-builder)
@@ -361,11 +361,22 @@ pour permettre une réponse au message.
 
 **Actualités** a aussi été construite le 2026-08-27 (dev uniquement) :
 `actualites_hero` (title_fr/en, subtitle_fr/en, `image`) au-dessus d'un
-listing live piloté par `news` ("À la Une" = actualité la plus récente,
-"Lire Aussi" = le reste, paginé), puis le même bandeau CTA partagé
+listing live piloté par `news` ("À la Une" = `featured=true`, curation
+manuelle ; "Lire Aussi" = le reste, paginé), puis le même bandeau CTA partagé
 (`accueil_cta_banner` id=2). Les deux anciennes collections
 `actualites_testimonials_highlight`/`actualites_documents_list` ont été
-retirées (0 ligne, aucune contrepartie dans ce fichier design).
+retirées (0 ligne, aucune contrepartie dans ce fichier design). `news` a
+aussi reçu deux champs manquants ce jour-là, repérés en creusant "Lire Aussi"
+(question directe de l'utilisateur : "only two collections, what about the
+lire aussi grid") : `featured` (boolean, même pattern que
+`testimonials.featured`) et `status` (published/draft/archived, même pattern
+que `documents`/`scholarships`/`tuition_plans` — `news` n'avait jusqu'ici
+**aucun** contrôle brouillon/publié, chaque ligne était publique dès sa
+création). Lecture publique resserrée à `filter[status][_eq]=published`.
+L'unique actualité existante (GAP Motors) passée à `status=published`,
+`featured=true`. **Vérifié réellement, pas juste supposé** : une ligne
+`draft` de test créée puis lue anonymement (`403` en lecture directe, absente
+du listing), supprimée ensuite.
 
 Les 6 pages existent déjà (`accueil`, `programmes`, `admissions`, `vie_campus`,
 `actualites`, `contact`, toutes `status: published`, + `a_propos` conservée
@@ -547,7 +558,11 @@ Résumé :
   autres (triées par `display_order`), aucune section dédiée n'existe pour
   elles dans Figma
 - **news** — `slug`, `title_fr`, `title_en`, `category`, `content_fr`,
-  `date_published`, `cover_image`
+  `date_published`, `cover_image`, `featured` (boolean — **ajouté
+  2026-08-27**, curation manuelle de l'article "À la Une" sur la page
+  Actualités, pas juste le plus récent), `status` (**ajouté 2026-08-27**,
+  `published`/`draft`/`archived` — **filtrer `_eq: published`**, jusque-là
+  `news` n'avait aucun filtre de visibilité)
 - **campus_services** — `name_fr`, `name_en`, `icon`, `category`, `display_section`
 - **partners** — `name`, `logo`, `type`, `website_url`, `featured`, `display_order`
 - **stats_counters** — `label_fr`, `label_en`, `value`, `suffix`, `icon`, `display_order`

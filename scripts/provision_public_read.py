@@ -43,7 +43,7 @@ PUBLIC_FOLDER_NAME = "Public"
 READ_COLLECTIONS = [
     ("poles", {}, ["*"]),
     ("programs", {"status": {"_eq": "published"}}, ["*"]),
-    ("news", {}, ["*"]),
+    ("news", {"status": {"_eq": "published"}}, ["*"]),
     ("campus_services", {}, ["*"]),
     ("partners", {}, ["*"]),
     ("stats_counters", {}, ["*"]),

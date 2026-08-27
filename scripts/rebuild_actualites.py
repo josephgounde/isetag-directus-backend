@@ -3,13 +3,15 @@
 """Builds the Actualites page (dev first) from the real Figma design file
 (node-id=6-461, frame "Actualites - Desktop"), not the old prototype-based
 guess. Real structure: hero (title+subtitle+photo) -> "A la Une" (the single
-most recent/featured news article, full-width) -> "Lire Aussi" (paginated
-grid of the other news articles, 9/page, up to 7 pages in the mock) -> same
-shared CTA banner as every other page -> sitewide footer.
+featured news article, full-width) -> "Lire Aussi" (paginated grid of the
+other news articles, 9/page, up to 7 pages in the mock) -> same shared CTA
+banner as every other page -> sitewide footer.
 
 "A la Une" and "Lire Aussi" are NOT page-builder blocks: they're a live
-listing driven by the `news` collection itself (most recent = featured, rest
-paginated), same pattern as poles/programs listings elsewhere in this
+listing driven by the `news` collection itself (filter[featured][_eq]=true
+for "A la Une" -- see scripts/add_news_featured_status.py, a manual editorial
+choice, not just "whatever is most recent" -- rest sorted by date_published
+for "Lire Aussi"), same pattern as poles/programs listings elsewhere in this
 project. No new collection needed for them.
 
 Also retires actualites_testimonials_highlight and actualites_documents_list:

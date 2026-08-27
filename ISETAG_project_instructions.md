@@ -2157,4 +2157,31 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       juste après un `PATCH /collections/<x>` — la lecture immédiate montrait
       encore l'ancien groupe) : le dossier "Actualités" ne contient plus que
       `actualites_hero` et `news`.
+- [x] **`news.featured`/`news.status` ajoutés** (2026-08-27, dev). Question
+      directe de l'utilisateur en relisant le travail Actualités : "only two
+      collections, what about the 'lire aussi' grid in the middle of the
+      page??" — la réponse (« c'est un listing live sur `news`, pas un bloc »)
+      était correcte mais incomplète : `news` n'avait **aucun** moyen de
+      choisir éditorialement quelle actualité est "À la Une" (rien qu'un tri
+      implicite par date, une hypothèse jamais posée comme telle) ni de
+      champ `status` — chaque ligne créée était publique instantanément,
+      contrairement à `documents`/`scholarships`/`tuition_plans`. Corrigé :
+      - `featured` (boolean) — même pattern que `testimonials.featured` déjà
+        utilisé dans ce projet — "À la Une" = `filter[featured][_eq]=true`,
+        un choix éditorial explicite, pas une déduction de date.
+      - `status` (`published`/`draft`/`archived`, défaut `draft`) — même
+        pattern que `documents`/`scholarships`/`tuition_plans`. Permission de
+        lecture publique resserrée à `filter[status][_eq]=published`.
+      - L'actualité GAP Motors (seule ligne existante) passée à
+        `status=published`, `featured=true`.
+      - **Vérifié réellement, pas juste affirmé** : une ligne `news` de test
+        créée avec `status=draft`, confirmée invisible en lecture anonyme
+        (`GET /items/news/<id>` → `403`, absente de `GET /items/news`),
+        puis supprimée. `filter[featured][_eq]=true` revérifié en anonyme
+        après coup, résout bien GAP Motors.
+      - Script : `scripts/add_news_featured_status.py` (idempotent, rejoué
+        pour confirmer — 2ᵉ passage : 0 changement, comme attendu). "Lire
+        Aussi" reste sans collection dédiée (grille = `news` triée
+        `-date_published`, en excluant la ligne `featured`, paginée) — voir
+        `docs/frontend-api-guide.md` pour la requête exacte.
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur
