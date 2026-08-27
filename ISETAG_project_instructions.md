@@ -2340,9 +2340,16 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       - **`pages.programmes.sections` est vide sur dev ET prod** —
         `programmes_hero` existe et a du vrai contenu des deux côtés, mais
         n'a jamais été branché à la page (contrairement à `contact_hero`/
-        `actualites_hero` cette session). **Pas encore corrigé** — signalé
-        à l'utilisateur, correction proposée mais pas exécutée (il a
-        redirigé la conversation vers `poles`/`pole_filieres` d'abord).
+        `actualites_hero` cette session). **Corrigé** ("yes wire
+        programmes_hero to the page now") : ajouté à l'allowlist M2A de
+        `pages_sections.item` (relation, pas le champ — même piège que
+        d'habitude) puis lié à `pages.programmes.sections` sort=1, sur dev
+        et prod. Script `scripts/wire_programmes_hero.py` (idempotent).
+        Vérifié par deep-fetch anonyme réel des deux côtés
+        (`sections.item:programmes_hero.*` résout titre/sous-titre/image).
+        Pas de bandeau CTA ajouté à cette étape (pas demandé explicitement,
+        contrairement à Contact/Actualités où le Figma le montrait
+        clairement) — à confirmer séparément si voulu.
       - **`poles.featured_name_fr/en`, `poles.featured_description_fr/en`,
         `poles.tags_fr` retirés (dev + prod)** : confirmé être un doublon
         exact de `pole_filieres` — le texte "filière phare" de chaque pôle
