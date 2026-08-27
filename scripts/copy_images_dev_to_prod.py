@@ -20,6 +20,7 @@ Usage:
 import json
 import mimetypes
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -28,8 +29,21 @@ import urllib.request
 import uuid
 
 DEV_BASE = os.environ.get("DEV_BASE_URL", "http://localhost:8055").rstrip("/")
-DEV_EMAIL = os.environ.get("DEV_ADMIN_EMAIL", "admin@isetag-univ.net")
-DEV_PASSWORD = os.environ.get("DEV_ADMIN_PASSWORD", "isetag_dev_admin_pw")
+DEV_ENV_PATH = os.environ.get("DEV_ENV_PATH", r"J:\SiteWeb_ISETAG\Directus-backend\.env")
+
+if "DEV_ADMIN_EMAIL" in os.environ:
+    DEV_EMAIL = os.environ["DEV_ADMIN_EMAIL"]
+    DEV_PASSWORD = os.environ["DEV_ADMIN_PASSWORD"]
+else:
+    _dev_env = {}
+    with open(DEV_ENV_PATH, encoding="utf-8") as _f:
+        for _line in _f:
+            _line = _line.strip()
+            _m = re.match(r"^([A-Z_]+)=(.*)$", _line)
+            if _m:
+                _dev_env[_m.group(1)] = _m.group(2)
+    DEV_EMAIL = _dev_env["DIRECTUS_ADMIN_EMAIL"]
+    DEV_PASSWORD = _dev_env["DIRECTUS_ADMIN_PASSWORD"]
 
 PROD_BASE = os.environ["TARGET_BASE_URL"].rstrip("/")
 PROD_EMAIL = os.environ["DIRECTUS_ADMIN_EMAIL"]
