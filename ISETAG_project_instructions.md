@@ -2206,4 +2206,22 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
       par `slug`). **À faire** : remplacer par du vrai contenu/photos puis
       passer en `status=published` dès que l'équipe communication fournit
       la matière — ou supprimer ces 3 lignes si elles ne sont plus voulues.
+- [x] **`news.body_fr`/`body_en` ajoutés** (2026-08-27, dev). Demande directe :
+      "add a text field to the news collection for the real article content
+      that will be displayed on another view by the frontend team" — une
+      page de détail par actualité que l'équipe frontend doit encore
+      construire (aucune route de ce type n'existe aujourd'hui dans
+      `pages`/`pages_sections`, qui ne couvre que les 6 pages composées).
+      `content_fr` existant **reste tel quel** : c'est l'extrait court déjà
+      utilisé sur les cartes "À la Une"/"Lire Aussi", pas l'article complet
+      — les deux champs coexistent avec des rôles distincts, pas de
+      renommage/migration. `body_fr`/`body_en` : `type: text`, `interface:
+      input-rich-text-html` — même pattern que
+      `admissions_richtext.content_fr` (WYSIWYG déjà établi dans ce projet),
+      pas du texte brut. Les deux `null` pour l'instant (aucun contenu
+      fourni), lecture publique déjà couverte par le `fields: ["*"]`
+      existant sur la permission `news` — vérifié par un fetch anonyme réel
+      de `news/2` avec `fields=...,body_fr,body_en` (200, valeurs `null`
+      comme attendu, pas d'erreur de champ manquant). Script :
+      `scripts/add_news_body_fields.py` (idempotent, rejoué pour confirmer).
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur

@@ -557,12 +557,18 @@ Résumé :
   séparée — les 2 lignes `level: "Maritime"` restent affichées avec les
   autres (triées par `display_order`), aucune section dédiée n'existe pour
   elles dans Figma
-- **news** — `slug`, `title_fr`, `title_en`, `category`, `content_fr`,
-  `date_published`, `cover_image`, `featured` (boolean — **ajouté
-  2026-08-27**, curation manuelle de l'article "À la Une" sur la page
-  Actualités, pas juste le plus récent), `status` (**ajouté 2026-08-27**,
-  `published`/`draft`/`archived` — **filtrer `_eq: published`**, jusque-là
-  `news` n'avait aucun filtre de visibilité)
+- **news** — `slug`, `title_fr`, `title_en`, `category`, `content_fr`
+  (extrait court, utilisé sur les cartes "À la Une"/"Lire Aussi" — pas
+  l'article complet), `date_published`, `cover_image`, `featured` (boolean —
+  **ajouté 2026-08-27**, curation manuelle de l'article "À la Une" sur la
+  page Actualités, pas juste le plus récent), `status` (**ajouté
+  2026-08-27**, `published`/`draft`/`archived` — **filtrer `_eq:
+  published`**, jusque-là `news` n'avait aucun filtre de visibilité),
+  `body_fr`/`body_en` (**ajoutés 2026-08-27**, WYSIWYG/HTML — même pattern
+  que `admissions_richtext.content_fr` — le contenu **complet** de
+  l'article, pour une page de détail par actualité que le front doit encore
+  construire ; `content_fr` reste le seul champ utilisé sur la liste
+  Actualités elle-même)
 - **campus_services** — `name_fr`, `name_en`, `icon`, `category`, `display_section`
 - **partners** — `name`, `logo`, `type`, `website_url`, `featured`, `display_order`
 - **stats_counters** — `label_fr`, `label_en`, `value`, `suffix`, `icon`, `display_order`
