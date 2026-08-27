@@ -2347,9 +2347,12 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         et prod. Script `scripts/wire_programmes_hero.py` (idempotent).
         Vérifié par deep-fetch anonyme réel des deux côtés
         (`sections.item:programmes_hero.*` résout titre/sous-titre/image).
-        Pas de bandeau CTA ajouté à cette étape (pas demandé explicitement,
-        contrairement à Contact/Actualités où le Figma le montrait
-        clairement) — à confirmer séparément si voulu.
+        **Bandeau CTA ajouté ensuite** ("yes add the CTA banner too") :
+        même `accueil_cta_banner` id=2 partagé que Contact/Actualités,
+        `pages_sections` sort=2 sur dev et prod. `pages.programmes.sections`
+        est maintenant `[programmes_hero sort=1, accueil_cta_banner sort=2]`
+        des deux côtés, revérifié par deep-fetch anonyme (les deux items
+        résolvent leur contenu réel).
       - **`poles.featured_name_fr/en`, `poles.featured_description_fr/en`,
         `poles.tags_fr` retirés (dev + prod)** : confirmé être un doublon
         exact de `pole_filieres` — le texte "filière phare" de chaque pôle
