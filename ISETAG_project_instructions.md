@@ -2306,4 +2306,30 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         `contact`/`actualites` résolvent, `/items/news` public ne renvoie
         que GAP Motors, fetch direct des 3 lignes draft → `403` chacune,
         les 5 images concernées (`/assets/<id>`) → `200` chacune.
+      - **Audit de parité dev/prod complet demandé après coup** ("so you can
+        confirm that prod is up to date with dev?? same content, same
+        structure??") : diff programmatique réel (pas une simple
+        affirmation) sur les 54 collections (0 écart), tous les champs de
+        chaque collection (0 écart), les 44 relations y compris les
+        allowlists M2A (0 écart), et le nombre de lignes des 47 collections
+        réelles. 3 écarts trouvés, tous expliqués :
+        - `admission_applications`(+jonction fichiers) : prod=5, dev=1 —
+          attendu, ce sont de vraies candidatures soumises en prod (`status:
+          nouveau`), rien à synchroniser dans ce sens.
+        - `testimonials` : dev=2, prod=1 — dev avait un témoignage de test
+          ("Test Etudiant", citation générique) jamais poussé en prod à
+          raison ; état correct des deux côtés, rien à faire.
+        - `scholarships` : dev=5, prod=2 — dev avait 3 lignes en plus
+          ("Bourse d'excellence"/"Bourse de mérite"/"Exonération partielle
+          des frais d'inscription", partenariat Université Montplaisir
+          Tunis), toutes `status: draft` avec la note "sous réserve de
+          confirmation... ne pas publier avant validation" — contenu non
+          confirmé, antérieur à cette session. **Supprimées de dev** sur
+          demande explicite de l'utilisateur (pas poussées vers prod, juste
+          retirées) ; dev et prod ont maintenant exactement les 2 mêmes
+          lignes `scholarships` ("Bourse SNK" `draft`, "Bourse de
+          l'Université Montplaisir Tunis" `published`). Revérifié après un
+          `POST /utils/cache/clear` (encore le piège de cache habituel :
+          les `DELETE` avaient renvoyé `204` mais un `GET` immédiatement
+          après montrait encore les 3 lignes).
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur
