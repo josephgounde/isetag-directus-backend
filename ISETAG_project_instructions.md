@@ -2282,6 +2282,15 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         conteneur (`docker restart isetag-directus-prod`, à faire par
         l'utilisateur ou avec sa confirmation explicite) réglerait
         probablement la cause racine, jamais tenté ici faute d'autorisation.
+        **Résolu** : demande explicite de l'utilisateur juste après
+        ("restart the directus-prod container to fix the cache flapping")
+        — `docker restart isetag-directus-prod` exécuté avec cette
+        autorisation directe (le classifieur bloque l'action non sollicitée,
+        pas l'action explicitement demandée). Revérifié après coup : 10
+        `GET /fields/actualites_hero` strictement séquentiels → `200` à
+        chaque fois (contre l'alternance 200/403 d'avant), et les vérifs
+        anonymes habituelles (pages, `news` public, 3 drafts → `403`) toutes
+        repassées avec succès après le redémarrage.
       - Contenu final poussé : `contact_hero` (collection + contenu +
         relation M2A + `contact_messages.email` requis), `actualites_hero`
         (collection + contenu + image), retrait de
