@@ -111,10 +111,12 @@ choses par section du site plutôt que par ordre alphabétique de table :
   `admissions_hero`, `admissions_richtext`, `admissions_feature`,
   `admissions_steps` (guide "Comment s'inscrire"), `admissions_cta_banner`
 - **Vie Campus** — `campus_services`
-- **Actualités** — `news`, `actualites_testimonials_highlight` ("Success
-  Stories"), `actualites_documents_list` (bibliothèque filtrable),
-  `testimonials`, `documents` (données de référence, ex-dossier "Ressources"
-  fusionné ici — voir plus bas)
+- **Actualités** — `news`, `actualites_hero`. *(Obsolète depuis le
+  2026-08-27 : `actualites_testimonials_highlight`/`actualites_documents_list`
+  retirées — aucune contrepartie dans le vrai design ; `testimonials` →
+  déplacée dans "Accueil & Global" ; `documents` → déplacée dans
+  "Admissions". Voir l'entrée « Rangement documents/testimonials corrigé »
+  plus bas pour le détail.)*
 - **Accueil & Global** — `partners`, `stats_counters`, `accueil_news_preview`
   (config du nombre d'actus affichées sur Accueil), `accueil_programs_highlight`
   (formations mises en avant sur Accueil)
@@ -2130,4 +2132,29 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         (`actualites_hero` ajouté, les 3 entrées retirées supprimées).
       - **Pas encore fait** : upload de l'image hero, push vers prod (même
         choix que Contact — reste en dev pour l'instant).
+- [x] **Rangement `documents`/`testimonials` corrigé** (2026-08-27, dev).
+      Signalé par l'utilisateur en relisant le travail Actualités : "why did
+      you put a file field type in actualité Document collection?? to match
+      which part of the actualité page??" — question légitime, ni l'un ni
+      l'autre n'a été touché ce jour-là. `documents` (champ `file`, 0 ligne)
+      et `testimonials` (2 lignes) existaient déjà avant cette session et
+      restent groupés dans le dossier Content **"Actualités"** — reliquat de
+      la fusion d'un ancien dossier "Ressources" dans "Actualités" (voir
+      « Organisation du menu Content » plus haut), sans rapport avec le
+      contenu réel de la page Actualités (qui n'a ni bibliothèque de
+      documents ni carrousel de témoignages, confirmé plus haut). Usage réel :
+      `documents` alimente la section documents téléchargeables
+      d'**Admissions** (`filter[category][_eq]=admission`), `testimonials`
+      alimente le carrousel `accueil_testimonials_highlight` sur **Accueil**
+      et les témoignages par filière sur la **Fiche filière**. Corrigé par
+      `meta.group` : `documents` → "Admissions" (une seule page
+      consommatrice), `testimonials` → "Accueil & Global" (plusieurs pages
+      consommatrices, même statut que `partners`/`stats_counters`).
+      Changement de rangement de menu uniquement (`meta.group`, capturé par
+      `directus schema snapshot` mais sans impact sur les données ni les
+      permissions) — pas une suppression, aucune ligne touchée. Vérifié après
+      un `POST /utils/cache/clear` (même piège de cache d'API que d'habitude
+      juste après un `PATCH /collections/<x>` — la lecture immédiate montrait
+      encore l'ancien groupe) : le dossier "Actualités" ne contient plus que
+      `actualites_hero` et `news`.
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur
