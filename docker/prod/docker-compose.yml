@@ -89,27 +89,24 @@ services:
       - internal
       - isetag_edge
 
-  frontend:
-    image: ${FRONTEND_IMAGE}
-    container_name: isetag-frontend-prod
-    restart: always
-    environment:
-      DIRECTUS_API_URL: ${DIRECTUS_PUBLIC_URL}
-    networks:
-      - isetag_edge
+  # Pas de service "frontend" : le site public est un build Angular statique (SSG),
+  # deploye par la CI GitHub Actions (rsync) directement dans /opt/isetag/frontend/dist
+  # sur le VPS -- aucun serveur Node/SSR a faire tourner, nginx sert les fichiers
+  # directement (voir nginx/conf.d/isetag-prod.conf).
 
   # Config cible une fois le DNS isetag-univ.net/cms.isetag-univ.net basculé
   # vers ce VPS (sert nginx/conf.d/isetag-prod.conf). Pas encore ce qui tourne
   # réellement aujourd'hui : voir isetag-nginx-prod (nginx-prod/conf.d/,
-  # hostname sslip.io) plus bas, actuellement démarré manuellement en dehors
-  # de ce compose. À fusionner une fois le DNS prêt.
+  # hostname sslip.io + cms.isetag-univ.net + preview.isetag-univ.net),
+  # actuellement démarré manuellement en dehors de ce compose (mêmes mounts
+  # que ci-dessous, plus /opt/isetag/frontend/dist -- voir
+  # ISETAG_manual_deploy_runbook.txt). À fusionner une fois le DNS prêt.
   nginx:
-    image: nginx:alpine
+    image: nginx:1.27-alpine
     container_name: isetag-nginx-prod
     restart: always
     depends_on:
       - directus
-      - frontend
     ports:
       - "80:80"
       - "443:443"
@@ -119,6 +116,7 @@ services:
       - ../../nginx/snippets:/etc/nginx/snippets:ro
       - certbot_webroot:/var/www/certbot:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ../../frontend/dist:/opt/isetag/frontend/dist:ro
     networks:
       - isetag_edge
 
