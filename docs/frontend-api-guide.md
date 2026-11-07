@@ -86,8 +86,7 @@ mention est obsolète, à ne plus utiliser comme référence.
 | Page | Collection(s) | Notes |
 |---|---|---|
 | Accueil | `pages` (`key=accueil`) → sections | Page composée de sections éditoriales ordonnées. Le contenu "À propos" (accroche "Choisir l'ISETAG") est intégré dans le hero de cette page, pas une page séparée. |
-| Programmes | `pages` (`key=programmes`) → sections (`programmes_hero` sort 1, `accueil_cta_banner` id=2 sort 2), + `poles`, `pole_filieres`, `programs` | 3 parties : (1) hero (`programmes_hero`), (2) les 4 `poles`, chacun avec ses filières/options réelles dans `pole_filieres` filtré par `pole` (pas dans `poles` lui-même — voir l'entrée `featured_name_fr`/`tags_fr` retirés ci-dessous), (3) `programs` = "Référentiel de nos formations", catalogue filtrable en listing direct (`filter[pole][_eq]=...`, `schedule`, `is_hnd`). Bandeau CTA final = même `accueil_cta_banner` id=2 partagé que Contact/Actualités (lié le 2026-08-27). |
-| Fiche filière | `programs` (par `slug`), `testimonials` (filtrées par `program`) | Pas de page-builder — page 1:1 avec un `programs`. |
+| Programmes | `pages` (`key=programmes`) → sections (`programmes_hero` sort 1, `programmes_referentiel` sort 2, `accueil_cta_banner` id=2 sort 3) | **Reconstruite le 2026-08-28, dev ET prod** (poussée sur prod le jour même). (1) hero (`programmes_hero`) ; (2) `programmes_referentiel` = section "Référentiel de nos formations" — heading/subtitle/image + `items` (O2M vers `programmes_referentiel_tabs`, **6 lignes, une par onglet du prototype Figma** — pas une ligne par formation, voir l'entrée détaillée plus bas : chaque onglet porte sa liste à puces complète dans un seul champ `content_fr` WYSIWYG) ; (3) bandeau CTA partagé, rebranché sort 3. Un seul appel imbriqué renvoie tout : `GET /items/pages?filter[key][_eq]=programmes&fields=*,sections.collection,sections.item:programmes_referentiel.*`. La partie "les 4 pôles avec leurs filières" (`poles`/`pole_filieres`, supprimées de **dev seulement** le 2026-08-28, toujours intactes sur prod) **reste à reconstruire** — voir la note plus haut. |
 | Admissions | `pages` (`key=admissions`) → sections, + `tuition_plans`, `scholarships`, `documents` (`filter[category][_eq]=admission`) | Sections éditoriales (dont le guide "Comment s'inscrire" en étapes numérotées), tarifs/bourses/documents en listing direct. Le formulaire de pré-inscription est un cas à part, voir section dédiée ci-dessous — **pas un simple GET**. |
 | Vie Campus | `pages` (`key=vie_campus`) → sections, + `campus_services` | Sections éditoriales (hero, mise en avant), puis listing `campus_services` (filtrer par `display_section` si plusieurs zones). |
 | Actualités *(nav "Ressources" → renommée)* | `pages` (`key=actualites`) → sections, + `news` | Hero éditorial (`actualites_hero`), puis un listing **live** (pas des blocs page-builder) piloté directement par `news` : `filter[featured][_eq]=true` (curation manuelle, un choix éditorial — pas juste "la plus récente") pour "À la Une" (grand format), le reste trié `sort=-date_published` et paginé (9/page) pour la grille "Lire Aussi". Toujours filtrer `filter[status][_eq]=published` (comme `documents`/`scholarships`/`tuition_plans`). Puis le même bandeau CTA partagé que les autres pages (`accueil_cta_banner` id=2, pas de collection dédiée). **`actualites_testimonials_highlight`/`actualites_documents_list` ont été retirées le 2026-08-27** : aucune contrepartie dans le vrai fichier Figma design (pas de section "Success Stories" ni "ressources" sur cette page) — ne plus s'y référer. |
@@ -211,23 +210,53 @@ contenu réel à ce jour :
   `cta2` = "Découvrir nos Programmes" → `/programmes`) — remplace l'ancienne
   copie plus longue rédigée avant que l'équipe design finalise le texte
   on-page ; `image` inchangée (déjà la bonne photo du portail/cour campus)
-- **`accueil_poles_highlight`** — heading_fr/en uniquement (heading_fr =
-  "Choisis le pôle qui te valorise", repris du prototype Figma — absent du
-  document éditorial d'origine) ; le carrousel de pôles lui-même vient
-  directement de la collection partagée `poles` (tous les pôles sont
-  affichés, triés par `display_order` — pas de sélection curatée donc pas de
-  jonction M2M ici). Chaque carte pôle affiche en plus la liste de ses
-  `programs` (filtrer `programs?filter[pole][_eq]=<id>` — les libellés courts
-  du prototype ne correspondent pas toujours exactement à `name_fr`, à
-  vérifier avec l'équipe design/contenu). `poles.description_fr` (déjà
-  existant) concorde mot pour mot avec le texte affiché sur la carte active
-  dans le prototype Figma v2 (vérifié 2026-08-03, pôle Maritime) — aucune
-  correction nécessaire. `poles.image` (5 photos réelles fournies par
-  l'équipe institutionnelle, uploadées 2026-07-31) diffère des photos
-  utilisées dans le prototype Figma v2 (silhouettes stock génériques par
-  métier) — **conservées telles quelles délibérément** : les photos réelles de
-  l'institution sont préférées aux silhouettes stock du prototype, à moins
-  que l'équipe design ne demande explicitement l'alignement visuel
+- **`accueil_poles_highlight`** — **reconstruite le 2026-08-28** (dev et
+  prod). heading_fr/en (heading_fr = "Choisis le pôle qui te valorise") +
+  **`cards`** (O2M natif vers `Poles_Description`, trié par
+  `display_order` — même pattern que `accueil_reasons.items` /
+  `accueil_reasons_items`). Un seul appel
+  (`GET /items/accueil_poles_highlight?fields=*,cards.*`) renvoie le titre
+  et les 4 cartes pôle. Remplace l'ancien pattern (carrousel alimenté
+  directement par les collections `poles`/`programs`, supprimées de dev le
+  2026-08-28 — voir la note plus haut) : `accueil_poles_highlight` ne
+  dépend plus d'aucune autre collection.
+- **`Poles_Description`** — **nouvelle collection créée le 2026-08-28**
+  (dev et prod), groupe "Accueil & Global". Une ligne par pôle (4 lignes :
+  Maritime, Industriel, Gestion, Communication & Numérique), reliée à
+  `accueil_poles_highlight` via `accueil_poles_highlight_id` (FK cachée,
+  champ technique de la relation O2M — ne pas l'éditer directement, passer
+  par `accueil_poles_highlight.cards`). Champs : `display_order`,
+  `title_fr/en`, `description_fr/en` (WYSIWYG), `image_1` + `image_2` (deux
+  photos par carte, comme dans le prototype Figma — **relation
+  `directus_files` manquante à la création, corrigée le 2026-08-28 sur dev
+  ET prod** : les fichiers étaient bien enregistrés et servaient
+  correctement en anonyme, mais l'Admin UI ne pouvait pas résoudre
+  l'image sans l'appel `/relations` explicite, gotcha déjà connu du
+  projet mais raté sur cette collection — image affichée "cassée"/vide
+  dans le formulaire malgré une valeur correcte en base), **`tags_fr/en`**
+  (ajouté le 2026-08-28 sur dev **puis prod**, même jour — petite ligne de mots-clés sous les 2 images,
+  format `MOT1 | MOT2 | ...`. **Repéré dans Figma : identique mot pour mot
+  sur les 4 pôles** — "TRANSPORT MARITIME | PORTUAIRE | SHIPPING
+  MANAGEMENT | DOUANE ET TRANSIT | LOGISTIQUE" partout, y compris sous
+  Industriel/Gestion/Communication où ce texte ne correspond à rien.
+  Vérifié à l'écran sur les 4 cartes avant d'ajouter le champ — ce n'est
+  pas une supposition. Très probablement un composant Figma copié-collé
+  sans être personnalisé par carte (défaut du prototype, pas du contenu
+  réel voulu). **Repris tel quel sur demande explicite de l'utilisateur**
+  ("add the field and use the text as-is") plutôt que laissé vide ou
+  corrigé unilatéralement — `tags_en` reste `null`, jamais traduit),
+  `button_1_label_fr/en` + `button_1_link` (bouton "Je me pré-inscris", même URL que
+  `accueil_hero.cta1_url` : `/admissions#pre-inscription`),
+  `button_2_label_fr/en` + `button_2_link` (bouton "Découvrir le Pôle X" →
+  `/programmes#<slug-du-pôle>`, ex. `/programmes#maritime-logistique` —
+  **ancres qui n'existent pas encore réellement sur la page Programmes**,
+  actuellement hero-only ; à confirmer avec l'équipe frontend avant de
+  s'appuyer dessus). Contenu (titres, descriptions) repris mot pour mot des
+  anciennes lignes `poles` (elles-mêmes vérifiées contre le prototype Figma
+  le 2026-08-03) ; images = les vraies photos institutionnelles retrouvées
+  encore présentes (orphelines) dans le dossier Public après la suppression
+  de `poles`/`programs` — vérifiées visuellement une par une avant
+  réutilisation, pas seulement par nom de fichier.
 - **`accueil_promoter_message`** (ajouté 2026-08-10) — heading_fr/en (=
   "Bienvenue à l'ISETAG"), subheading_fr/en (= "Le mot du promoteur"),
   body_fr/en (WYSIWYG, texte libre), `author` (texte simple, non traduit —
@@ -340,9 +369,16 @@ des programmes individuels — voir `accueil_poles_highlight` ci-dessus). Si une
 section "formations phares" distincte des pôles est demandée un jour, ce sera
 une nouvelle collection à recréer, pas une réactivation.
 
-Programmes et Vie Campus n'ont pas encore leurs propres collections de
-blocs (hero/richtext/cta_banner, etc.) : elles seront créées au moment où le
-contenu de ces pages sera saisi, en suivant la même convention de nommage et le
+**Programmes** a sa section hero (`programmes_hero`, créée le 2026-08-25,
+branchée à `pages_sections` le 2026-08-27) — c'est actuellement la **seule**
+section de cette page (voir plus haut, `poles`/`programs`/`pole_filieres`
+supprimées de dev le 2026-08-28). Les parties 2 (pôles + leurs filières) et 3
+(référentiel des formations) restent à reconstruire — voir la note plus haut
+pour ce qui existait avant et ce qui est encore disponible côté prod.
+
+**Vie Campus** n'a pas encore ses propres collections de blocs
+(hero/richtext/cta_banner, etc.) : elles seront créées au moment où le
+contenu de cette page sera saisi, en suivant la même convention de nommage et le
 même schéma de champs que les collections `admissions_*`/`accueil_*` ci-dessus
 (copiées comme référence). Si vous consultez ce guide avant que ce travail soit
 fait, la spec OpenAPI live (`GET {BASE_URL}/server/specs/oas`) reste la source
@@ -384,9 +420,11 @@ mais probablement inutile vu que son contenu vit dans le hero Accueil).
 `accueil` (9 sections), `admissions` (19 sections, depuis l'ajout des
 sections tarifs/bourses le 2026-08-03), `contact` (2 sections, depuis le
 2026-08-27) et `actualites` (2 sections, depuis le 2026-08-27) ont du
-contenu réel ; `programmes` et `vie_campus` renvoient `sections: []` en
-attendant que l'équipe communication/admissions compose leur contenu via
-l'Admin UI Directus.
+contenu réel ; `programmes` a 1 section (`programmes_hero` seul, sur dev
+depuis le 2026-08-28 — voir la note `poles`/`programs`/`pole_filieres`
+plus haut) et `vie_campus` renvoie `sections: []`, en attendant que
+l'équipe communication/admissions compose leur contenu via l'Admin UI
+Directus.
 
 ## Référence des collections publiques
 
@@ -403,87 +441,118 @@ Résumé :
   Figma pour cette section). Champs : `title_fr/en`, `subtitle_fr/en`,
   `image`. `_en` vide pour l'instant (contenu FR uniquement dans le
   prototype).
-- **poles** — **reconstruite le 2026-08-23** pour matcher le nouveau prototype
-  Figma de la page Programmes. **4 lignes** (le 5ᵉ pôle "Santé & Paramédical"
-  a été supprimé, absent du nouveau design) : `slug`, `name_fr`, `name_en`,
-  `icon`, `color`, `display_order` (1=Maritime, 2=Industriel, 3=Gestion,
-  4=Communication, ordre du prototype), `image` (photo héro du pôle),
-  `description_fr/en` (ancien champ, conservé), et les champs ajoutés pour
-  matcher le prototype : `subtitle_fr/en` (sous-titre court sous le nom du
-  pôle), `notes_fr/en` (bloc de notes/puces : régimes de cours, tutelle
-  académique, date limite d'admission), `deadline_fr/en` (ligne "Date limite
-  de recevabilité des dossiers : 16 septembre 2026" — identique sur les 4
-  pôles actuellement). Les champs `_en` sont tous `null` pour l'instant
-  (contenu FR uniquement dans le prototype).
-  **`featured_name_fr/en`/`featured_description_fr/en`/`tags_fr` retirés le
-  2026-08-27** : doublon confirmé de `pole_filieres` (le texte de la
-  filière phare de chaque pôle était copié-collé mot pour mot depuis sa
-  ligne `pole_filieres` correspondante, et `tags_fr` ne listait que les noms
-  des autres filières sans lien/description/image) — utiliser `pole_filieres`
-  filtré par `pole` pour tout ce qui concerne les filières d'un pôle, plus
-  ces champs sur `poles` lui-même.
-- **programs** — **reconstruite le 2026-08-23** pour matcher le "Référentiel
-  de nos formations" du nouveau prototype Figma (liste par cycle avec 6
-  onglets). Champs : `slug`, `name_fr`, `name_en`, `pole` (relation → poles,
-  **`null` pour toutes les nouvelles lignes** — le référentiel du prototype
-  n'associe pas ces filières à un pôle précis, c'est un catalogue académique
-  transversal par cycle), `cycle` (**nouveau champ**, valeurs :
-  `bts`/`hnd`/`licence`/`master`/`maritime`/`certifiante`), `level`, `is_hnd`,
-  `schedule` (anciens champs, conservés uniquement sur les lignes `cycle:
-  "hnd"` héritées), `seo_title_fr`, `seo_description_fr`, `cover_image`,
-  `status` (**filtrer `_eq: published`**).
-  Répartition actuelle (77 lignes) : `bts` 39, `certifiante` 18, `licence` 8,
-  `maritime` 6, `hnd` 6 (**anciennes lignes conservées telles quelles** —
-  le prototype Figma n'a que du texte de remplissage anglais pour l'onglet
-  HND, non utilisable), `master` 0 (**aucun contenu réel dans le prototype**
-  pour cet onglet — c'est une copie exacte du contenu Licence, donc rien n'a
-  été inséré ; à compléter quand le contenu réel sera fourni). Pour les
-  cycles `licence` et `certifiante`, chaque puce du prototype (ex. "Génie
-  Civil : Bâtiments ; Réseaux hydrauliques ... ; Voies et Ouvrages d'art.")
-  est stockée comme **une seule ligne `name_fr`** avec les sous-spécialités
-  séparées par `;` à l'intérieur du texte, plutôt que d'être éclatée en
-  lignes séparées.
-- **pole_filieres** — **nouvelle collection créée le 2026-08-25**, distincte
-  de `programs`/`poles`. Elle porte le contenu de la rangée de boutons
-  filtrables affichée sous l'en-tête de chaque section "Pôle X" de la page
-  Programmes (mécanique repérée dans le fichier Figma "Test 1", zone
-  node-id=4190-1478 — même principe de bande de variantes empilées que pour
-  le "Référentiel des formations"). Cliquer un bouton change le texte et la
-  photo affichés en dessous ; ce n'est **pas** le même contenu que le
-  catalogue plat `programs`. **33 lignes** : Maritime 10, Industriel 9,
-  Gestion 8, Communication 6. Champs : `pole` (relation → poles),
-  `display_order`, `code` (sigle court affiché sur le bouton non-sélectionné
-  quand il existe, ex. `GLPM`/`EMN`/`PM`/`AQ`/`SSPPM`/`SN` — `null` sinon),
-  `button_label_fr` (texte exact du bouton), `title_fr` (nom complet utilisé
-  en tête de la description), `kind` (`filiere` = description en
-  paragraphes, ou `certifiante` = intro + liste à puces groupée),
-  `description_fr` (JSON — liste de paragraphes, utilisé si `kind:
-  "filiere"`), `intro_fr` (texte d'intro des cartes `certifiante`, identique
-  sur les 3 pôles qui en ont une : "Formations courtes de 4 à 9 mois,
-  proposées en cours du jour et du soir, avec 75 % de pratique annoncé."),
-  `certifiante_groups` (JSON — liste de `{group_fr, items_fr}` ; `group_fr`
-  est `null` pour Maritime et Gestion qui n'ont qu'une liste plate, rempli
-  pour Industriel qui a 5 groupes nommés type "Génie Civil"), `image`
-  (photo dédiée par filière — **33/33 lignes ont une image, 2026-08-25**.
-  25 photos uploadées depuis `contenu_programmes/poles_images/` fourni par
-  l'utilisateur et liées sur 27 lignes (flyer "Formations certifiantes"
-  réutilisé sur les 3 pôles qui en ont une) ; identification faite par
-  inspection visuelle, les fichiers Figma exportés n'ayant aucun nom
-  exploitable ("Rectangle 65 (n).png"). Les 2 dernières lignes — Maritime
-  GLPM et Communication "Communication des Organisations & Communication
-  option Publicité" — réutilisent directement `poles.image` (le pôle avait
-  déjà cette photo, uploadée lors de la reconstruction `poles`/`programs`
-  du 2026-08-23, puisque GLPM et Communication des Organisations sont déjà
-  les filières "featured" de leur pôle respectif — même photo, pas de
-  nouvel upload),
-  `has_content` (booléen — `false` sur 4 lignes du pôle Communication qui
-  n'ont pas encore de contenu réel dans le prototype : "Communication option
-  Publicité", "E-Commerce et Marketing numérique", "Marketing Digital",
-  "Formations certifiantes digitales" — les boutons existent dans le design
-  mais le frontend doit soit les masquer, soit afficher un état "contenu à
-  venir"), `status`. Le bouton "Je me pré-inscris" visible sur chaque carte
-  Figma est un CTA générique identique partout — non stocké en base,
-  à coder en dur côté frontend.
+- **poles / programs / pole_filieres — SUPPRIMÉES de dev le 2026-08-28**,
+  à la demande explicite de l'utilisateur ("delete everything from page
+  programmes, collections and content, leave just programmes_hero"), après
+  confirmation que ni `admission_applications.desired_program` ni
+  `testimonials.program` (les deux seules FK externes vers `programs`)
+  n'avaient de valeur réelle en base (0 ligne sur 1, 0 ligne sur 2) — ces
+  deux champs ont donc été supprimés aussi. **Prod n'est pas touché : les
+  trois collections et tout leur contenu existent toujours en prod**,
+  intacts (`poles` 4 lignes, `programs` 77 lignes, `pole_filieres` 33
+  lignes) — voir plus bas pour ce qu'elles contenaient.
+
+  **Effet de bord découvert après coup, réparé le jour même :** le
+  carrousel de pôles de la page **Accueil** (section
+  `accueil_poles_highlight`) tirait ses cartes directement de
+  `poles`/`programs` — cassé sur dev pendant quelques heures ("Leave it
+  broken on dev for now" le temps de trouver la bonne suite), puis
+  reconstruit de façon autonome via la nouvelle collection
+  `Poles_Description` (voir son entrée plus haut) sur **dev et prod**.
+  `accueil_poles_highlight` ne dépend plus de `poles`/`programs` nulle
+  part, y compris sur prod où ces deux collections existent pourtant
+  toujours.
+
+  **`programs` (le catalogue à 77 lignes) a été reconstruite le jour même
+  puis abandonnée quelques heures plus tard au profit d'un modèle plus
+  simple** — voir l'entrée `programmes_referentiel` / `programmes_referentiel_tabs`
+  ci-dessous pour l'état final. `programs` n'existe plus du tout sur dev.
+
+  **Pour mémoire (contenu qui existait sur dev jusqu'au 2026-08-28, encore
+  présent sur prod, toujours à reconstruire — partie 2 de la page) :**
+  - `poles` — 4 lignes (Maritime, Industriel, Gestion, Communication) :
+    `slug`, `name_fr/en`, `icon`, `color`, `display_order`, `image`,
+    `description_fr/en`, `subtitle_fr/en`, `notes_fr/en`, `deadline_fr/en`.
+  - `pole_filieres` — 33 lignes (Maritime 10, Industriel 9, Gestion 8,
+    Communication 6) : la rangée de boutons filtrables sous l'en-tête de
+    chaque section "Pôle X" (mécanique Figma "Test 1", node-id=4190-1478).
+    Champs : `pole` (FK), `display_order`, `code`, `button_label_fr`,
+    `title_fr`, `kind` (`filiere`/`certifiante`), `description_fr` (JSON),
+    `intro_fr`, `certifiante_groups` (JSON), `image` (33/33 lignes),
+    `has_content`, `status`.
+
+- **`programmes_referentiel` / `programmes_referentiel_tabs`** —
+  **construites, corrigées puis poussées sur prod le 2026-08-28** (dev ET
+  prod), section "Référentiel de nos formations" de la page Programmes,
+  branchée à `pages_sections` sort 2 (après `programmes_hero`, avant le
+  bandeau CTA repoussé à sort 3).
+
+  **Premier essai (abandonné le jour même)** : un catalogue plat `programs`
+  à 77 lignes, une ligne par formation, en O2M sous `programmes_referentiel.items`.
+  Correction utilisateur directe : *"the referentiel de formation on figma
+  only has 6 tabs, and each tab has a descriptive text in form of bullet
+  list. what are you doing with 77 items???"* — confirmée en ouvrant le
+  champ `items` dans l'Admin UI : une liste brute de 77 ID numérotés sur 6
+  pages, inutilisable pour un éditeur de contenu. `programs` a été
+  supprimée après avoir transféré son contenu réel vers le modèle correct
+  ci-dessous — rien perdu, juste reformaté.
+
+  **Modèle final** : `programmes_referentiel` : `heading_fr/en` (=
+  "Référentiel de nos formations"), `subtitle_fr/en` (= "Consultez la
+  liste complète de nos formations pour chaque cycle."), **`image`**
+  (photo de fond derrière le heading/subtitle, **identique sur les 6
+  états d'onglet** dans Figma — étudiants en uniforme blanc/casquette
+  blanche assis à des pupitres, un encadrant debout) + **`items`** (O2M
+  vers `programmes_referentiel_tabs`, trié par `display_order`, sort=6
+  puis 7 — `image` avant `items` dans le formulaire, pas après : premier
+  essai avait l'ordre inversé, le champ semblait "manquant" en scrollant
+  seulement jusqu'au bout de la liste des 6 onglets). Un couple
+  `description_fr/en` ajouté par erreur pendant la mise au point (voir
+  changelog) a été retiré le jour même — pas de champ inutilisé.
+
+  **`image` : historique du fichier.** Réutilise `01 Hero.jpeg`
+  (uploadée le 2026-07-30) — trouvée déjà présente dans la bibliothèque
+  Directus après recherche visuelle (pas par mot-clé, le titre ne
+  contenait aucun indice). **19,7 Mo, très au-dessus du seuil WebP du
+  projet (>1 Mo → conversion + downscale)** — repéré après coup, converti
+  le 2026-08-28 : downscale à 1920px de large (ratio conservé, 7952×5304
+  → 1920×1281) + WebP qualité 82 → **179 Ko**. Le fichier original
+  JPEG n'a **pas** été supprimé sur dev : bloqué par une contrainte FK,
+  `accueil_reasons_items.image` (le carrousel "5 raisons" de la page
+  Accueil) réutilise ce même fichier sur dev — **et a donc le même
+  problème de poids (19,7 Mo), non corrigé, hors périmètre de cette
+  passe**. À traiter séparément si besoin. `programmes_referentiel.image`
+  pointe vers la version WebP — id différent par environnement (upload
+  séparé, dedupe par titre "Referentiel formations - hero (webp)") :
+  `4bb9d152-23cf-40a6-ad90-ac4ddfa4d485` sur dev,
+  `5b8ba231-4fd1-4b0e-ac4e-335f2d02ef8d` sur prod.
+
+  **`programmes_referentiel_tabs` : nom d'affichage corrigé le
+  2026-08-28.** Le titre de page auto-généré par Directus tronquait
+  "Programmes Referentiel Tabs" en **"Programmes Referentiel ..."** —
+  visuellement indiscernable de la collection parente `programmes_referentiel`
+  dans l'en-tête et le fil d'ariane (signalé par l'utilisateur, confirmé
+  à l'écran). Correction : `meta.translations` réglé sur "Referentiel --
+  Onglets" pour cette collection (appliqué dès la création sur prod,
+  pas besoin de le corriger après coup comme sur dev). Les deux
+  collections restent des soeurs normales dans le dossier "Programmes"
+  du menu — ce n'était pas un doublon de schéma, juste un intitulé
+  ambigu.
+  `programmes_referentiel_tabs` — **6 lignes, une par onglet du prototype
+  Figma** (`display_template` = `tab_label_fr`, donc l'Admin UI affiche
+  "BTS"/"HND"/etc. plutôt que des ID) : `display_order`, `cycle`
+  (`bts`/`hnd`/`licence`/`master`/`maritime`/`certifiante`), `tab_label_fr/en`,
+  et **`content_fr/en`** (WYSIWYG — la liste à puces complète de l'onglet,
+  une seule zone de texte éditable, pas une ligne par formation). Contenu
+  réel (repris de l'ancien `programs`, lui-même vérifié contre Figma le
+  2026-08-23) : `bts` 39 puces, `hnd` 6, `licence` 8 (format "catégorie :
+  sous-spécialités", ex. "Génie Mécanique & Productique : Technologie
+  Mécanique et Design ; Chaudronnerie Industrielle ; ..."), `maritime` 6,
+  `certifiante` 18 (5 avec le même format catégorie:sous-spécialités, 13
+  en titres simples), `master` — **`content_fr` à `null`, aucun contenu
+  réel fourni dans le prototype pour cet onglet** (texte de remplissage
+  anglais uniquement, non utilisable). Lecture anonyme imbriquée vérifiée :
+  `GET /items/programmes_referentiel?fields=*,items.*` → `200`.
 - **scholarships** — `name`, `amount`, `description`, `conditions`,
   `display_order`, `status` (**filtrer `_eq: published`**), + `image`,
   `cta_label_fr/en`, `cta_url` (ajoutés 2026-08-01 pour matcher les cartes
@@ -584,7 +653,7 @@ Résumé :
 - **documents** — `title`, `category` (`admission`/`filieres`/`reglement`/`autre`),
   `file`, `display_order`, `status` (**filtrer `_eq: published`**)
 
-Pour les collections avec un champ `status` (`programs`, `tuition_plans`,
+Pour les collections avec un champ `status` (`tuition_plans`,
 `scholarships`, `documents`), le filtre `published` est déjà imposé **côté
 serveur** par la permission Directus elle-même (voir
 `scripts/provision_public_read.py`) : une requête anonyme ne peut

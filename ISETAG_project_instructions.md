@@ -2418,4 +2418,253 @@ SMTP_FROM=ISETAG <noreply@isetag-univ.net>
         confirmation explicite ; conteneurs actifs sur le VPS réduits aux 3
         vrais services (`isetag-directus-prod`, `isetag-nginx-prod`,
         `isetag-postgres-prod`).
+- [x] **2026-08-28 — Nettoyage page Programmes (dev uniquement) : poles/programs/pole_filieres supprimées**
+  - Contexte : l'utilisateur, en consultant prod, ne comprenait pas la
+    structure de la page Programmes (`poles` vs `pole_filieres` vs
+    `programs`, ce dernier jamais découvert avant ce jour-là — pas branché
+    à `pages_sections`, un catalogue plat interrogé directement). Audit
+    complet fait sur prod puis dev (identiques) : `pages.programmes.sections`
+    n'avait que `programmes_hero` (sort 1) + `accueil_cta_banner` partagé
+    (sort 2) ; `poles` (4 lignes) et `pole_filieres` (33 lignes) n'ont
+    **jamais** été des blocs page-builder, ce sont des catalogues interrogés
+    directement par le frontend. Une collection vide `Programmes` (majuscule,
+    dossier de navigation Directus sans table) regroupait ces 3 collections
+    + `programmes_hero` dans le menu — signalée à tort comme "orpheline" au
+    premier passage, corrigée après avoir vu qu'elle groupait aussi
+    `programs` (77 lignes, jamais vu jusque-là — en fait le "Référentiel de
+    nos formations" reconstruit le 2026-08-23, jamais branché nulle part).
+  - Demande explicite de l'utilisateur : "delete everything from page
+    programmes, collections and content, leave just programmes_hero
+    collection and content" — **dev uniquement** (confirmé via question
+    explicite, prod non touché).
+  - Exécuté sur dev : `pages_sections` id=37 (`accueil_cta_banner` sur
+    Programmes) déwiré (pas supprimé — collection partagée avec
+    Accueil/Admissions/Actualités/Contact) ; collection `pole_filieres`
+    supprimée (aucune dépendance) ; collection `Programmes` (dossier vide)
+    supprimée ; `poles`/`programs` bloqués au premier essai par Postgres
+    (`other objects depend on it`) — dépendances trouvées :
+    `admission_applications.desired_program` → FK `programs.id`,
+    `testimonials.program` → FK `programs.id`. Vérifié qu'aucune ligne
+    réelle n'utilisait ces champs (0/1 et 0/2) avant suppression, sur
+    confirmation explicite ("Fully delete, drop the FK links too") : les 2
+    champs FK supprimés, puis `programs` et `poles` supprimés.
+  - **Effet de bord découvert après coup** : `accueil_poles_highlight`
+    (carrousel de pôles de la page Accueil) tirait ses cartes directement de
+    `poles`/`programs`. Cette section n'a donc plus de source de données sur
+    dev — signalé à l'utilisateur, qui a choisi de **laisser cassé pour
+    l'instant** ("Leave it broken on dev for now"), reconstruction à faire
+    séparément plus tard. Prod non affecté (toutes les collections/contenu
+    intacts côté prod).
+  - État final dev : page Programmes = `programmes_hero` seul. Docs
+    (`docs/frontend-api-guide.md`) mis à jour avec le contenu qui existait
+    (pour référence/reconstruction future) et l'état actuel.
+- [x] **2026-08-28 — Reconstruction autonome du carrousel de pôles Accueil (dev + prod)**
+  - Suite au nettoyage de la page Programmes (entrée précédente), l'effet de
+    bord (carrousel `accueil_poles_highlight` cassé sur dev, plus de source
+    de données) a été réparé le jour même.
+  - Créé `Poles_Description` (groupe "Accueil & Global") sur dev puis prod,
+    demande explicite utilisateur, champs : `display_order`, `title_fr/en`,
+    `description_fr/en`, `image_1`/`image_2`, `button_1_label_fr/en` +
+    `button_1_link`, `button_2_label_fr/en` + `button_2_link`.
+  - Peuplé avec le contenu réel des anciennes lignes `poles` (titres,
+    descriptions — repris mot pour mot) et de vraies photos institutionnelles
+    retrouvées orphelines dans le dossier Public de dev après la suppression
+    de `poles`/`programs` (2 photos par pôle, identifiées par nom de fichier
+    **puis vérifiées visuellement une par une**, pas seulement supposées) :
+    Maritime, Industriel, Gestion, Communication & Numérique.
+  - Bouton 1 ("Je me pré-inscris") réutilise l'URL réelle déjà utilisée par
+    `accueil_hero.cta1_url` (`/admissions#pre-inscription`). Bouton 2
+    ("Découvrir le Pôle X") pointe vers `/programmes#<slug-du-pôle>` — **ces
+    ancres n'existent pas encore réellement sur la page Programmes**
+    (actuellement hero-only), à confirmer avec l'équipe frontend.
+  - Branché à `accueil_poles_highlight` via une vraie relation O2M
+    (`accueil_poles_highlight.cards` → `Poles_Description`, triée par
+    `display_order`), en copiant le pattern déjà établi
+    `accueil_reasons.items` → `accueil_reasons_items` — plutôt que de
+    reproduire l'ancien pattern "collection interrogée séparément, non
+    branchée nulle part" qui avait causé toute la confusion initiale sur
+    `programs`. Un seul appel API renvoie désormais le titre + les 4 cartes.
+  - **Poussé sur prod le jour même** (contrairement au nettoyage
+    Programmes qui reste dev-only) : collection, permission de lecture
+    publique, 8 images, 4 lignes de contenu, relation O2M — tout créé
+    séparément côté prod (nouveaux UUID de fichiers, mêmes IDs de lignes
+    1-4 par coïncidence de l'ordre d'insertion). Vérifié en conditions
+    réelles : lecture anonyme imbriquée (`?fields=*,cards.*`) et accès aux
+    2×4 images, tous `200` sur prod. `poles`/`programs`/`pole_filieres`
+    restent intacts sur prod (non touchés) — `accueil_poles_highlight` n'en
+    dépend simplement plus, sur aucun des deux environnements.
+- [x] **2026-08-28 — Section "Référentiel de nos formations" reconstruite sur la page Programmes (dev uniquement)**
+  - Contenu vérifié dans Figma ("Test 1", page ISETAG, groupe "Referentiel
+    des formations") avant reconstruction : titre réel "Référentiel de nos
+    formations", sous-titre "Consultez la liste complète de nos formations
+    pour chaque cycle.", 6 onglets **BTS / HND / Licence / Master /
+    Maritime / Formations Certifiantes** — confirme exactement les valeurs
+    déjà utilisées par l'ancien champ `programs.cycle`.
+  - Contenu (77 lignes) repris tel quel de prod (jamais modifié, toujours
+    intact là-bas) plutôt que re-saisi : aucune perte, juste une
+    reconstruction du schéma + branchement sur dev.
+  - Créé `programmes_referentiel` (groupe "Programmes") : heading/subtitle
+    + `items` (O2M natif vers `programs`), même pattern que
+    `accueil_reasons.items` et `Poles_Description` (entrée précédente) —
+    plutôt que de reproduire l'ancien anti-pattern "catalogue interrogé à
+    part, jamais branché nulle part" qui avait causé toute la confusion
+    initiale sur cette page.
+  - Recréé `programs` (77 lignes, mêmes données) **sans le champ `pole`**
+    (FK vers `poles`, toujours `null` sauf 6 lignes `hnd` héritées jamais
+    utilisées dans le vrai design — simplification délibérée, plus de
+    dépendance vers `poles`).
+  - Branché à `pages_sections` de la page Programmes, sort 2 (après
+    `programmes_hero`, sort 1) — `programmes_referentiel` ajoutée à
+    l'allowlist M2A `pages_sections.item` via `/relations` (pas `/fields`,
+    gotcha connu). Vérifié en lecture anonyme : requête imbriquée complète
+    (`pages?...&sections.item:programmes_referentiel.*`) et filtre par
+    cycle (`programs?filter[cycle][_eq]=maritime`) tous les deux `200`,
+    contenu réel confirmé (ex. 6 filières maritimes correctes).
+  - **Dev uniquement, pas encore poussé sur prod.** Prod garde son
+    ancienne `programs` (avec `pole`, non branchée) intacte pour l'instant.
+  - Reste à faire pour la page Programmes : partie 2 (les 4 pôles + leurs
+    filières, `poles`/`pole_filieres` supprimées le 2026-08-28) et le
+    bandeau CTA final (à revérifier/rebrancher après ces deux
+    reconstructions).
+- [x] **2026-08-28 — Correction : texte descriptif ajouté aux items du Référentiel (dev)**
+  - Correction utilisateur suite à l'entrée précédente : "everything that
+    belong to referentiel de nos formations must sit in that collection,
+    but i don't see the descriptive text in each items, add it there".
+  - Vérifié dans Figma quelles lignes ont réellement un texte descriptif
+    distinct plutôt que de supposer : sur les 6 onglets, seuls `licence`
+    (8/8 lignes) et une partie de `certifiante` (5/18) ont un format
+    "catégorie : sous-spécialités" dans le prototype — les 64 autres
+    lignes (`bts` 39, `hnd` 6, `maritime` 6, `certifiante` 13) sont de
+    simples titres sans texte descriptif dans le design source.
+  - Ajouté `description_fr`/`description_en` à `programs`. Pour les 13
+    lignes concernées, `name_fr` scindé au niveau du `:` : la catégorie
+    reste `name_fr`, les sous-spécialités deviennent `description_fr`
+    (contenu réel, juste redistribué — rien d'inventé). Les 64 autres
+    lignes gardent `description_fr` à `null`, délibérément (pas de texte
+    descriptif à y mettre sans fabriquer du contenu).
+  - Vérifié : lecture anonyme filtrée par cycle avec `description_fr`
+    renvoie `200` et le contenu réel attendu.
+- [x] **2026-08-28 — Correction majeure : Référentiel de nos formations reconstruit en 6 onglets (dev)**
+  - Le modèle `programs` à 77 lignes (une par formation) était une
+    mauvaise lecture du prototype Figma, corrigée par l'utilisateur en
+    ouvrant directement l'Admin UI : *"the referentiel de formation on
+    figma only has 6 tabs, and each tab has a descriptive text in form of
+    bullet list. what are you doing with 77 items???"*. Confirmé de visu :
+    le champ `items` affichait 77 ID numériques bruts sur 6 pages,
+    inutilisable pour un éditeur de contenu.
+  - Reconstruit correctement : `programmes_referentiel_tabs`, **6 lignes,
+    une par onglet** (BTS/HND/Licence/Master/Maritime/Formations
+    Certifiantes), chacune avec `content_fr` (WYSIWYG) contenant la liste
+    à puces complète de l'onglet en une seule zone de texte. Contenu réel
+    transféré depuis l'ancien `programs` (rien réécrit ni inventé, juste
+    reformaté), qui a ensuite été supprimé. Vérifié dans l'Admin UI :
+    l'éditeur riche affiche une vraie liste à puces propre, identique à ce
+    qui est visible dans Figma.
+  - `display_template` réglé sur `tab_label_fr` pour que l'Admin UI
+    affiche "BTS"/"HND"/etc. au lieu d'ID.
+  - Erreur intermédiaire à noter : après la demande initiale ("i don't see
+    the descriptive text in each items, add it there"), une correction
+    utilisateur ambiguë ("who sent you to programs??") a été mal comprise
+    comme "ajoute la description sur `programmes_referentiel` lui-même"
+    plutôt que sur ses items — deux champs `description_fr/en` vides ont
+    été ajoutés à `programmes_referentiel` par erreur avant cette
+    clarification finale. Laissés en place (vides, inoffensifs) plutôt que
+    retirés dans la précipitation.
+  - Toujours dev uniquement, pas poussé sur prod.
+- [x] **2026-08-28 — Image de fond ajoutée à programmes_referentiel (dev)**
+  - Correction utilisateur : "the programmes referentiel collection is
+    supposed to have an image behind the heading and the subtitle but
+    there is no field image there".
+  - Vérifié dans Figma avant d'ajouter le champ : une photo identique
+    derrière le heading/subtitle sur les 6 états d'onglet (étudiants en
+    uniforme blanc/casquette blanche à des pupitres, encadrant debout).
+    Champ `image` (uuid, relation `directus_files`) ajouté à
+    `programmes_referentiel`.
+  - Utilisateur a précisé que l'image existait déjà dans la bibliothèque
+    Directus — recherchée par mots-clés (atelier/labo/classe/salle,
+    infrastructure d'apprentissage, enseignant) sans succès, puis trouvée
+    en vérifiant visuellement les candidats restants : `01 Hero.jpeg`
+    (`06c3bdcb-a09c-488b-ad48-ce845a1b367b`, uploadée le 2026-07-30) —
+    correspond exactement (uniforme blanc, casquettes blanches, pupitres,
+    encadrant debout). Réutilisée telle quelle, pas de nouvel upload.
+    Vérifié : lecture anonyme de l'asset et de la requête imbriquée
+    `programmes_referentiel?fields=*,items.id`, toutes les deux `200`.
+  - Toujours dev uniquement, pas poussé sur prod.
+- [x] **2026-08-28 — Deux corrections utilisateur sur programmes_referentiel (dev)**
+  1. **Image pas convertie en WebP** : la règle projet (>1 Mo → WebP +
+     downscale) n'avait pas été appliquée en réutilisant `01 Hero.jpeg`
+     (19,7 Mo, 7952×5304). Corrigé : téléchargée, downscale à 1920px de
+     large, reconvertie en WebP qualité 82 (→ 179 Ko), reuploadée,
+     `programmes_referentiel.image` repointé dessus. Suppression de
+     l'original refusée par Postgres (contrainte FK) : découverte que
+     `accueil_reasons_items.image` (carrousel "5 raisons", page Accueil)
+     réutilise le même fichier 19,7 Mo — même problème, **pas corrigé,
+     hors périmètre de cette passe**, à traiter séparément.
+  2. **"Second programme referentiel collection juste à côté"** : pas un
+     doublon de schéma (vérifié : une seule `programmes_referentiel`),
+     mais un vrai bug de lisibilité confirmé à l'écran — le titre de page
+     Directus tronquait "Programmes Referentiel Tabs" en "Programmes
+     Referentiel ...", indiscernable du parent. Corrigé via
+     `meta.translations` sur `programmes_referentiel_tabs` → "Referentiel
+     -- Onglets", maintenant clairement distinct dans le menu et l'en-tête.
+  - Accessoirement, l'ordre des champs `image`/`items` sur
+    `programmes_referentiel` a aussi été corrigé (image avant items,
+    c'était l'inverse) — c'est ce qui avait fait croire à une image
+    manquante juste avant cette conversation.
+  - Toujours dev uniquement, pas poussé sur prod.
+- [x] **2026-08-28 — Référentiel de nos formations poussé sur prod**
+  - Collections `programmes_referentiel` (heading/subtitle/image/items) et
+    `programmes_referentiel_tabs` (6 lignes) créées sur prod avec le
+    schéma final directement — ordre des champs correct (`image` avant
+    `items`) et `meta.translations` ("Referentiel -- Onglets") réglés dès
+    la création, sans avoir besoin des deux corrections après-coup faites
+    sur dev.
+  - Image WebP (179 Ko) copiée de dev vers le dossier Public de prod (id
+    différent par environnement : `4bb9d152...` sur dev,
+    `5b8ba231...` sur prod).
+  - Contenu des 6 onglets repris tel quel depuis dev (aucune réécriture).
+  - Branché à `pages_sections` de la page Programmes : `programmes_hero`
+    (sort 1, inchangé) → `programmes_referentiel` (sort 2, nouveau) →
+    `accueil_cta_banner` (repoussé de sort 2 à sort 3). Ajouté à
+    l'allowlist M2A `pages_sections.item` via `/relations`.
+  - Vérifié en lecture anonyme sur prod : requête imbriquée de la page
+    Programmes, asset de l'image, et `programmes_referentiel_tabs`
+    filtrée par cycle (`maritime`) — toutes `200`, contenu réel confirmé
+    (6 filières maritimes correctes).
+  - Non touché sur prod : `poles`/`pole_filieres`/`programs` (l'ancien,
+    77 lignes) restent intacts, sans rapport avec cette section.
+- [x] **2026-08-28 — Relation image manquante corrigée sur Poles_Description (dev + prod)**
+  - Signalé par l'utilisateur : "poles Description collection in Accueil
+    & Global has no image still now".
+  - Cause : `image_1`/`image_2` créés (lors de la construction initiale de
+    `Poles_Description`, plus tôt le même jour) sans l'appel
+    `POST /relations` explicite vers `directus_files` — gotcha déjà connu
+    et documenté en mémoire projet, raté sur cette collection précise.
+    Les valeurs étaient correctes en base et les assets servaient bien en
+    anonyme (`/assets/<id>` → 200), mais l'Admin UI ne pouvait pas
+    résoudre la relation pour afficher l'image dans le formulaire.
+  - Corrigé sur dev puis vérifié identique sur prod (même gap présent) :
+    `POST /relations` pour `image_1` et `image_2` sur les deux
+    environnements. Vérifié visuellement dans l'Admin UI dev après coup —
+    l'image s'affiche correctement.
+- [x] **2026-08-28 — Champ tags_fr ajouté à Poles_Description (dev)**
+  - Signalé par l'utilisateur : petite ligne de texte sous les 2 images de
+    chaque carte pôle, visible dans Figma, absente du schéma.
+  - Vérifié à l'écran avant de construire quoi que ce soit (l'utilisateur
+    a navigué lui-même dans Figma, capture par pôle) : les 4 pôles
+    (Maritime, Industriel, Gestion, Communication) affichent le **même
+    texte mot pour mot** — "TRANSPORT MARITIME | PORTUAIRE | SHIPPING
+    MANAGEMENT | DOUANE ET TRANSIT | LOGISTIQUE" — y compris sur des
+    pôles sans rapport avec le maritime. Signalé comme probable défaut de
+    prototype (composant copié-collé non personnalisé) avant d'agir.
+  - Décision utilisateur explicite : reprendre le texte tel quel plutôt
+    que le laisser vide ou le corriger unilatéralement.
+  - Ajouté `tags_fr`/`tags_en` à `Poles_Description`, positionnés juste
+    après `image_1`/`image_2` (ordre des champs pensé dès cette fois,
+    leçon de l'incident précédent). Les 4 lignes mises à jour avec le
+    texte identique. Vérifié : lecture anonyme `200`.
+  - **Poussé sur prod le jour même** : même ordre de champs reproduit
+    (bump des boutons +2, `tags_fr`/`tags_en` insérés juste après
+    `image_2`), 4 lignes mises à jour avec le texte identique. Vérifié :
+    lecture anonyme sur prod `200`.
 - [ ] Composants Angular (Home, Formations, Admissions) — hors périmètre, pris en charge par un autre développeur

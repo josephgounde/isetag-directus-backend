@@ -43,8 +43,11 @@ services:
       IP_TRUST_PROXY: "true"
       STORAGE_LOCATIONS: local
       STORAGE_LOCAL_ROOT: /directus/uploads
-      CACHE_ENABLED: "true"
-      CACHE_STORE: memory
+      # Disabled: same PM2-cluster + in-memory-cache combo that caused prod's
+      # schema-cache flapping (see docker/prod/docker-compose.yml) -- confirmed
+      # present here too (2026-08-28). Schema/permission writes are now
+      # reflected immediately with no propagation delay.
+      CACHE_ENABLED: "false"
       CORS_ENABLED: "true"
       CORS_ORIGIN: "http://localhost:4200,http://localhost:4000"
       EMAIL_TRANSPORT: smtp
